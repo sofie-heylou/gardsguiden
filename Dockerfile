@@ -52,8 +52,6 @@ RUN addgroup --system --gid 1001 nodejs \
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 # Static assets (CSS, JS chunks) — not included in standalone
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-# Public directory (favicon, images, etc.)
-COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
 # ── Seed database ──────────────────────────────────────────────────────────
 # Bake the current database into the image so the app works out-of-the-box
