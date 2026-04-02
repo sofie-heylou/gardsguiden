@@ -43,33 +43,27 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
-# Non-root user for container security
-RUN addgroup --system --gid 1001 nodejs \
- && adduser  --system --uid 1001 nextjs
-
 # ── Application files ──────────────────────────────────────────────────────
 # Standalone server + its traced node_modules (includes better-sqlite3)
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder /app/.next/standalone ./
 # Static assets (CSS, JS chunks) — not included in standalone
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder /app/.next/static ./.next/static
 
 # ── Seed database ──────────────────────────────────────────────────────────
 # Bake the current database into the image so the app works out-of-the-box
 # even before a Railway volume is attached.  The entrypoint copies this seed
 # to /data/gardsguiden.db if no database exists there yet.
 RUN mkdir -p /app/seed
-COPY --from=builder --chown=nextjs:nodejs /app/data/gardsguiden.db /app/seed/gardsguiden.db
+COPY --from=builder /app/data/gardsguiden.db /app/seed/gardsguiden.db
 
 # ── Persistent data directory ──────────────────────────────────────────────
 # Mount a Railway volume at /data to persist the SQLite database across
 # deployments.  Set DB_PATH=/data/gardsguiden.db in Railway's Variables.
-RUN mkdir -p /data && chown nextjs:nodejs /data
+RUN mkdir -p /data
 
 # ── Entrypoint ─────────────────────────────────────────────────────────────
-COPY --chown=nextjs:nodejs docker-entrypoint.sh ./
+COPY docker-entrypoint.sh ./
 RUN chmod +x docker-entrypoint.sh
-
-USER nextjs
 
 EXPOSE 3000
 
