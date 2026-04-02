@@ -1,0 +1,26 @@
+# Next.js
+.next/
+out/
+
+# Dependencies
+node_modules/
+
+# Environment
+.env.local
+.env*.local
+
+# Database (exclude SQLite files except the seeded production DB)
+*.sqlite
+*.db
+*.db-shm
+*.db-wal
+!data/gardsguiden.db
+
+# Scraper intermediate / temp files
+data/tmp/
+
+# OS
+.DS_Store
+
+# Debug
+npm-debug.log*

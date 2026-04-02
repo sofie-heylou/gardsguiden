@@ -1,0 +1,20 @@
+[build]
+  builder = "dockerfile"
+  dockerfilePath = "Dockerfile"
+
+[deploy]
+  healthcheckPath = "/api/health"
+  healthcheckTimeout = 30
+  restartPolicyType = "ON_FAILURE"
+  restartPolicyMaxRetries = 10
+
+# ── Required environment variables ────────────────────────────────────────────
+# Set these in the Railway dashboard under Variables:
+#
+#   NEXT_PUBLIC_MAPBOX_TOKEN   your Mapbox public token
+#   DB_PATH                    /data/gardsguiden.db
+#   NODE_ENV                   production
+#
+# ── Volume ────────────────────────────────────────────────────────────────────
+# Create a Volume in the Railway dashboard and mount it at /data.
+# The app will seed /data/gardsguiden.db from the image on first start.

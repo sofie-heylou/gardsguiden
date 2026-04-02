@@ -1,0 +1,37 @@
+# Build output — rebuilt inside Docker
+.next/
+node_modules/
+
+# Scrapers — local-only tools, never deployed
+scripts/
+
+# Scraper intermediate files
+data/tmp/
+
+# Secrets — never bake into the image
+.env.local
+.env*.local
+
+# Git
+.git/
+.gitignore
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Docker files themselves
+Dockerfile
+.dockerignore
+
+# Logs
+*.log
+npm-debug.log*
+
+# Test / analysis artifacts
+.next/analyze/
+coverage/

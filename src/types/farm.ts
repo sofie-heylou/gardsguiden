@@ -1,0 +1,21 @@
+export interface Farm {
+  id: string;
+  name: string;
+  description: string;
+  address: string;
+  kommun: string;
+  lan: "Stockholm" | "Uppsala" | "Västmanland" | "Södermanland";
+  lat: number;
+  lng: number;
+  website: string;
+  phone: string;
+  email: string;
+  products: string[];
+  onSiteSales: boolean;
+  tastingRoom: boolean;
+  gardsförsäljningLicense: boolean;
+  isArchipelago: boolean;
+  openingHours: string;
+  season: string;
+  source: string;
+}
