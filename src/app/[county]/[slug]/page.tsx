@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import Link from "next/link";
 import {
   ShoppingBag,
   GlassWater,
@@ -255,6 +256,16 @@ export default async function FarmDetailPage({ params }: Props) {
             <Navigation size={16} />
             Vägbeskrivning
           </a>
+
+          <p className="text-center text-[11px] text-stone-400">
+            Stämmer inte informationen?{" "}
+            <Link
+              href={`/ta-bort/${farm.id}`}
+              className="underline hover:text-stone-600 transition-colors"
+            >
+              Kontakta oss
+            </Link>
+          </p>
         </div>
       </div>
     </>

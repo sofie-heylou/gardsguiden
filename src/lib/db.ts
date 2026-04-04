@@ -86,15 +86,30 @@ function initSchema(db: Database.Database): void {
       id                TEXT PRIMARY KEY,
       farm_id           TEXT NOT NULL REFERENCES farms(id) ON DELETE CASCADE,
       user_id           TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      status            TEXT NOT NULL DEFAULT 'pending',   -- pending | verified | rejected
-      verification_code TEXT NOT NULL,                     -- SHA-256 hex of the 6-digit code
+      status            TEXT NOT NULL DEFAULT 'pending',          -- pending | email_verified | rejected
+      payment_status    TEXT NOT NULL DEFAULT 'unpaid',           -- unpaid | pending_payment | confirmed
+      verification_code TEXT NOT NULL,                            -- SHA-256 hex of the 6-digit code
       created_at        TEXT NOT NULL DEFAULT (datetime('now')),
       verified_at       TEXT
     );
 
-    CREATE INDEX IF NOT EXISTS idx_claims_farm   ON farm_claims(farm_id);
-    CREATE INDEX IF NOT EXISTS idx_claims_user   ON farm_claims(user_id);
-    CREATE INDEX IF NOT EXISTS idx_claims_status ON farm_claims(status);
+    CREATE INDEX IF NOT EXISTS idx_claims_farm    ON farm_claims(farm_id);
+    CREATE INDEX IF NOT EXISTS idx_claims_user    ON farm_claims(user_id);
+    CREATE INDEX IF NOT EXISTS idx_claims_status  ON farm_claims(status);
+    CREATE INDEX IF NOT EXISTS idx_claims_payment ON farm_claims(payment_status);
+
+    -- ── Removal requests ───────────────────────────────────────────────────────
+    CREATE TABLE IF NOT EXISTS farm_removal_requests (
+      id         TEXT PRIMARY KEY,
+      farm_id    TEXT NOT NULL REFERENCES farms(id) ON DELETE CASCADE,
+      email      TEXT NOT NULL,
+      reason     TEXT,
+      status     TEXT NOT NULL DEFAULT 'pending',   -- pending | completed
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_removals_farm   ON farm_removal_requests(farm_id);
+    CREATE INDEX IF NOT EXISTS idx_removals_status ON farm_removal_requests(status);
 
     -- ── Edit audit log ─────────────────────────────────────────────────────────
     CREATE TABLE IF NOT EXISTS farm_edits (
@@ -120,5 +135,8 @@ function initSchema(db: Database.Database): void {
   }
   if (!columnExists(db, "farms", "boost_expires_at")) {
     db.exec(`ALTER TABLE farms ADD COLUMN boost_expires_at TEXT`);
+  }
+  if (!columnExists(db, "farm_claims", "payment_status")) {
+    db.exec(`ALTER TABLE farm_claims ADD COLUMN payment_status TEXT NOT NULL DEFAULT 'unpaid'`);
   }
 }

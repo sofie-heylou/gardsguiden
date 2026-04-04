@@ -63,7 +63,8 @@ export async function POST(req: NextRequest) {
   // Consume the code (delete it so it can't be reused)
   db.prepare("DELETE FROM auth_codes WHERE id = ?").run(authCode.id);
 
-  // If there's a matching pending farm_claim with the same code, verify it too
+  // If there's a matching pending farm_claim with the same code, mark email verified
+  // (payment must be confirmed separately before claimed_by is set on the farm)
   const claim = db.prepare(`
     SELECT id, farm_id FROM farm_claims
     WHERE user_id = ? AND status = 'pending'
@@ -73,14 +74,10 @@ export async function POST(req: NextRequest) {
 
   if (claim) {
     db.prepare(`
-      UPDATE farm_claims SET status = 'verified', verified_at = datetime('now')
+      UPDATE farm_claims
+      SET status = 'email_verified', verified_at = datetime('now')
       WHERE id = ?
     `).run(claim.id);
-
-    db.prepare(`
-      UPDATE farms SET claimed_by = ?
-      WHERE id = ? AND (claimed_by IS NULL OR claimed_by = ?)
-    `).run(user.id, claim.farm_id, user.id);
   }
 
   // Issue session
@@ -89,6 +86,7 @@ export async function POST(req: NextRequest) {
   const response = NextResponse.json({
     ok: true,
     user: { id: user.id, email: user.email, name: user.name, phone: user.phone },
+    ...(claim ? { claim_id: claim.id, farm_id: claim.farm_id } : {}),
   });
 
   response.cookies.set(COOKIE_NAME, token, {

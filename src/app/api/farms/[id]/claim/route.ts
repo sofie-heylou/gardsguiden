@@ -25,7 +25,7 @@ export async function POST(
     return NextResponse.json({ error: "Gården hittades inte" }, { status: 404 });
   }
 
-  // Already claimed by someone else
+  // Already claimed by someone else (confirmed)
   if (farm.claimed_by && farm.claimed_by !== user.id) {
     return NextResponse.json(
       { error: "Den här gården är redan registrerad av någon annan" },
@@ -33,14 +33,23 @@ export async function POST(
     );
   }
 
-  // Claim (idempotent if already owned by this user)
-  db.prepare("UPDATE farms SET claimed_by = ? WHERE id = ?").run(user.id, farm.id);
+  // Check if user already has a pending/email_verified claim for this farm
+  const existing = db.prepare(`
+    SELECT id FROM farm_claims
+    WHERE user_id = ? AND farm_id = ? AND payment_status IN ('unpaid', 'pending_payment')
+    ORDER BY created_at DESC LIMIT 1
+  `).get(user.id, farm.id) as { id: string } | undefined;
 
-  // Record in farm_claims audit log
+  if (existing) {
+    return NextResponse.json({ ok: true, claim_id: existing.id });
+  }
+
+  // Create a new claim (email already verified via active session)
+  const claimId = generateId();
   db.prepare(`
-    INSERT INTO farm_claims (id, farm_id, user_id, verification_code, status, verified_at)
-    VALUES (?, ?, ?, '', 'verified', datetime('now'))
-  `).run(generateId(), farm.id, user.id);
+    INSERT INTO farm_claims (id, farm_id, user_id, verification_code, status, payment_status, verified_at)
+    VALUES (?, ?, ?, '', 'email_verified', 'unpaid', datetime('now'))
+  `).run(claimId, farm.id, user.id);
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, claim_id: claimId });
 }
