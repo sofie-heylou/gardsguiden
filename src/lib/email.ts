@@ -6,7 +6,7 @@
  */
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const FROM = "Gårdsguiden <onboarding@resend.dev>";
+const FROM = "Gårdsguiden <noreply@gardsguiden.se>";
 export const ADMIN_EMAIL = "hej@gardsguiden.se";
 
 export interface EmailPayload {
