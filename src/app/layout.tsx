@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Lora } from "next/font/google";
 import Header from "../components/Header";
 import BottomNav from "../components/BottomNav";
+import SiteFooter from "../components/SiteFooter";
 import { AuthProvider } from "../components/AuthProvider";
 import { SITE_URL } from "../lib/site";
 import "./globals.css";
@@ -77,6 +78,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AuthProvider>
           <Header />
           <main className="flex-1 overflow-hidden">{children}</main>
+          <SiteFooter />
           <BottomNav />
         </AuthProvider>
       </body>

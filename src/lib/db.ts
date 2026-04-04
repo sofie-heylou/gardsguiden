@@ -125,6 +125,15 @@ function initSchema(db: Database.Database): void {
     CREATE INDEX IF NOT EXISTS idx_submissions_status  ON farm_submissions(status);
     CREATE INDEX IF NOT EXISTS idx_submissions_user    ON farm_submissions(user_id);
 
+    -- ── Contact messages ───────────────────────────────────────────────────────
+    CREATE TABLE IF NOT EXISTS contact_messages (
+      id         TEXT PRIMARY KEY,
+      name       TEXT NOT NULL,
+      email      TEXT NOT NULL,
+      message    TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
     -- ── Removal requests ───────────────────────────────────────────────────────
     CREATE TABLE IF NOT EXISTS farm_removal_requests (
       id         TEXT PRIMARY KEY,
