@@ -33,10 +33,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Ange ett meddelande" }, { status: 400 });
   }
 
-  const db = getDb();
-  db.prepare(
-    "INSERT INTO contact_messages (id, name, email, message) VALUES (?, ?, ?, ?)"
-  ).run(generateId(), name.trim(), email.trim(), message.trim());
+  let db;
+  try {
+    db = getDb();
+    db.prepare(
+      "INSERT INTO contact_messages (id, name, email, message) VALUES (?, ?, ?, ?)"
+    ).run(generateId(), name.trim(), email.trim(), message.trim());
+  } catch (err) {
+    console.error("[contact] DB error:", err);
+    return NextResponse.json({ error: "Databasfel – försök igen" }, { status: 500 });
+  }
 
   sendEmail({
     to: ADMIN_EMAIL,
