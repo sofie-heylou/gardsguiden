@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import type { Farm } from "../types/farm";
 import { CATEGORIES, farmMatchesCategory } from "../lib/categories";
+import { farmPath } from "../lib/counties";
 import { useGeolocation } from "../hooks/useGeolocation";
 
 type SortKey = "name" | "lan" | "distance";
@@ -239,7 +240,7 @@ export default function FarmList({ initialFarms }: Props) {
               return (
                 <li key={farm.id}>
                   <Link
-                    href={`/gard/${farm.id}`}
+                    href={farmPath(farm)}
                     className="block bg-white rounded-xl border border-stone-100 shadow-sm hover:shadow-md active:shadow-none transition-shadow px-4 py-4"
                   >
                     {/* Name + distance */}

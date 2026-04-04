@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getAllFarms } from "../lib/farms";
+import { COUNTY_SLUGS, farmPath } from "../lib/counties";
 import { SITE_URL } from "../lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -21,12 +22,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
+  const countyRoutes: MetadataRoute.Sitemap = COUNTY_SLUGS.map((slug) => ({
+    url: `${SITE_URL}/${slug}`,
+    lastModified: now,
+    changeFrequency: "weekly",
+    priority: 0.9,
+  }));
+
   const farmRoutes: MetadataRoute.Sitemap = farms.map((farm) => ({
-    url: `${SITE_URL}/gard/${farm.id}`,
+    url: `${SITE_URL}${farmPath(farm)}`,
     lastModified: now,
     changeFrequency: "monthly",
     priority: 0.6,
   }));
 
-  return [...staticRoutes, ...farmRoutes];
+  return [...staticRoutes, ...countyRoutes, ...farmRoutes];
 }

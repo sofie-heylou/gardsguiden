@@ -156,10 +156,12 @@ src/
   app/
     page.tsx              # Kartvy (dynamic import, ssr:false)
     lista/page.tsx        # Listvy (SSR, farms skickas som prop)
-    gard/[id]/page.tsx    # Gårdsdetalj (SSR, JSON-LD strukturerade data)
+    gard/[id]/page.tsx    # Legacy redirect → /[county]/[slug] (308 permanent)
+    [county]/page.tsx     # Länslista: /stockholm, /uppsala, /vastmanland, /sodermanland
+    [county]/[slug]/page.tsx  # Gårdsdetalj med JSON-LD (SSG, 161 sidor)
     api/farms/route.ts    # REST-endpoint — stöder ?lan, ?category, ?q, proximity
     api/health/route.ts   # Hälsokontroll — returnerar { status, farms }
-    sitemap.ts            # Genererar /sitemap.xml automatiskt (163 URLs)
+    sitemap.ts            # Genererar /sitemap.xml automatiskt (167 URLs)
     robots.ts             # /robots.txt
     opengraph-image.tsx   # 1200×630 OG-bild via ImageResponse
   components/

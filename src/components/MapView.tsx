@@ -10,6 +10,7 @@ import { LocateFixed, SlidersHorizontal, X, Loader2, AlertTriangle, ArrowRight, 
 import Link from "next/link";
 import type { Farm } from "../types/farm";
 import { CATEGORIES, farmMatchesCategory } from "../lib/categories";
+import { farmPath } from "../lib/counties";
 import { useGeolocation } from "../hooks/useGeolocation";
 
 const TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
@@ -283,7 +284,7 @@ export default function MapView() {
                   {selected.tastingRoom && <span className="flex items-center gap-1"><GlassWater size={10} />Provsmakning</span>}
                 </div>
               )}
-              <Link href={`/gard/${selected.id}`}
+              <Link href={farmPath(selected)}
                 className="flex items-center gap-1 text-[12px] font-medium text-stone-700 hover:text-stone-900 transition-colors outline-none focus:outline-none">
                 Visa detaljer
                 <ArrowRight size={11} />
