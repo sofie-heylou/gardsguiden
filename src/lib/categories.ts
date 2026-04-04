@@ -17,7 +17,7 @@ export const CATEGORIES: Category[] = [
     slug: "mejeriprodukter",
     label: "Mejeriprodukter",
     emoji: "🥛",
-    products: ["mejeri"],
+    products: ["mejeri", "ost", "mjölk"],
   },
   {
     slug: "agg",
@@ -47,13 +47,13 @@ export const CATEGORIES: Category[] = [
     slug: "brod-bageri",
     label: "Bröd & bageri",
     emoji: "🍞",
-    products: ["bakat"],
+    products: ["bakat", "bröd", "mjöl"],
   },
   {
     slug: "drycker",
     label: "Drycker",
     emoji: "🍺",
-    products: ["öl", "vin", "sprit", "cider", "mjöd"],
+    products: ["öl", "vin", "sprit", "cider", "mjöd", "must"],
   },
   {
     slug: "ovrigt",

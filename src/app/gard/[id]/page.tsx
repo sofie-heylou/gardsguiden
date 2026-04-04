@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import Link from "next/link";
 import {
   ShoppingBag,
   GlassWater,
@@ -10,12 +9,12 @@ import {
   Phone,
   Mail,
   Globe,
-  Clock,
   Navigation,
 } from "lucide-react";
 import { getFarmById } from "../../../lib/farms";
 import BackButton from "../../../components/BackButton";
 import FarmDetailMapLoader from "../../../components/FarmDetailMapLoader";
+import OpeningHoursTable from "../../../components/OpeningHoursTable";
 import { SITE_URL } from "../../../lib/site";
 import type { Farm } from "../../../types/farm";
 
@@ -112,32 +111,16 @@ export default async function FarmDetailPage({ params }: Props) {
   const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${farm.lat},${farm.lng}`;
 
   const badges = [
-    farm.onSiteSales && {
-      label: "Gårdsförsäljning",
-      icon: ShoppingBag,
-      color: "bg-green-100 text-green-800",
-    },
-    farm.tastingRoom && {
-      label: "Provsmakning",
-      icon: GlassWater,
-      color: "bg-amber-50 text-amber-800",
-    },
-    farm.gardsförsäljningLicense && {
-      label: "Gårdsförsäljningslicens",
-      icon: BadgeCheck,
-      color: "bg-blue-50 text-blue-800",
-    },
-    farm.isArchipelago && {
-      label: "Skärgård",
-      icon: Sailboat,
-      color: "bg-sky-50 text-sky-800",
-    },
-  ].filter(Boolean) as { label: string; icon: React.ElementType; color: string }[];
+    farm.onSiteSales       && { label: "Gårdsförsäljning",        icon: ShoppingBag },
+    farm.tastingRoom       && { label: "Provsmakning",             icon: GlassWater  },
+    farm.gardsförsäljningLicense && { label: "Gårdsförsäljningslicens", icon: BadgeCheck  },
+    farm.isArchipelago     && { label: "Skärgård",                 icon: Sailboat    },
+  ].filter(Boolean) as { label: string; icon: React.ElementType }[];
 
   return (
     <>
       <FarmJsonLd farm={farm} />
-      <div className="h-full overflow-y-auto bg-stone-50">
+      <div className="h-full overflow-y-auto" style={{ background: "#FAFAF8" }}>
         <div className="max-w-lg mx-auto px-4 py-4 pb-8 space-y-6">
 
           <BackButton />
@@ -145,7 +128,7 @@ export default async function FarmDetailPage({ params }: Props) {
           <FarmDetailMapLoader lat={farm.lat} lng={farm.lng} name={farm.name} />
 
           <div>
-            <h1 className="text-2xl font-bold text-stone-900 leading-tight">
+            <h1 className="font-display text-2xl text-stone-900 leading-tight">
               {farm.name}
             </h1>
             <p className="mt-1 text-sm text-stone-500 flex items-center gap-1">
@@ -155,13 +138,10 @@ export default async function FarmDetailPage({ params }: Props) {
           </div>
 
           {badges.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {badges.map(({ label, icon: Icon, color }) => (
-                <span
-                  key={label}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${color}`}
-                >
-                  <Icon size={13} />
+            <div className="flex flex-wrap gap-3">
+              {badges.map(({ label, icon: Icon }) => (
+                <span key={label} className="flex items-center gap-1.5 text-xs text-stone-500">
+                  <Icon size={13} className="text-stone-400" />
                   {label}
                 </span>
               ))}
@@ -183,7 +163,7 @@ export default async function FarmDetailPage({ params }: Props) {
                 {farm.products.map((p) => (
                   <span
                     key={p}
-                    className="px-3 py-1 rounded-full text-sm bg-green-100 text-green-800"
+                    className="px-2.5 py-0.5 rounded text-[12px] bg-stone-100 text-stone-500 capitalize"
                   >
                     {p}
                   </span>
@@ -197,13 +177,7 @@ export default async function FarmDetailPage({ params }: Props) {
               <h2 className="text-xs font-semibold uppercase tracking-wide text-stone-400">
                 Öppettider
               </h2>
-              <div className="flex items-start gap-2 text-sm text-stone-700">
-                <Clock size={15} className="mt-0.5 shrink-0 text-stone-400" />
-                <div className="space-y-0.5">
-                  {farm.openingHours && <p>{farm.openingHours}</p>}
-                  {farm.season && <p className="text-stone-500">{farm.season}</p>}
-                </div>
-              </div>
+              <OpeningHoursTable openingHours={farm.openingHours} season={farm.season} />
             </section>
           )}
 
@@ -217,7 +191,7 @@ export default async function FarmDetailPage({ params }: Props) {
                   <li>
                     <a
                       href={`tel:${farm.phone}`}
-                      className="flex items-center gap-3 text-sm text-green-700 hover:text-green-900"
+                      className="flex items-center gap-3 text-sm text-stone-700 hover:text-stone-900"
                     >
                       <Phone size={15} className="shrink-0" />
                       {farm.phone}
@@ -228,7 +202,7 @@ export default async function FarmDetailPage({ params }: Props) {
                   <li>
                     <a
                       href={`mailto:${farm.email}`}
-                      className="flex items-center gap-3 text-sm text-green-700 hover:text-green-900 break-all"
+                      className="flex items-center gap-3 text-sm text-stone-700 hover:text-stone-900 break-all"
                     >
                       <Mail size={15} className="shrink-0" />
                       {farm.email}
@@ -241,7 +215,7 @@ export default async function FarmDetailPage({ params }: Props) {
                       href={farm.website}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-3 text-sm text-green-700 hover:text-green-900 break-all"
+                      className="flex items-center gap-3 text-sm text-stone-700 hover:text-stone-900 break-all"
                     >
                       <Globe size={15} className="shrink-0" />
                       {farm.website.replace(/^https?:\/\//, "")}
@@ -252,19 +226,11 @@ export default async function FarmDetailPage({ params }: Props) {
             </section>
           )}
 
-          <section className="space-y-1 text-sm text-stone-600">
-            <h2 className="text-xs font-semibold uppercase tracking-wide text-stone-400 mb-2">
-              Plats
-            </h2>
-            {farm.address && <p>{farm.address}</p>}
-            <p>{farm.kommun} · {farm.lan}</p>
-          </section>
-
           <a
             href={mapsUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-green-700 text-white font-semibold text-sm hover:bg-green-800 active:bg-green-900 transition-colors shadow-sm"
+            className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-stone-800 text-white font-semibold text-sm hover:bg-stone-700 active:bg-stone-900 transition-colors"
           >
             <Navigation size={16} />
             Vägbeskrivning

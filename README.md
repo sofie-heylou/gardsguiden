@@ -1,137 +1,140 @@
 # Gårdsguiden
 
-A directory of farms selling directly to consumers in four Swedish counties:
-**Stockholm**, **Uppsala**, **Västmanland**, and **Södermanland**.
+En katalog över gårdsbutiker i fyra svenska län:
+**Stockholm**, **Uppsala**, **Västmanland** och **Södermanland**.
 
-- **122 verified farms** with geocoordinates, categories, and contact info
-- Interactive map (Mapbox GL) with clustering and radius search
-- Scrollable list view with full-text search, county and category filters
-- Server-rendered farm detail pages with JSON-LD structured data
-- SQLite database, Next.js App Router, Tailwind CSS v4
+- **176 verifierade gårdar** med koordinater, kategorier och kontaktuppgifter
+- Interaktiv karta (Mapbox GL) med klustring och radiussökning
+- Listvy med fritextsökning, läns- och kategorifilter
+- Server-renderade gårdsdetaljsidor med JSON-LD strukturerade data
+- SQLite-databas, Next.js App Router, Tailwind CSS v4
 
 ---
 
-## Local Development
+## Lokal utveckling
 
-### Prerequisites
+### Krav
 
 - Node.js 22+
-- A Mapbox public token ([mapbox.com](https://mapbox.com))
+- Ett Mapbox-token ([mapbox.com](https://mapbox.com))
 
-### Setup
+### Kom igång
 
 ```bash
 npm install
 
-# Create .env.local with your Mapbox token
-echo "NEXT_PUBLIC_MAPBOX_TOKEN=pk.your_token_here" > .env.local
+# Skapa .env.local med ditt Mapbox-token
+echo "NEXT_PUBLIC_MAPBOX_TOKEN=pk.ditt_token_här" > .env.local
 
-# Start the dev server
+# Starta dev-servern
 npm run dev        # http://localhost:3000
 ```
 
-The SQLite database (`data/gardsguiden.db`) is already populated with 122 farms.
-If it is missing, run the migration:
+SQLite-databasen (`data/gardsguiden.db`) är redan ifylld med 176 gårdar.
+Saknas den, kör migreringen:
 
 ```bash
-npx tsx scripts/migrate-json-to-sqlite.ts   # seeds from data/farms.json
-npx tsx scripts/migrate-categories.ts       # builds the category junction tables
+npx tsx scripts/migrate-json-to-sqlite.ts   # fyller från data/farms.json
+npx tsx scripts/migrate-categories.ts       # bygger kategorikopplingstabellerna
 ```
 
-### Scripts
+### NPM-kommandon
 
-| Command | Description |
+| Kommando | Beskrivning |
 |---|---|
-| `npm run dev` | Start dev server (Turbopack) |
-| `npm run build` | Production build |
-| `npm run start` | Start production server |
-| `npm run analyze` | Bundle analysis (opens `.next/analyze/client.html`) |
+| `npm run dev` | Starta dev-server (Turbopack) |
+| `npm run build` | Produktionsbygge |
+| `npm run start` | Starta produktionsservern |
+| `npm run analyze` | Bundelanalys (öppnar `.next/analyze/client.html`) |
 
 ---
 
-## Updating Farm Data
+## Uppdatera gårdsdata
 
-Farm data lives in `data/farms.json` and is scraped locally with the scripts
-in `/scripts/`. These scripts are **never deployed** — they run on your machine
-and produce a new SQLite database that you redeploy.
+All gårdsdata bor i `data/farms.json` och skrapas lokalt med skripten i
+`/scripts/`. Dessa skript **driftsätts aldrig** — de körs på din maskin och
+producerar en ny SQLite-databas som du sedan driftsätter.
 
-### Full pipeline
+### Pipeline
 
 ```bash
-# 1. Run scrapers (all use curl internally to avoid TLS issues)
-node scripts/seed-farms.js
-node scripts/scrape-regional-tourism.js
-node scripts/scrape-smaka-pa-sverige.js
-node scripts/scrape-eldrimner.js
-node scripts/scrape-systembolaget.js
+# 1. Skrapa nya gårdar från Google Places
+#    (kräver GOOGLE_PLACES_API_KEY som miljövariabel)
+GOOGLE_PLACES_API_KEY=din_nyckel node scripts/scrape-google-places.js
 
-# 2. Compile, deduplicate, geocode → data/farms.json
-node scripts/compile-farms.js
+# 2. Filtrera resultaten i tre hinkar: keep / maybe / removed
+npx tsx scripts/filter-google-results.ts
 
-# 3. Fix data quality (removes non-farm entries, corrects flags)
-node scripts/fix-farms-data.js
+# 3. Slå ihop filtrerade resultat med befintlig data/farms.json
+npx tsx scripts/merge-google-results.ts
 
-# 4. Migrate JSON → SQLite
+# 4. Fixa tomma kommunfält via adress + Nominatim
+npx tsx scripts/fix-empty-kommun.ts
+
+# 5. Rensa bort ogiltiga poster
+npx tsx scripts/clean-farms.ts
+
+# 6. Migrera JSON → SQLite
 npx tsx scripts/migrate-json-to-sqlite.ts
 
-# 5. Build the category junction tables
+# 7. Bygg kategorikopplingstabellerna
 npx tsx scripts/migrate-categories.ts
 
-# 6. Verify
+# 8. Verifiera
 sqlite3 data/gardsguiden.db "SELECT lan, COUNT(*) FROM farms GROUP BY lan"
 ```
 
-### Deploy the new database
+### Driftsätt ny databas
 
-After running the pipeline above, redeploy the app (see Railway section below).
-The new `data/gardsguiden.db` is baked into the Docker image as a seed.
-On first start with an empty Railway volume, the entrypoint copies it to
-`/data/gardsguiden.db` automatically.
+Efter att pipeline körts ovan, driftsätt appen på nytt (se Railway-avsnittet nedan).
+Den nya `data/gardsguiden.db` bakas in i Docker-imagen som en seed.
+Vid första start med en tom Railway-volym kopierar entrypointen den automatiskt
+till `/data/gardsguiden.db`.
 
-To replace the database on a **running** Railway deployment without downtime:
+För att ersätta databasen på en **körd** Railway-driftsättning utan driftstopp:
 
-1. Build and push the new image (via `railway up` or a git push)
-2. In the Railway volume, delete the existing `gardsguiden.db` before the new
-   container starts, or SSH in and replace the file directly
+1. Bygg och pusha ny image (via `railway up` eller en git push)
+2. Ta bort den befintliga `gardsguiden.db` i Railway-volymen innan den nya
+   containern startar, eller SSH:a in och ersätt filen direkt
 
 ---
 
-## Deploy to Railway
+## Driftsätt på Railway
 
-### First-time setup
+### Första gången
 
-1. **Create a Railway project** and link this repository.
+1. **Skapa ett Railway-projekt** och länka detta repository.
 
-2. **Set environment variables** in Railway → Variables:
+2. **Sätt miljövariabler** under Railway → Variables:
 
-   | Variable | Value |
+   | Variabel | Värde |
    |---|---|
-   | `NEXT_PUBLIC_MAPBOX_TOKEN` | `pk.your_mapbox_token` |
+   | `NEXT_PUBLIC_MAPBOX_TOKEN` | `pk.ditt_mapbox_token` |
    | `DB_PATH` | `/data/gardsguiden.db` |
    | `NODE_ENV` | `production` |
-   | `NEXT_PUBLIC_SITE_URL` | `https://your-app.railway.app` |
+   | `NEXT_PUBLIC_SITE_URL` | `https://din-app.railway.app` |
 
-3. **Create a Volume** in Railway → Volumes and mount it at `/data`.
-   This persists the SQLite database across deployments.
+3. **Skapa en Volume** under Railway → Volumes och montera den på `/data`.
+   Detta bevarar SQLite-databasen mellan driftsättningar.
 
-4. Railway picks up `railway.toml` automatically and builds the Dockerfile.
-   The `NEXT_PUBLIC_MAPBOX_TOKEN` build arg is passed from Variables.
+4. Railway plockar upp `railway.toml` automatiskt och bygger Dockerfile.
+   `NEXT_PUBLIC_MAPBOX_TOKEN` skickas vidare som build arg från Variables.
 
-5. On the first start, the entrypoint seeds `/data/gardsguiden.db` from the
-   image's bundled copy.
+5. Vid första start seedar entrypointen `/data/gardsguiden.db` från
+   imagens inbyggda kopia.
 
-### Subsequent deploys
+### Efterföljande driftsättningar
 
 ```bash
-railway up       # build + deploy from local working directory
-# or just push to the linked branch — Railway redeploys automatically
+railway up       # bygg + driftsätt från lokal arbetskatalog
+# eller pusha till den länkade grenen — Railway driftsätter automatiskt
 ```
 
-### Local Docker test
+### Lokal Docker-test
 
 ```bash
 docker build \
-  --build-arg NEXT_PUBLIC_MAPBOX_TOKEN=pk.your_token \
+  --build-arg NEXT_PUBLIC_MAPBOX_TOKEN=pk.ditt_token \
   -t gardsguiden .
 
 docker run -p 3000:3000 \
@@ -141,59 +144,60 @@ docker run -p 3000:3000 \
   gardsguiden
 
 curl http://localhost:3000/api/health
-# {"status":"ok","farms":122}
+# {"status":"ok","farms":176}
 ```
 
 ---
 
-## Architecture
+## Arkitektur
 
 ```
 src/
   app/
-    page.tsx              # Map view (dynamic import, ssr:false)
-    lista/page.tsx        # List view (SSR, initial farms passed as prop)
-    gard/[id]/page.tsx    # Farm detail (SSR, JSON-LD structured data)
-    api/farms/route.ts    # REST endpoint — supports ?lan, ?category, ?q, proximity
-    api/health/route.ts   # Health check — returns { status, farms }
-    sitemap.ts            # Auto-generates /sitemap.xml (124 URLs)
+    page.tsx              # Kartvy (dynamic import, ssr:false)
+    lista/page.tsx        # Listvy (SSR, farms skickas som prop)
+    gard/[id]/page.tsx    # Gårdsdetalj (SSR, JSON-LD strukturerade data)
+    api/farms/route.ts    # REST-endpoint — stöder ?lan, ?category, ?q, proximity
+    api/health/route.ts   # Hälsokontroll — returnerar { status, farms }
+    sitemap.ts            # Genererar /sitemap.xml automatiskt (178 URLs)
     robots.ts             # /robots.txt
-    opengraph-image.tsx   # 1200×630 OG image via ImageResponse
+    opengraph-image.tsx   # 1200×630 OG-bild via ImageResponse
   components/
-    MapView.tsx           # Mapbox GL map, Supercluster, filter panel
-    FarmList.tsx          # List view with all filters + near-me sort
+    MapView.tsx           # Mapbox GL-karta, Supercluster, filterpanel
+    FarmList.tsx          # Listvy med alla filter + nära-mig-sortering
     Header.tsx / BottomNav.tsx
   lib/
-    db.ts                 # SQLite connection (reads DB_PATH env var)
+    db.ts                 # SQLite-anslutning (läser DB_PATH från env)
     farms.ts              # getFilteredFarms(), getFarmsNearLocation()
-    categories.ts         # 9 product categories with slug/emoji/mapping
-    site.ts               # SITE_URL constant
+    categories.ts         # 9 produktkategorier med slug/ikon/mappning
+    site.ts               # SITE_URL-konstant
   hooks/
-    useGeolocation.ts     # Geolocation with sessionStorage cache
+    useGeolocation.ts     # Geolokalisering med sessionStorage-cache
 
 data/
-  farms.json              # Source of truth for farm data (122 farms)
-  gardsguiden.db          # SQLite database (baked into Docker image as seed)
-  scrape-log.txt          # Scraper run history
+  farms.json              # Källa till sanning för gårdsdata (176 gårdar)
+  gardsguiden.db          # SQLite-databas (bakas in i Docker-imagen som seed)
 
-scripts/                  # LOCAL ONLY — never deployed
-  seed-farms.js
-  scrape-*.js
-  compile-farms.js
-  fix-farms-data.js
-  geocode-farms.js
-  migrate-json-to-sqlite.ts
-  migrate-categories.ts
+scripts/                  # ENBART LOKALT — driftsätts aldrig
+  scrape-google-places.js    # Google Places Text Search + Details API
+  filter-google-results.ts   # Filtrera skrapresultat i keep/maybe/removed
+  merge-google-results.ts    # Slå ihop filtrerade resultat med farms.json
+  fix-empty-kommun.ts        # Fyll i tomma kommunfält via adress + Nominatim
+  clean-farms.ts             # Ta bort poster utanför länsgränserna
+  compile-farms.js           # Kompilera rådata från flera källor
+  geocode-farms.js           # Geokoda adresser via Nominatim
+  migrate-json-to-sqlite.ts  # Migrera data/farms.json → gardsguiden.db
+  migrate-categories.ts      # Bygg kategorikopplingstabellerna
 ```
 
-### Database schema
+### Databasschema
 
 ```sql
-farms             -- 122 rows, PK: id (slug)
-categories        -- 9 rows, PK: id
-farm_categories   -- junction table (many-to-many)
+farms             -- 176 rader, PK: id (slug)
+categories        -- 9 rader, PK: id
+farm_categories   -- kopplingsTabell (många-till-många)
 
--- Indexes
+-- Index
 idx_farms_lan       ON farms(lan)
 idx_farms_lat       ON farms(lat)
 idx_farms_lng       ON farms(lng)
@@ -202,13 +206,11 @@ idx_farms_lat_lng   ON farms(lat, lng)
 
 ---
 
-## Data Sources
+## Datakällor
 
-| Source | Status | Notes |
+| Källa | Status | Anteckningar |
 |---|---|---|
-| Seed (curated) | ✓ | 100 real farms, hand-verified |
-| visitsormland.se | ✓ | 25 Södermanland farms, scraped |
-| smakapasverige.se | Unreachable | TLS timeout during scrape |
-| eldrimner.com | Partial | Producer list not filterable by county |
-| systembolaget.se | Requires key | API subscription required |
-| Nominatim (OSM) | ✓ | All 122 farms geocoded; free, no key |
+| Google Places API | ✓ | 176 gårdar, verifierade med webbplatser |
+| Nominatim (OSM) | ✓ | Alla gårdar geokodade; gratis, ingen nyckel |
+| visitsormland.se | Borttagen | Ersatt av Google Places-data |
+| smakapasverige.se | Ej åtkomlig | TLS-timeout vid skrapning |

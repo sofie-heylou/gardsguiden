@@ -16,7 +16,7 @@ export default function FarmDetailMap({ lat, lng, name }: Props) {
       <Map
         initialViewState={{ latitude: lat, longitude: lng, zoom: 13 }}
         mapboxAccessToken={TOKEN}
-        mapStyle="mapbox://styles/mapbox/outdoors-v12"
+        mapStyle="mapbox://styles/mapbox/light-v11"
         style={{ width: "100%", height: "100%" }}
         scrollZoom={false}
         dragPan={false}
@@ -27,7 +27,7 @@ export default function FarmDetailMap({ lat, lng, name }: Props) {
       >
         <Marker latitude={lat} longitude={lng} anchor="bottom">
           <div
-            className="w-4 h-4 rounded-full bg-green-600 border-2 border-white shadow-md"
+            className="w-4 h-4 rounded-full bg-amber-400 shadow-md"
             title={name}
           />
         </Marker>

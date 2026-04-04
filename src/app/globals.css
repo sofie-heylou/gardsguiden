@@ -7,3 +7,8 @@
     display: none;
   }
 }
+
+/* Serif display font — loaded via next/font in layout.tsx */
+@utility font-display {
+  font-family: var(--font-lora, Georgia, "Times New Roman", serif);
+}

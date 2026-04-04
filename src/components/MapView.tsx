@@ -6,7 +6,7 @@ import type { MapRef, ViewStateChangeEvent } from "react-map-gl/mapbox";
 import type { FillLayer } from "mapbox-gl";
 import Supercluster from "supercluster";
 import type { BBox, Feature, Polygon } from "geojson";
-import { LocateFixed, SlidersHorizontal, X, Loader2 } from "lucide-react";
+import { LocateFixed, SlidersHorizontal, X, Loader2, AlertTriangle, ArrowRight, ShoppingBag, GlassWater } from "lucide-react";
 import Link from "next/link";
 import type { Farm } from "../types/farm";
 import { CATEGORIES, farmMatchesCategory } from "../lib/categories";
@@ -49,14 +49,14 @@ const circleLayer: FillLayer = {
   id: "radius-fill",
   type: "fill",
   source: "radius-circle",
-  paint: { "fill-color": "#2563eb", "fill-opacity": 0.08 },
+  paint: { "fill-color": "#f59e0b", "fill-opacity": 0.08 },
 };
 
 const circleBorderLayer: FillLayer = {
   id: "radius-border",
   type: "fill",
   source: "radius-circle",
-  paint: { "fill-color": "transparent", "fill-outline-color": "#2563eb" },
+  paint: { "fill-color": "transparent", "fill-outline-color": "#f59e0b" },
 };
 
 function buildPoints(farms: Farm[]): FarmPoint[] {
@@ -193,7 +193,7 @@ export default function MapView() {
         onMove={onMove}
         onLoad={onLoad}
         mapboxAccessToken={TOKEN}
-        mapStyle="mapbox://styles/mapbox/outdoors-v12"
+        mapStyle="mapbox://styles/mapbox/light-v11"
         style={{ width: "100%", height: "100%" }}
       >
         <NavigationControl position="top-right" />
@@ -209,7 +209,7 @@ export default function MapView() {
         {/* User position dot */}
         {pos && nearMeActive && (
           <Marker longitude={pos.lng} latitude={pos.lat}>
-            <div className="w-4 h-4 rounded-full bg-blue-600 border-2 border-white shadow-md" />
+            <div className="w-4 h-4 rounded-full bg-amber-500 border-2 border-white shadow-md" />
           </Marker>
         )}
 
@@ -224,10 +224,10 @@ export default function MapView() {
               <Marker key={`cluster-${clusterId}`} longitude={lng} latitude={lat}
                 onClick={() => handleClusterClick(clusterId, lng, lat)}>
                 <button
-                  className="flex items-center justify-center rounded-full bg-green-700 text-white font-semibold shadow-md border-2 border-white cursor-pointer"
+                  className="flex items-center justify-center rounded-full bg-amber-400 text-stone-900 font-semibold shadow-md cursor-pointer"
                   style={{
-                    width: Math.min(20 + (count / Math.max(farms.length, 1)) * 60, 56),
-                    height: Math.min(20 + (count / Math.max(farms.length, 1)) * 60, 56),
+                    width: Math.min(28 + (count / Math.max(farms.length, 1)) * 60, 60),
+                    height: Math.min(28 + (count / Math.max(farms.length, 1)) * 60, 60),
                     fontSize: count > 99 ? 11 : 13,
                   }}
                   aria-label={`${count} gårdar`}
@@ -244,8 +244,8 @@ export default function MapView() {
             <Marker key={farm.id} longitude={lng} latitude={lat} anchor="bottom"
               onClick={(e) => { e.originalEvent.stopPropagation(); setSelected(farm); }}>
               <button
-                className={`w-5 h-5 rounded-full border-2 shadow-sm cursor-pointer transition-transform ${
-                  isSelected ? "bg-amber-400 border-amber-700 scale-125" : "bg-green-600 border-white hover:scale-110"
+                className={`w-3.5 h-3.5 rounded-full shadow-sm cursor-pointer transition-transform ${
+                  isSelected ? "bg-amber-500 scale-150" : "bg-amber-300 hover:scale-125"
                 }`}
                 aria-label={farm.name}
               />
@@ -257,25 +257,36 @@ export default function MapView() {
           <Popup
             longitude={selected.lng} latitude={selected.lat}
             anchor="bottom" offset={16} closeOnClick={false}
-            onClose={() => setSelected(null)} maxWidth="280px"
+            closeButton={false}
+            onClose={() => setSelected(null)} maxWidth="240px"
           >
-            <div className="p-1 text-stone-900">
-              <h3 className="font-semibold text-sm leading-tight mb-0.5">{selected.name}</h3>
-              <p className="text-xs text-stone-500 mb-2">{selected.kommun}, {selected.lan}</p>
-              {selected.products.length > 0 && (
+            <div className="p-2 pr-7 relative">
+              <button
+                onClick={() => setSelected(null)}
+                className="absolute top-1.5 right-1.5 text-stone-400 hover:text-stone-700 p-0.5 outline-none focus:outline-none"
+                aria-label="Stäng"
+              >
+                <X size={13} />
+              </button>
+              <h3 className="font-display text-[14px] text-stone-900 leading-snug mb-0.5">{selected.name}</h3>
+              <p className="text-[11px] text-stone-400 mb-2">{selected.kommun}, {selected.lan}</p>
+              {selected.products.filter(p => p !== "annat").length > 0 && (
                 <div className="flex flex-wrap gap-1 mb-2">
-                  {selected.products.map((p) => (
-                    <span key={p} className="px-1.5 py-0.5 rounded text-[10px] bg-green-100 text-green-800">{p}</span>
+                  {selected.products.filter(p => p !== "annat").map((p) => (
+                    <span key={p} className="px-1.5 py-0.5 rounded text-[10px] bg-stone-100 text-stone-500 capitalize">{p}</span>
                   ))}
                 </div>
               )}
-              <div className="flex gap-2 text-xs mb-3">
-                {selected.onSiteSales && <span className="text-green-700">✓ Gårdsförsäljning</span>}
-                {selected.tastingRoom && <span className="text-amber-700">✓ Provsmakning</span>}
-              </div>
+              {(selected.onSiteSales || selected.tastingRoom) && (
+                <div className="flex gap-3 text-[11px] text-stone-400 mb-2.5">
+                  {selected.onSiteSales && <span className="flex items-center gap-1"><ShoppingBag size={10} />Gårdsförsäljning</span>}
+                  {selected.tastingRoom && <span className="flex items-center gap-1"><GlassWater size={10} />Provsmakning</span>}
+                </div>
+              )}
               <Link href={`/gard/${selected.id}`}
-                className="block text-center text-xs font-medium bg-green-700 text-white rounded px-3 py-1.5 hover:bg-green-800 transition-colors">
+                className="flex items-center gap-1 text-[12px] font-medium text-stone-700 hover:text-stone-900 transition-colors outline-none focus:outline-none">
                 Visa detaljer
+                <ArrowRight size={11} />
               </Link>
             </div>
           </Popup>
@@ -285,17 +296,17 @@ export default function MapView() {
       {/* Filter toggle */}
       <button
         onClick={() => setFiltersOpen((o) => !o)}
-        className={`absolute top-3 left-3 flex items-center gap-1.5 text-sm font-medium px-3 py-2 rounded-full shadow-lg border transition-colors ${
+        className={`absolute top-3 left-3 flex items-center gap-1.5 text-sm font-medium px-3 py-2 rounded-full shadow-sm border transition-colors ${
           activeFilterCount > 0
-            ? "bg-green-700 text-white border-green-800"
-            : "bg-white text-stone-800 border-stone-200 hover:bg-stone-50"
+            ? "bg-stone-800 text-white border-stone-800"
+            : "bg-white text-stone-700 border-stone-200 hover:border-stone-400"
         }`}
         aria-label="Öppna filter"
       >
         <SlidersHorizontal size={15} />
         Filter
         {activeFilterCount > 0 && (
-          <span className="ml-0.5 bg-white text-green-700 font-bold text-xs w-4 h-4 rounded-full flex items-center justify-center">
+          <span className="ml-0.5 bg-white text-stone-800 font-bold text-xs w-4 h-4 rounded-full flex items-center justify-center">
             {activeFilterCount}
           </span>
         )}
@@ -317,7 +328,7 @@ export default function MapView() {
               {COUNTIES.map((c) => (
                 <button key={c} onClick={() => toggleCounty(c)}
                   className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                    county === c ? "bg-green-700 text-white" : "bg-stone-100 text-stone-600 hover:bg-stone-200"
+                    county === c ? "bg-stone-800 text-white" : "bg-white text-stone-500 border border-stone-200 hover:border-stone-400"
                   }`}>
                   {c}
                 </button>
@@ -330,17 +341,16 @@ export default function MapView() {
             <div className="flex flex-wrap gap-1.5">
               {CATEGORIES.map((cat) => (
                 <button key={cat.slug} onClick={() => toggleCategory(cat.slug)}
-                  className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                    category === cat.slug ? "bg-amber-600 text-white" : "bg-stone-100 text-stone-600 hover:bg-stone-200"
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                    category === cat.slug ? "bg-stone-800 text-white" : "bg-white text-stone-500 border border-stone-200 hover:border-stone-400"
                   }`}>
-                  <span>{cat.emoji}</span>
                   {cat.label}
                 </button>
               ))}
             </div>
           </div>
 
-          <div className="flex items-center justify-between pt-1 border-t border-stone-100">
+          <div className="flex items-center justify-between pt-1 border-t border-amber-100">
             <span className="text-xs text-stone-500">
               {farms.length} av {allFarms.length} gårdar visas
             </span>
@@ -349,7 +359,7 @@ export default function MapView() {
                 <button onClick={clearFilters} className="text-xs text-stone-500 underline">Rensa</button>
               )}
               <button onClick={() => setFiltersOpen(false)}
-                className="text-xs font-semibold text-white bg-green-700 px-4 py-1.5 rounded-full hover:bg-green-800 transition-colors">
+                className="text-xs font-semibold text-white bg-stone-800 px-4 py-1.5 rounded-full hover:bg-stone-700 transition-colors">
                 Klar
               </button>
             </div>
@@ -359,7 +369,7 @@ export default function MapView() {
 
       {/* Radius selector — visible only in near me mode */}
       {nearMeActive && (
-        <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-white rounded-full shadow-lg border border-stone-200 px-2 py-1.5">
+        <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-white rounded-full shadow-lg border border-amber-100 px-2 py-1.5">
           <span className="text-xs text-stone-500 pl-1 pr-2">Radie:</span>
           {RADIUS_OPTIONS.map((r) => (
             <button
@@ -367,8 +377,8 @@ export default function MapView() {
               onClick={() => setRadius(r)}
               className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
                 radius === r
-                  ? "bg-blue-600 text-white"
-                  : "text-stone-600 hover:bg-stone-100"
+                  ? "bg-amber-400 text-stone-900"
+                  : "text-stone-600 hover:bg-amber-50"
               }`}
             >
               {r} km
@@ -387,7 +397,7 @@ export default function MapView() {
       {/* Denied / unavailable message */}
       {(geoStatus === "denied" || geoStatus === "unavailable") && wantsNearMe && (
         <div className="absolute bottom-16 left-3 right-3 bg-white border border-red-200 rounded-xl shadow-lg px-4 py-3 flex items-start gap-2">
-          <span className="text-red-600 mt-0.5">⚠</span>
+          <AlertTriangle size={14} className="text-red-500 mt-0.5 shrink-0" />
           <div className="flex-1">
             <p className="text-xs text-red-700">
               {geoStatus === "denied"
@@ -407,8 +417,8 @@ export default function MapView() {
         disabled={locating}
         className={`absolute bottom-4 right-4 flex items-center gap-1.5 text-sm font-medium px-3 py-2 rounded-full shadow-lg border transition-colors disabled:opacity-50 ${
           nearMeActive
-            ? "bg-blue-600 text-white border-blue-700 hover:bg-blue-700"
-            : "bg-white text-stone-800 border-stone-200 hover:bg-stone-50 active:bg-stone-100"
+            ? "bg-amber-500 text-stone-900 border-amber-600 hover:bg-amber-600"
+            : "bg-amber-400 text-stone-900 border-amber-500 hover:bg-amber-500 active:bg-amber-600"
         }`}
         aria-label={nearMeActive ? "Stäng Nära mig" : "Hitta mig"}
       >
@@ -416,7 +426,7 @@ export default function MapView() {
           ? <Loader2 size={16} className="animate-spin" />
           : <LocateFixed size={16} />
         }
-        {nearMeActive ? "Nära mig" : "Hitta mig"}
+        Nära mig
       </button>
     </div>
   );

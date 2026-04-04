@@ -13,7 +13,7 @@ export default function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="h-14 shrink-0 bg-stone-800 border-t border-stone-700 flex">
+    <nav className="h-14 shrink-0 bg-white border-t border-stone-200 flex">
       {tabs.map(({ href, label, Icon }) => {
         const active = pathname === href;
         return (
@@ -21,12 +21,10 @@ export default function BottomNav() {
             key={href}
             href={href}
             className={`flex-1 flex flex-col items-center justify-center gap-0.5 text-xs transition-colors ${
-              active
-                ? "text-amber-300"
-                : "text-stone-400 hover:text-stone-200"
+              active ? "text-stone-800" : "text-stone-400 hover:text-stone-600"
             }`}
           >
-            <Icon size={22} strokeWidth={active ? 2.5 : 1.8} />
+            <Icon size={20} strokeWidth={active ? 2.2 : 1.6} />
             <span>{label}</span>
           </Link>
         );

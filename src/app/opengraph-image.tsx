@@ -15,54 +15,36 @@ export default function Image() {
         alignItems: "flex-start",
         justifyContent: "flex-end",
         padding: "72px 80px",
-        background: "linear-gradient(150deg, #1c1917 0%, #292524 40%, #1a2e1a 100%)",
+        background: "#FAFAF8",
         fontFamily: "system-ui, -apple-system, sans-serif",
         position: "relative",
       }}
     >
-      {/* Decorative circles */}
+      {/* Amber accent bar */}
       <div
         style={{
           position: "absolute",
-          top: -120,
-          right: -120,
-          width: 520,
-          height: 520,
-          borderRadius: "50%",
-          background: "rgba(34, 85, 34, 0.25)",
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          top: 60,
-          right: 180,
-          width: 220,
-          height: 220,
-          borderRadius: "50%",
-          background: "rgba(34, 85, 34, 0.15)",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: 6,
+          background: "#f59e0b",
         }}
       />
 
       {/* County tags */}
-      <div
-        style={{
-          display: "flex",
-          gap: 12,
-          marginBottom: 40,
-        }}
-      >
+      <div style={{ display: "flex", gap: 10, marginBottom: 44 }}>
         {["Stockholm", "Uppsala", "Västmanland", "Södermanland"].map((lan) => (
           <div
             key={lan}
             style={{
-              padding: "6px 16px",
+              padding: "6px 18px",
               borderRadius: 999,
-              background: "rgba(255,255,255,0.08)",
-              border: "1px solid rgba(255,255,255,0.15)",
-              color: "#d6d3d1",
+              background: "#f5f5f4",
+              border: "1px solid #e7e5e4",
+              color: "#78716c",
               fontSize: 22,
-              letterSpacing: 0.3,
+              letterSpacing: 0.2,
             }}
           >
             {lan}
@@ -73,12 +55,12 @@ export default function Image() {
       {/* App name */}
       <div
         style={{
-          fontSize: 96,
+          fontSize: 100,
           fontWeight: 700,
-          color: "#fef3c7",
-          letterSpacing: -2,
+          color: "#1c1917",
+          letterSpacing: -3,
           lineHeight: 1,
-          marginBottom: 24,
+          marginBottom: 28,
         }}
       >
         Gårdsguiden
@@ -87,14 +69,14 @@ export default function Image() {
       {/* Tagline */}
       <div
         style={{
-          fontSize: 34,
-          color: "#a8a29e",
+          fontSize: 32,
+          color: "#78716c",
           fontWeight: 400,
-          lineHeight: 1.4,
-          maxWidth: 700,
+          lineHeight: 1.45,
+          maxWidth: 720,
         }}
       >
-        Hitta gårdsbutiker och lokala råvaror direkt från bonden — i Stockholm, Uppsala, Västmanland och Södermanland.
+        176 gårdsbutiker i Mälardalen — köp lokalt direkt från bonden.
       </div>
 
       {/* Bottom domain badge */}
@@ -103,8 +85,8 @@ export default function Image() {
           position: "absolute",
           bottom: 72,
           right: 80,
-          fontSize: 24,
-          color: "rgba(255,255,255,0.3)",
+          fontSize: 22,
+          color: "#a8a29e",
           letterSpacing: 0.5,
         }}
       >

@@ -23,6 +23,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const farmRoutes: MetadataRoute.Sitemap = farms.map((farm) => ({
     url: `${SITE_URL}/gard/${farm.id}`,
+    lastModified: now,
     changeFrequency: "monthly",
     priority: 0.6,
   }));
