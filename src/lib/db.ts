@@ -98,6 +98,33 @@ function initSchema(db: Database.Database): void {
     CREATE INDEX IF NOT EXISTS idx_claims_status  ON farm_claims(status);
     CREATE INDEX IF NOT EXISTS idx_claims_payment ON farm_claims(payment_status);
 
+    -- ── New farm submissions ───────────────────────────────────────────────────
+    CREATE TABLE IF NOT EXISTS farm_submissions (
+      id              TEXT PRIMARY KEY,
+      name            TEXT NOT NULL,
+      description     TEXT,
+      address         TEXT,
+      kommun          TEXT,
+      lan             TEXT,
+      website         TEXT,
+      phone           TEXT,
+      email           TEXT,
+      products        TEXT,                                -- JSON array
+      opening_hours   TEXT,
+      season          TEXT,
+      on_site_sales   INTEGER NOT NULL DEFAULT 0,
+      tasting_room    INTEGER NOT NULL DEFAULT 0,
+      submitted_email TEXT NOT NULL,                       -- email given at submission time
+      user_id         TEXT REFERENCES users(id),           -- set if submitter was logged in
+      status          TEXT NOT NULL DEFAULT 'pending',     -- pending | approved | rejected
+      notes           TEXT,                                -- admin notes
+      created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+      reviewed_at     TEXT
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_submissions_status  ON farm_submissions(status);
+    CREATE INDEX IF NOT EXISTS idx_submissions_user    ON farm_submissions(user_id);
+
     -- ── Removal requests ───────────────────────────────────────────────────────
     CREATE TABLE IF NOT EXISTS farm_removal_requests (
       id         TEXT PRIMARY KEY,
