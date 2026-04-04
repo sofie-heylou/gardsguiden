@@ -42,7 +42,7 @@ export default function ClaimSection({ farmId, farmName }: Props) {
             <p className="text-sm font-medium text-emerald-800">Du äger denna gård</p>
           </div>
           <Link
-            href={`/konto/rediger/${farmId}`}
+            href={`/konto/redigera/${farmId}`}
             className="flex items-center gap-1 text-xs font-semibold text-emerald-700 border border-emerald-200 bg-white rounded-lg px-3 py-1.5 hover:border-emerald-400 transition-colors"
           >
             <Pencil size={11} />
