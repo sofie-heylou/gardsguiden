@@ -96,7 +96,6 @@ function initSchema(db: Database.Database): void {
     CREATE INDEX IF NOT EXISTS idx_claims_farm    ON farm_claims(farm_id);
     CREATE INDEX IF NOT EXISTS idx_claims_user    ON farm_claims(user_id);
     CREATE INDEX IF NOT EXISTS idx_claims_status  ON farm_claims(status);
-    CREATE INDEX IF NOT EXISTS idx_claims_payment ON farm_claims(payment_status);
 
     -- ── New farm submissions ───────────────────────────────────────────────────
     CREATE TABLE IF NOT EXISTS farm_submissions (
@@ -175,4 +174,5 @@ function initSchema(db: Database.Database): void {
   if (!columnExists(db, "farm_claims", "payment_status")) {
     db.exec(`ALTER TABLE farm_claims ADD COLUMN payment_status TEXT NOT NULL DEFAULT 'unpaid'`);
   }
+  db.exec(`CREATE INDEX IF NOT EXISTS idx_claims_payment ON farm_claims(payment_status)`);
 }
