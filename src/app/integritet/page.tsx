@@ -1,0 +1,161 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Integritetspolicy",
+  description: "Läs om hur Gårdsguiden hanterar dina personuppgifter i enlighet med GDPR.",
+  alternates: { canonical: "/integritet" },
+  robots: { index: true, follow: true },
+};
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="space-y-2">
+      <h2 className="font-display text-lg text-stone-900">{title}</h2>
+      <div className="text-sm text-stone-600 leading-relaxed space-y-2">{children}</div>
+    </section>
+  );
+}
+
+export default function IntegritetPage() {
+  return (
+    <div className="h-full overflow-y-auto" style={{ background: "#FAFAF8" }}>
+      <div className="max-w-lg mx-auto px-4 py-8 pb-14 space-y-8">
+
+        {/* ── Header ────────────────────────────────────────────────────────── */}
+        <div className="space-y-2">
+          <h1 className="font-display text-3xl text-stone-900">Integritetspolicy</h1>
+          <p className="text-xs text-stone-400">Senast uppdaterad: april 2025</p>
+        </div>
+
+        <hr className="border-stone-100" />
+
+        {/* ── Sections ──────────────────────────────────────────────────────── */}
+        <Section title="Vem är ansvarig">
+          <p>
+            Gårdsguiden är ansvarig för behandlingen av dina personuppgifter.
+          </p>
+          <p>
+            Kontakt:{" "}
+            <a href="mailto:hej@gardsguiden.se" className="underline hover:text-stone-900 transition-colors">
+              hej@gardsguiden.se
+            </a>
+          </p>
+        </Section>
+
+        <Section title="Vilka uppgifter samlas in">
+          <p>
+            Vi samlar bara in uppgifter från gårdsägare som väljer att göra
+            anspråk på sin gård eller lägga till en ny gård:
+          </p>
+          <ul className="list-disc list-inside space-y-1 text-stone-600">
+            <li><strong>E-postadress</strong> — används för inloggning med engångskod.</li>
+            <li><strong>Namn</strong> — valfritt, visas inte publikt.</li>
+            <li><strong>Telefonnummer</strong> — valfritt, används inte av oss.</li>
+          </ul>
+          <p>
+            Besökare som enbart söker eller tittar på gårdar lämnar inga
+            personuppgifter till oss.
+          </p>
+        </Section>
+
+        <Section title="Varför behandlas uppgifterna">
+          <p>
+            Uppgifterna används uteslutande för att låta gårdsägare logga in,
+            bekräfta ägarskap och hålla sin gårds information aktuell.
+            Vi säljer eller delar inte uppgifter med tredje part för
+            marknadsföringsändamål.
+          </p>
+        </Section>
+
+        <Section title="Kakor (cookies)">
+          <p>
+            Vi använder inga spårningskakor eller analysverktyg. Den enda kaka
+            vi sätter är en funktionskaka för inloggningssessionen
+            (<code className="text-xs bg-stone-100 px-1 py-0.5 rounded">gg_session</code>).
+            Den tas bort när du loggar ut eller efter 30 dagar.
+          </p>
+        </Section>
+
+        <Section title="Kartor — Mapbox">
+          <p>
+            Kartorna på webbplatsen drivs av{" "}
+            <a
+              href="https://www.mapbox.com/legal/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-stone-900 transition-colors"
+            >
+              Mapbox
+            </a>
+            . När kartan laddas skickas din IP-adress till Mapbox i enlighet
+            med deras integritetspolicy. Vi har ingen kontroll över den
+            behandlingen.
+          </p>
+        </Section>
+
+        <Section title="Betalning via Swish">
+          <p>
+            Om du gör anspråk på en gård sker betalningen via Swish, direkt
+            mellan dig och oss. Vi lagrar inte några kortuppgifter. Det enda
+            vi sparar är ditt Swish-referensnummer för att kunna matcha din
+            betalning mot ditt konto.
+          </p>
+        </Section>
+
+        <Section title="Var lagras uppgifterna">
+          <p>
+            Uppgifterna lagras i en databas på servrar inom EU.
+            Vi använder ingen molntjänst utanför EU för lagring av
+            personuppgifter.
+          </p>
+        </Section>
+
+        <Section title="Dina rättigheter (GDPR)">
+          <p>Du har rätt att:</p>
+          <ul className="list-disc list-inside space-y-1 text-stone-600">
+            <li><strong>Begära ett utdrag</strong> av de uppgifter vi har om dig.</li>
+            <li><strong>Rätta</strong> felaktiga uppgifter.</li>
+            <li><strong>Radera</strong> ditt konto och alla tillhörande uppgifter.</li>
+            <li><strong>Invända</strong> mot behandling du inte samtycker till.</li>
+          </ul>
+          <p>
+            Skicka din begäran till{" "}
+            <a href="mailto:hej@gardsguiden.se" className="underline hover:text-stone-900 transition-colors">
+              hej@gardsguiden.se
+            </a>{" "}
+            så återkommer vi inom sju dagar.
+          </p>
+        </Section>
+
+        <Section title="Kontakt i integritetsfrågor">
+          <p>
+            Har du frågor om hur vi hanterar dina uppgifter, eller vill du
+            utöva dina rättigheter? Hör av dig till{" "}
+            <a href="mailto:hej@gardsguiden.se" className="underline hover:text-stone-900 transition-colors">
+              hej@gardsguiden.se
+            </a>
+            {" "}eller via{" "}
+            <Link href="/kontakt" className="underline hover:text-stone-900 transition-colors">
+              kontaktformuläret
+            </Link>
+            .
+          </p>
+          <p>
+            Du har också rätt att lämna klagomål till{" "}
+            <a
+              href="https://www.imy.se"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-stone-900 transition-colors"
+            >
+              Integritetsskyddsmyndigheten (IMY)
+            </a>
+            .
+          </p>
+        </Section>
+
+      </div>
+    </div>
+  );
+}
