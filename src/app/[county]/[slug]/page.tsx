@@ -21,8 +21,8 @@ import ClaimSection from "../../../components/ClaimSection";
 import { SITE_URL } from "../../../lib/site";
 import type { Farm } from "../../../types/farm";
 
-// Only pre-rendered farm slugs are served — others are 404.
-export const dynamicParams = false;
+// Known farms are pre-rendered at build time; farms added later render on demand.
+export const dynamicParams = true;
 
 export function generateStaticParams() {
   const farms = getAllFarms();
