@@ -124,7 +124,7 @@ export default function LoginFlow() {
         <div className="rounded-xl bg-stone-50 border border-stone-100 p-4 space-y-2.5 text-sm">
           <div className="flex justify-between">
             <span className="text-stone-500">Swish</span>
-            <span className="font-semibold text-stone-800 tabular-nums">123-456 78 90</span>
+            <span className="font-semibold text-stone-800 tabular-nums">0700399741</span>
           </div>
           <div className="flex justify-between">
             <span className="text-stone-500">Belopp</span>

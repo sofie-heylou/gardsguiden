@@ -97,7 +97,7 @@ export default function ClaimSection({ farmId, farmName }: Props) {
         <div className="rounded-lg bg-stone-50 border border-stone-100 p-3 space-y-2 text-xs">
           <div className="flex justify-between">
             <span className="text-stone-400">Swish</span>
-            <span className="font-semibold text-stone-800 tabular-nums">123-456 78 90</span>
+            <span className="font-semibold text-stone-800 tabular-nums">0700399741</span>
           </div>
           <div className="flex justify-between">
             <span className="text-stone-400">Belopp</span>
