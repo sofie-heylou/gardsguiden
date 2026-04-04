@@ -52,6 +52,9 @@ export const metadata: Metadata = {
     title: "Gårdsguiden — Hitta gårdsbutiker nära dig",
     description: DESCRIPTION,
   },
+  verification: {
+    google: "_6kp1C4lcxVKFzOcTI3soxvSvu20xiMnxPTcNgrw0FE",
+  },
   robots: {
     index: true,
     follow: true,
