@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "../../../../lib/db";
 import { generateId, getCurrentUser } from "../../../../lib/auth";
+import { sendEmail, emailHtml, table, row, ADMIN_EMAIL } from "../../../../lib/email";
 
 export const dynamic = "force-dynamic";
 
@@ -65,6 +66,25 @@ export async function POST(req: NextRequest) {
     (submittedEmail as string).trim(),
     user?.id ?? null,
   );
+
+  const productList = Array.isArray(products) ? (products as string[]).join(", ") : null;
+
+  sendEmail({
+    to: ADMIN_EMAIL,
+    subject: `Ny gård inskickad: ${(name as string).trim()}`,
+    html: emailHtml(`
+      <p style="margin:0 0 16px;font-size:15px;font-weight:600;color:#1c1917;">Ny gård inskickad</p>
+      ${table(
+        row("Gårdsnamn",  (name as string).trim()) +
+        row("Inlämnad av", (submittedEmail as string).trim()) +
+        row("Webbplats",  typeof website === "string" ? website.trim() : null) +
+        row("Adress",     typeof address === "string" ? address.trim() : null) +
+        row("Kommun",     typeof kommun  === "string" ? kommun.trim()  : null) +
+        row("Län",        typeof lan     === "string" ? lan.trim()     : null) +
+        row("Produkter",  productList)
+      )}
+    `),
+  });
 
   return NextResponse.json({ ok: true });
 }
