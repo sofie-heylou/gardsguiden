@@ -9,12 +9,12 @@ export const revalidate = 3600;
 export const metadata: Metadata = {
   title: "Alla gårdar",
   description:
-    "Bläddra bland 176 gårdsbutiker i Stockholm, Uppsala, Västmanland och Södermanland. Filtrera på produkttyp, gårdsförsäljningslicens eller skärgårdsläge.",
+    "Bläddra bland 161 gårdsbutiker i Stockholm, Uppsala, Västmanland och Södermanland. Filtrera på produkttyp, gårdsförsäljningslicens eller skärgårdsläge.",
   alternates: { canonical: `${SITE_URL}/lista` },
   openGraph: {
     title: "Alla gårdar — Gårdsguiden",
     description:
-      "Bläddra bland 176 gårdsbutiker i Stockholm, Uppsala, Västmanland och Södermanland. Filtrera på produkttyp, gårdsförsäljningslicens eller skärgårdsläge.",
+      "Bläddra bland 161 gårdsbutiker i Stockholm, Uppsala, Västmanland och Södermanland. Filtrera på produkttyp, gårdsförsäljningslicens eller skärgårdsläge.",
     url: `${SITE_URL}/lista`,
     locale: "sv_SE",
     type: "website",
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Alla gårdar — Gårdsguiden",
     description:
-      "Bläddra bland 176 gårdsbutiker i Stockholm, Uppsala, Västmanland och Södermanland.",
+      "Bläddra bland 161 gårdsbutiker i Stockholm, Uppsala, Västmanland och Södermanland.",
   },
 };
 

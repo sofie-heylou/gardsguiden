@@ -3,7 +3,7 @@
 En katalog över gårdsbutiker i fyra svenska län:
 **Stockholm**, **Uppsala**, **Västmanland** och **Södermanland**.
 
-- **176 verifierade gårdar** med koordinater, kategorier och kontaktuppgifter
+- **161 verifierade gårdar** med koordinater, kategorier och kontaktuppgifter
 - Interaktiv karta (Mapbox GL) med klustring och radiussökning
 - Listvy med fritextsökning, läns- och kategorifilter
 - Server-renderade gårdsdetaljsidor med JSON-LD strukturerade data
@@ -30,7 +30,7 @@ echo "NEXT_PUBLIC_MAPBOX_TOKEN=pk.ditt_token_här" > .env.local
 npm run dev        # http://localhost:3000
 ```
 
-SQLite-databasen (`data/gardsguiden.db`) är redan ifylld med 176 gårdar.
+SQLite-databasen (`data/gardsguiden.db`) är redan ifylld med 161 gårdar.
 Saknas den, kör migreringen:
 
 ```bash
@@ -144,7 +144,7 @@ docker run -p 3000:3000 \
   gardsguiden
 
 curl http://localhost:3000/api/health
-# {"status":"ok","farms":176}
+# {"status":"ok","farms":161}
 ```
 
 ---
@@ -159,7 +159,7 @@ src/
     gard/[id]/page.tsx    # Gårdsdetalj (SSR, JSON-LD strukturerade data)
     api/farms/route.ts    # REST-endpoint — stöder ?lan, ?category, ?q, proximity
     api/health/route.ts   # Hälsokontroll — returnerar { status, farms }
-    sitemap.ts            # Genererar /sitemap.xml automatiskt (178 URLs)
+    sitemap.ts            # Genererar /sitemap.xml automatiskt (163 URLs)
     robots.ts             # /robots.txt
     opengraph-image.tsx   # 1200×630 OG-bild via ImageResponse
   components/
@@ -175,7 +175,7 @@ src/
     useGeolocation.ts     # Geolokalisering med sessionStorage-cache
 
 data/
-  farms.json              # Källa till sanning för gårdsdata (176 gårdar)
+  farms.json              # Källa till sanning för gårdsdata (161 gårdar)
   gardsguiden.db          # SQLite-databas (bakas in i Docker-imagen som seed)
 
 scripts/                  # ENBART LOKALT — driftsätts aldrig
@@ -193,7 +193,7 @@ scripts/                  # ENBART LOKALT — driftsätts aldrig
 ### Databasschema
 
 ```sql
-farms             -- 176 rader, PK: id (slug)
+farms             -- 161 rader, PK: id (slug)
 categories        -- 9 rader, PK: id
 farm_categories   -- kopplingsTabell (många-till-många)
 
@@ -210,7 +210,7 @@ idx_farms_lat_lng   ON farms(lat, lng)
 
 | Källa | Status | Anteckningar |
 |---|---|---|
-| Google Places API | ✓ | 176 gårdar, verifierade med webbplatser |
+| Google Places API | ✓ | 161 gårdar, verifierade med webbplatser |
 | Nominatim (OSM) | ✓ | Alla gårdar geokodade; gratis, ingen nyckel |
 | visitsormland.se | Borttagen | Ersatt av Google Places-data |
 | smakapasverige.se | Ej åtkomlig | TLS-timeout vid skrapning |

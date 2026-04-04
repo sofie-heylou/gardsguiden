@@ -96,30 +96,6 @@
     "source": "google-places:gårdsbutik"
   },
   {
-    "id": "cafe-eldkvarn",
-    "place_id": "ChIJw9g8vd93X0YRdvffaimZ_E4",
-    "name": "Cafe Eldkvarn",
-    "description": "",
-    "address": "Norr Mälarstrand 1, 112 20 Stockholm, Sverige",
-    "kommun": "Stockholm",
-    "lan": "Stockholm",
-    "lat": 59.32689569999999,
-    "lng": 18.0532751,
-    "website": "https://sv-se.facebook.com/CafeEldkvarn/",
-    "phone": "",
-    "email": "",
-    "products": [
-      "annat"
-    ],
-    "onSiteSales": true,
-    "tastingRoom": true,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "",
-    "season": "",
-    "source": "google-places:gårdscafé"
-  },
-  {
     "id": "dahliatradgarden",
     "place_id": "ChIJJwG2C4d3X0YRzReK8Is4W9w",
     "name": "Dahliaträdgården",
@@ -142,30 +118,6 @@
     "openingHours": "måndag: Öppet dygnet runt, tisdag: Öppet dygnet runt, onsdag: Öppet dygnet runt, torsdag: Öppet dygnet runt, fredag: Öppet dygnet runt, lördag: Öppet dygnet runt, söndag: Öppet dygnet runt",
     "season": "",
     "source": "google-places:odlare gård"
-  },
-  {
-    "id": "djurgardsbutiken",
-    "place_id": "ChIJHZqmxCZ4X0YRwK_NCLMtTIM",
-    "name": "Djurgårdsbutiken",
-    "description": "",
-    "address": "Arenavägen 63, 121 77 Johanneshov, Sverige",
-    "kommun": "Stockholm",
-    "lan": "Stockholm",
-    "lat": 59.29229359999999,
-    "lng": 18.0822271,
-    "website": "http://www.difbutiken.se/",
-    "phone": "08-122 506 70",
-    "email": "",
-    "products": [
-      "annat"
-    ],
-    "onSiteSales": true,
-    "tastingRoom": false,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "måndag: 10:00–19:00, tisdag: 10:00–19:00, onsdag: 10:00–19:00, torsdag: 10:00–19:00, fredag: 10:00–19:00, lördag: 10:00–17:00, söndag: 11:00–17:00",
-    "season": "",
-    "source": "google-places:gårdsbutik"
   },
   {
     "id": "edsvikens-musteri",
@@ -481,30 +433,6 @@
     "source": "google-places:gårdscafé"
   },
   {
-    "id": "kiviks-musteri-pa-sodermalm",
-    "place_id": "ChIJDdegeAB3X0YRg1Uj_RaTx7A",
-    "name": "Kiviks Musteri på Södermalm",
-    "description": "",
-    "address": "Maria Prästgårdsgata 15A, 118 52 Stockholm, Sverige",
-    "kommun": "Stockholm",
-    "lan": "Stockholm",
-    "lat": 59.31601729999999,
-    "lng": 18.0633365,
-    "website": "https://www.kiviksmusteri.se/besok-oss/musteributiken-i-stockholm/",
-    "phone": "08-560 475 99",
-    "email": "",
-    "products": [
-      "vin"
-    ],
-    "onSiteSales": false,
-    "tastingRoom": true,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "måndag: 11:00–17:00, tisdag: 11:00–17:00, onsdag: 11:00–17:00, torsdag: 11:00–17:00, fredag: 11:00–17:00, lördag: 12:00–18:00, söndag: 12:00–17:00",
-    "season": "",
-    "source": "google-places:musteri"
-  },
-  {
     "id": "kvarnnibble-butik-och-musteri",
     "place_id": "ChIJIb1CQgywX0YRRpyOc1JyIsc",
     "name": "Kvarnnibble Butik och Musteri",
@@ -623,54 +551,6 @@
     "openingHours": "",
     "season": "",
     "source": "google-places:gårdsbutik"
-  },
-  {
-    "id": "munchenbryggeriet-event-konferens",
-    "place_id": "ChIJT2b7ZOd3X0YRXebeEy1Z2Ew",
-    "name": "Münchenbryggeriet Event & Konferens",
-    "description": "",
-    "address": "Torkel Knutssonsgatan 2, 118 25 Stockholm, Sverige",
-    "kommun": "Stockholm",
-    "lan": "Stockholm",
-    "lat": 59.3205967,
-    "lng": 18.0558647,
-    "website": "https://munchenbryggeriet.se/",
-    "phone": "08-658 20 00",
-    "email": "",
-    "products": [
-      "öl"
-    ],
-    "onSiteSales": false,
-    "tastingRoom": true,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "måndag: Stängt, tisdag: 16:00–22:00, onsdag: 16:00–22:00, torsdag: 16:00–22:00, fredag: 16:00–22:00, lördag: 16:00–22:00, söndag: 16:00–22:00",
-    "season": "",
-    "source": "google-places:bryggeri"
-  },
-  {
-    "id": "munchenbryggeriet-event-konferens-kontor",
-    "place_id": "ChIJT5UJ2Jp3X0YRNXJEfNaJjdw",
-    "name": "Münchenbryggeriet Event & Konferens - Kontor",
-    "description": "",
-    "address": "Söder Mälarstrand, Kajplats 18, 118 25 Stockholm, Sverige",
-    "kommun": "Stockholm",
-    "lan": "Stockholm",
-    "lat": 59.32131450000001,
-    "lng": 18.0540613,
-    "website": "http://www.munchenbryggeriet.se/",
-    "phone": "08-658 20 00",
-    "email": "",
-    "products": [
-      "öl"
-    ],
-    "onSiteSales": false,
-    "tastingRoom": true,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": true,
-    "openingHours": "måndag: 08:00–16:00, tisdag: 08:00–16:00, onsdag: 08:00–16:00, torsdag: 08:00–16:00, fredag: 08:00–16:00, lördag: Stängt, söndag: Stängt",
-    "season": "",
-    "source": "google-places:bryggeri"
   },
   {
     "id": "nacka-bryggeri",
@@ -1082,30 +962,6 @@
     "source": "google-places:lokal producent mat"
   },
   {
-    "id": "spendrups-bryggeri-ab",
-    "place_id": "ChIJ20Y5_lSdX0YRbwo_rnYIuOE",
-    "name": "Spendrups Bryggeri AB",
-    "description": "",
-    "address": "Sankt Eriksgatan 119, 113 43 Stockholm, Sverige",
-    "kommun": "Stockholm",
-    "lan": "Stockholm",
-    "lat": 59.3478298,
-    "lng": 18.0400949,
-    "website": "https://www.spendrups.se/",
-    "phone": "08-672 77 00",
-    "email": "",
-    "products": [
-      "öl"
-    ],
-    "onSiteSales": false,
-    "tastingRoom": true,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "måndag: 08:00–17:00, tisdag: 08:00–17:00, onsdag: 08:00–17:00, torsdag: 08:00–17:00, fredag: 08:00–17:00, lördag: Stängt, söndag: Stängt",
-    "season": "",
-    "source": "google-places:bryggeri"
-  },
-  {
     "id": "stegsholms-gard",
     "place_id": "ChIJ0-qgegCI9UYRsPROjVgOos4",
     "name": "Stegsholms gård",
@@ -1322,30 +1178,6 @@
     "source": "google-places:gårdsbutik"
   },
   {
-    "id": "vintertradgarden-restaurang-och-event",
-    "place_id": "ChIJeY4n4zedX0YRHT32qh7fZLQ",
-    "name": "Vinterträdgården restaurang och event",
-    "description": "",
-    "address": "Jägmästargatan 2, 115 42 Stockholm, Sverige",
-    "kommun": "Stockholm",
-    "lan": "Stockholm",
-    "lat": 59.35215509999999,
-    "lng": 18.10383,
-    "website": "https://www.restaurangvt.se/",
-    "phone": "073-330 86 89",
-    "email": "",
-    "products": [
-      "grönsaker"
-    ],
-    "onSiteSales": true,
-    "tastingRoom": true,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "måndag: 10:00–13:30, tisdag: 10:00–13:30, onsdag: 10:00–13:30, torsdag: 10:00–13:30, fredag: 10:00–13:30, lördag: Stängt, söndag: Stängt",
-    "season": "",
-    "source": "google-places:gårdsrestaurang"
-  },
-  {
     "id": "vaddo-gardsmejeri-gardsbutik-cafe",
     "place_id": "ChIJxTR7DCj-X0YRwfvoa0gtaAU",
     "name": "Väddö Gårdsmejeri - Gårdsbutik & Café",
@@ -1416,30 +1248,6 @@
     "openingHours": "måndag: Stängt, tisdag: Stängt, onsdag: Stängt, torsdag: 12:00–17:30, fredag: 12:00–17:00, lördag: 11:00–15:00, söndag: Stängt",
     "season": "",
     "source": "google-places:gårdsbutik"
-  },
-  {
-    "id": "wingardh-wellness",
-    "place_id": "ChIJtQc9z7FxX0YRFSOHit-7WKE",
-    "name": "Wingårdh Wellness",
-    "description": "",
-    "address": "Regeringsgatan 47, 111 56 Stockholm, Sverige",
-    "kommun": "Stockholm",
-    "lan": "Stockholm",
-    "lat": 59.3332254,
-    "lng": 18.067488,
-    "website": "http://www.wingardhwellness.com/",
-    "phone": "073-961 63 34",
-    "email": "",
-    "products": [
-      "vin"
-    ],
-    "onSiteSales": false,
-    "tastingRoom": true,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "måndag: 09:00–18:00, tisdag: 09:00–18:00, onsdag: 09:00–18:00, torsdag: 09:00–18:30, fredag: 07:30–18:00, lördag: Stängt, söndag: Stängt",
-    "season": "",
-    "source": "google-places:vingård"
   },
   {
     "id": "wolraths-bryggeri",
@@ -1896,30 +1704,6 @@
     "openingHours": "måndag: 10:00–18:00, tisdag: 10:00–18:00, onsdag: 10:00–18:00, torsdag: 10:00–18:00, fredag: 10:00–18:00, lördag: 10:00–16:00, söndag: 10:00–16:00",
     "season": "",
     "source": "google-places:gårdsförsäljning"
-  },
-  {
-    "id": "granngarden",
-    "place_id": "ChIJq6qqqiGNXkYRlE9DR9bJicE",
-    "name": "Granngården",
-    "description": "",
-    "address": "Fagottvägen 1A, 633 47 Eskilstuna, Sverige",
-    "kommun": "Eskilstuna",
-    "lan": "Södermanland",
-    "lat": 59.39700000000001,
-    "lng": 16.471,
-    "website": "https://www.granngarden.se/butiker/eskilstuna",
-    "phone": "",
-    "email": "",
-    "products": [
-      "annat"
-    ],
-    "onSiteSales": false,
-    "tastingRoom": false,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "måndag: 09:00–19:00, tisdag: 09:00–19:00, onsdag: 09:00–19:00, torsdag: 09:00–19:00, fredag: 09:00–19:00, lördag: 10:00–16:00, söndag: 10:00–16:00",
-    "season": "",
-    "source": "google-places:lokal producent mat"
   },
   {
     "id": "gardshuset-pa-aleby",
@@ -2955,30 +2739,6 @@
     "source": "google-places:gårdsbutik"
   },
   {
-    "id": "granngarden-2",
-    "place_id": "ChIJ1bGaCU_JX0YRjW-SRAKQd2w",
-    "name": "Granngården",
-    "description": "",
-    "address": "Stångjärnsgatan 8, 753 23 Uppsala, Sverige",
-    "kommun": "Uppsala",
-    "lan": "Uppsala",
-    "lat": 59.8470356,
-    "lng": 17.6828116,
-    "website": "https://www.granngarden.se/butiker/uppsala",
-    "phone": "",
-    "email": "",
-    "products": [
-      "annat"
-    ],
-    "onSiteSales": true,
-    "tastingRoom": false,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "måndag: 08:00–19:00, tisdag: 08:00–19:00, onsdag: 08:00–19:00, torsdag: 08:00–19:00, fredag: 08:00–19:00, lördag: 10:00–16:00, söndag: 11:00–16:00",
-    "season": "",
-    "source": "google-places:gårdsbutik"
-  },
-  {
     "id": "granum-musteri",
     "place_id": "ChIJH-3BURi1X0YRG5-TT8Edq4c",
     "name": "Granum Musteri",
@@ -3147,30 +2907,6 @@
     "source": "google-places:odlare gård"
   },
   {
-    "id": "mikaelsgarden",
-    "place_id": "ChIJIwrQAQrMX0YRKZmU30bYEio",
-    "name": "Mikaelsgården",
-    "description": "",
-    "address": "Skolgatan 24, 753 16 Uppsala, Sverige",
-    "kommun": "Uppsala",
-    "lan": "Uppsala",
-    "lat": 59.8644573,
-    "lng": 17.6350326,
-    "website": "https://uppsalastadsmission.se/verksamheter/mikaelsgarden/",
-    "phone": "018-16 03 33",
-    "email": "",
-    "products": [
-      "annat"
-    ],
-    "onSiteSales": false,
-    "tastingRoom": false,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "måndag: 07:30–14:00, tisdag: 07:30–14:00, onsdag: 07:30–14:00, torsdag: 07:30–14:00, fredag: 07:30–14:00, lördag: Stängt, söndag: Stängt",
-    "season": "",
-    "source": "google-places:lokal producent mat"
-  },
-  {
     "id": "miklagard",
     "place_id": "ChIJTdphtPfNX0YRCOGn3BFuOYM",
     "name": "Miklagård",
@@ -3241,54 +2977,6 @@
     "openingHours": "måndag: Stängt, tisdag: Stängt, onsdag: Stängt, torsdag: Stängt, fredag: 11:00–18:00, lördag: 11:00–16:00, söndag: 11:00–16:00",
     "season": "",
     "source": "google-places:gårdsbutik"
-  },
-  {
-    "id": "restaurang-soderby-gard",
-    "place_id": "ChIJdaF3TD3LX0YRZSulDnCnt30",
-    "name": "Restaurang Söderby Gård",
-    "description": "",
-    "address": "Söderby Gård, 755 91 Uppsala, Sverige",
-    "kommun": "Uppsala",
-    "lan": "Uppsala",
-    "lat": 59.811926,
-    "lng": 17.4979327,
-    "website": "https://www.golfuppsala.se/",
-    "phone": "018-430 19 73",
-    "email": "",
-    "products": [
-      "annat"
-    ],
-    "onSiteSales": true,
-    "tastingRoom": true,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": true,
-    "openingHours": "måndag: 08:30–16:00, tisdag: 08:30–16:00, onsdag: 08:30–16:00, torsdag: 08:30–16:00, fredag: 08:30–16:00, lördag: 08:00–16:00, söndag: 08:00–16:00",
-    "season": "",
-    "source": "google-places:gårdsrestaurang"
-  },
-  {
-    "id": "restaurang-tradgarden-italiensk-restaurang-uppsala",
-    "place_id": "ChIJudxYdBHMX0YR75o5uDjsyns",
-    "name": "Restaurang Trädgården - Italiensk Restaurang Uppsala",
-    "description": "",
-    "address": "Heidenstamsgatan 69, 754 27 Uppsala, Sverige",
-    "kommun": "Uppsala",
-    "lan": "Uppsala",
-    "lat": 59.8778252,
-    "lng": 17.647161,
-    "website": "http://www.restaurangtradgarden.se/",
-    "phone": "018-22 12 44",
-    "email": "",
-    "products": [
-      "grönsaker"
-    ],
-    "onSiteSales": true,
-    "tastingRoom": true,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "måndag: 11:00–22:00, tisdag: 11:00–22:00, onsdag: 11:00–22:00, torsdag: 11:00–22:00, fredag: 11:00–23:00, lördag: 12:00–23:00, söndag: 12:00–22:00",
-    "season": "",
-    "source": "google-places:gårdsrestaurang"
   },
   {
     "id": "ro-gardsmejeri",
@@ -3527,30 +3215,6 @@
     "gardsförsäljningLicense": false,
     "isArchipelago": false,
     "openingHours": "måndag: Stängt, tisdag: Stängt, onsdag: Stängt, torsdag: Stängt, fredag: Stängt, lördag: Stängt, söndag: 12:00–14:00",
-    "season": "",
-    "source": "google-places:gårdsförsäljning"
-  },
-  {
-    "id": "brunnby-gard",
-    "place_id": "ChIJ9fhKp6pgXkYRm63xcywu0eg",
-    "name": "Brunnby Gård",
-    "description": "",
-    "address": "BRUNNBY 4, 725 97 Västerås, Sverige",
-    "kommun": "Västerås",
-    "lan": "Västmanland",
-    "lat": 59.61268359999999,
-    "lng": 16.6635387,
-    "website": "http://www.hushallningssallskapet.se/",
-    "phone": "",
-    "email": "",
-    "products": [
-      "annat"
-    ],
-    "onSiteSales": true,
-    "tastingRoom": false,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "måndag: Stängt, tisdag: 09:00–17:00, onsdag: 09:00–17:00, torsdag: Stängt, fredag: Stängt, lördag: 09:00–17:00, söndag: Stängt",
     "season": "",
     "source": "google-places:gårdsförsäljning"
   },
@@ -3863,30 +3527,6 @@
     "gardsförsäljningLicense": false,
     "isArchipelago": false,
     "openingHours": "måndag: 11:00–15:00, tisdag: 11:00–15:00, onsdag: 11:00–15:00, torsdag: 11:00–15:00, fredag: 11:00–15:00, lördag: Stängt, söndag: Stängt",
-    "season": "",
-    "source": "google-places:gårdsrestaurang"
-  },
-  {
-    "id": "restaurang-agarden",
-    "place_id": "ChIJrfB6M5knXEYRhYDh0xnT4yY",
-    "name": "Restaurang Ågården",
-    "description": "",
-    "address": "Kapellgatan 8, 732 30 Arboga, Sverige",
-    "kommun": "Arboga",
-    "lan": "Västmanland",
-    "lat": 59.39321769999999,
-    "lng": 15.8390617,
-    "website": "https://mymenuweb.com/swe/restaurants/2305203/?utm_source=google_profile&utm_medium=google_profile&utm_campaign=admin",
-    "phone": "0589-102 46",
-    "email": "",
-    "products": [
-      "annat"
-    ],
-    "onSiteSales": true,
-    "tastingRoom": true,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "måndag: 11:00–14:00, tisdag: 11:00–14:00, onsdag: 11:00–14:00, torsdag: 11:00–14:00, fredag: 11:00–14:00, 17:30–01:00, lördag: 17:30–01:00, söndag: Stängt",
     "season": "",
     "source": "google-places:gårdsrestaurang"
   },

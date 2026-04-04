@@ -76,7 +76,7 @@ export default function Image() {
           maxWidth: 720,
         }}
       >
-        176 gårdsbutiker i Mälardalen — köp lokalt direkt från bonden.
+        161 gårdsbutiker i Mälardalen — köp lokalt direkt från bonden.
       </div>
 
       {/* Bottom domain badge */}
