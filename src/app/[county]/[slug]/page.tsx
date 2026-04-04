@@ -16,6 +16,7 @@ import { SLUG_TO_COUNTY, COUNTY_TO_SLUG, COUNTY_SLUGS, farmPath } from "../../..
 import BackButton from "../../../components/BackButton";
 import FarmDetailMapLoader from "../../../components/FarmDetailMapLoader";
 import OpeningHoursTable from "../../../components/OpeningHoursTable";
+import ClaimSection from "../../../components/ClaimSection";
 import { SITE_URL } from "../../../lib/site";
 import type { Farm } from "../../../types/farm";
 
@@ -242,6 +243,8 @@ export default async function FarmDetailPage({ params }: Props) {
               </ul>
             </section>
           )}
+
+          <ClaimSection farmId={farm.id} farmName={farm.name} />
 
           <a
             href={mapsUrl}

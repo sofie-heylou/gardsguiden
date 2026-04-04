@@ -50,10 +50,15 @@ export function generateCode(): string {
  * Create a session token for the given user and persist it to the DB.
  * Returns the raw token (to be set as a cookie value).
  */
+/** Format a JS Date as SQLite UTC string: "YYYY-MM-DD HH:MM:SS" */
+function toSqlite(d: Date): string {
+  return d.toISOString().replace("T", " ").replace(/\.\d+Z$/, "");
+}
+
 export function createSession(userId: string): string {
   const db = getDb();
   const token = generateToken();
-  const expiresAt = new Date(Date.now() + SESSION_MAX_AGE_SEC * 1000).toISOString();
+  const expiresAt = toSqlite(new Date(Date.now() + SESSION_MAX_AGE_SEC * 1000));
 
   db.prepare(`
     INSERT INTO sessions (token, user_id, expires_at)
@@ -71,7 +76,7 @@ export function verifySession(token: string): User | null {
   if (!token) return null;
   const db = getDb();
 
-  const now = new Date().toISOString();
+  const now = toSqlite(new Date());
 
   // Delete expired sessions lazily
   db.prepare(`DELETE FROM sessions WHERE expires_at < ?`).run(now);
@@ -101,4 +106,15 @@ export function getCurrentUser(request: NextRequest): User | null {
  */
 export function deleteSession(token: string): void {
   getDb().prepare(`DELETE FROM sessions WHERE token = ?`).run(token);
+}
+
+/**
+ * Server-component helper — reads the session cookie via next/headers.
+ * Only call this from Server Components or Route Handlers.
+ */
+export async function getServerUser(): Promise<User | null> {
+  const { cookies } = await import("next/headers");
+  const token = (await cookies()).get(COOKIE_NAME)?.value;
+  if (!token) return null;
+  return verifySession(token);
 }

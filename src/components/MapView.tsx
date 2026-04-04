@@ -6,7 +6,7 @@ import type { MapRef, ViewStateChangeEvent } from "react-map-gl/mapbox";
 import type { FillLayer } from "mapbox-gl";
 import Supercluster from "supercluster";
 import type { BBox, Feature, Polygon } from "geojson";
-import { LocateFixed, SlidersHorizontal, X, Loader2, AlertTriangle, ArrowRight, ShoppingBag, GlassWater } from "lucide-react";
+import { LocateFixed, SlidersHorizontal, X, Loader2, AlertTriangle, ArrowRight, ShoppingBag, GlassWater, BadgeCheck } from "lucide-react";
 import Link from "next/link";
 import type { Farm } from "../types/farm";
 import { CATEGORIES, farmMatchesCategory } from "../lib/categories";
@@ -270,7 +270,15 @@ export default function MapView() {
                 <X size={13} />
               </button>
               <h3 className="font-display text-[14px] text-stone-900 leading-snug mb-0.5">{selected.name}</h3>
-              <p className="text-[11px] text-stone-400 mb-2">{selected.kommun}, {selected.lan}</p>
+              <div className="flex items-center gap-2 mb-2">
+                <p className="text-[11px] text-stone-400">{selected.kommun}, {selected.lan}</p>
+                {selected.isClaimed && (
+                  <span className="flex items-center gap-0.5 text-[10px] font-medium text-emerald-600">
+                    <BadgeCheck size={11} />
+                    Verifierad
+                  </span>
+                )}
+              </div>
               {selected.products.filter(p => p !== "annat").length > 0 && (
                 <div className="flex flex-wrap gap-1 mb-2">
                   {selected.products.filter(p => p !== "annat").map((p) => (

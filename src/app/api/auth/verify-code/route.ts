@@ -10,7 +10,6 @@ import {
 
 export const dynamic = "force-dynamic";
 
-// Generic error to avoid leaking whether an email/code exists
 const INVALID_ERROR = "Ogiltig eller utgången kod";
 
 export async function POST(req: NextRequest) {
@@ -33,49 +32,58 @@ export async function POST(req: NextRequest) {
 
   const db = getDb();
 
-  // Find the user
   const user = db.prepare(
     "SELECT id, email, name, phone FROM users WHERE email = ?"
-  ).get(email) as { id: string; email: string; name: string | null; phone: string | null } | undefined;
+  ).get(email) as
+    | { id: string; email: string; name: string | null; phone: string | null }
+    | undefined;
 
   if (!user) {
     return NextResponse.json({ error: INVALID_ERROR }, { status: 401 });
   }
 
-  // Find a matching pending claim created within the TTL window
-  const cutoff = new Date(Date.now() - CODE_TTL_SEC * 1000).toISOString();
+  // SQLite datetime('now') stores "YYYY-MM-DD HH:MM:SS" (UTC, no T/Z).
+  // JS toISOString() produces "YYYY-MM-DDThh:mm:ss.sssZ" — different format,
+  // so string comparison with SQLite timestamps requires matching format.
+  const toSqlite = (d: Date) => d.toISOString().replace("T", " ").replace(/\.\d+Z$/, "");
+  const cutoff = toSqlite(new Date(Date.now() - CODE_TTL_SEC * 1000));
   const codeHash = hashCode(code);
 
-  const claim = db.prepare(`
-    SELECT id, farm_id
-    FROM farm_claims
-    WHERE user_id = ?
-      AND status = 'pending'
-      AND verification_code = ?
-      AND created_at > ?
-    ORDER BY created_at DESC
-    LIMIT 1
-  `).get(user.id, codeHash, cutoff) as { id: string; farm_id: string } | undefined;
+  // Verify against auth_codes
+  const authCode = db.prepare(`
+    SELECT id FROM auth_codes
+    WHERE user_id = ? AND code_hash = ? AND created_at > ?
+    ORDER BY created_at DESC LIMIT 1
+  `).get(user.id, codeHash, cutoff) as { id: string } | undefined;
 
-  if (!claim) {
+  if (!authCode) {
     return NextResponse.json({ error: INVALID_ERROR }, { status: 401 });
   }
 
-  // Mark the claim as verified and record the timestamp
-  db.prepare(`
-    UPDATE farm_claims
-    SET status = 'verified', verified_at = datetime('now')
-    WHERE id = ?
-  `).run(claim.id);
+  // Consume the code (delete it so it can't be reused)
+  db.prepare("DELETE FROM auth_codes WHERE id = ?").run(authCode.id);
 
-  // Mark the farm as claimed by this user (if not already claimed)
-  db.prepare(`
-    UPDATE farms
-    SET claimed_by = ?
-    WHERE id = ? AND (claimed_by IS NULL OR claimed_by = ?)
-  `).run(user.id, claim.farm_id, user.id);
+  // If there's a matching pending farm_claim with the same code, verify it too
+  const claim = db.prepare(`
+    SELECT id, farm_id FROM farm_claims
+    WHERE user_id = ? AND status = 'pending'
+      AND verification_code = ? AND created_at > ?
+    ORDER BY created_at DESC LIMIT 1
+  `).get(user.id, codeHash, cutoff) as { id: string; farm_id: string } | undefined;
 
-  // Issue a session token
+  if (claim) {
+    db.prepare(`
+      UPDATE farm_claims SET status = 'verified', verified_at = datetime('now')
+      WHERE id = ?
+    `).run(claim.id);
+
+    db.prepare(`
+      UPDATE farms SET claimed_by = ?
+      WHERE id = ? AND (claimed_by IS NULL OR claimed_by = ?)
+    `).run(user.id, claim.farm_id, user.id);
+  }
+
+  // Issue session
   const token = createSession(user.id);
 
   const response = NextResponse.json({

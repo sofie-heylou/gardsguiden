@@ -71,6 +71,16 @@ function initSchema(db: Database.Database): void {
 
     CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id);
 
+    -- ── Login codes (email-only auth, no farm required) ──────────────────────
+    CREATE TABLE IF NOT EXISTS auth_codes (
+      id         TEXT PRIMARY KEY,
+      user_id    TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      code_hash  TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_auth_codes_user ON auth_codes(user_id);
+
     -- ── Claim workflow ─────────────────────────────────────────────────────────
     CREATE TABLE IF NOT EXISTS farm_claims (
       id                TEXT PRIMARY KEY,

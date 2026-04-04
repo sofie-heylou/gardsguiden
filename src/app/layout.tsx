@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Lora } from "next/font/google";
 import Header from "../components/Header";
 import BottomNav from "../components/BottomNav";
+import { AuthProvider } from "../components/AuthProvider";
 import { SITE_URL } from "../lib/site";
 import "./globals.css";
 
@@ -73,9 +74,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="sv" className={lora.variable}>
       <body className="h-dvh flex flex-col overflow-hidden" style={{ background: "#FAFAF8", color: "#2c2c2c" }}>
-        <Header />
-        <main className="flex-1 overflow-hidden">{children}</main>
-        <BottomNav />
+        <AuthProvider>
+          <Header />
+          <main className="flex-1 overflow-hidden">{children}</main>
+          <BottomNav />
+        </AuthProvider>
       </body>
     </html>
   );
