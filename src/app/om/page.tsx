@@ -5,12 +5,12 @@ import { MapPin, PlusCircle, BadgeCheck } from "lucide-react";
 export const metadata: Metadata = {
   title: "Om Gårdsguiden",
   description:
-    "Lär dig mer om Gårdsguiden — en katalog över gårdsbutiker och direktförsäljning i Stockholm, Uppsala, Västmanland och Södermanland.",
+    "Lär dig mer om Gårdsguiden — en katalog över gårdsbutiker och direktförsäljning i hela Sverige.",
   alternates: { canonical: "/om" },
   openGraph: {
     title: "Om Gårdsguiden",
     description:
-      "En katalog över gårdsbutiker och direktförsäljning i Mälardalen. Hitta lokalt kött, grönsaker, mejeriprodukter och mer direkt från bonden.",
+      "En katalog över gårdsbutiker och direktförsäljning i Sverige. Hitta lokalt kött, grönsaker, mejeriprodukter och mer direkt från bonden.",
   },
 };
 
@@ -62,11 +62,13 @@ export default function OmPage() {
           </p>
         </div>
 
-        {/* ── Län ───────────────────────────────────────────────────────────── */}
+        {/* ── Täckning ──────────────────────────────────────────────────────── */}
         <div className="space-y-3">
-          <h2 className="font-display text-xl text-stone-900">Fyra län</h2>
-          <p className="text-sm text-stone-600">
-            Just nu täcker Gårdsguiden gårdar i följande län:
+          <h2 className="font-display text-xl text-stone-900">Täckning</h2>
+          <p className="text-sm text-stone-600 leading-relaxed">
+            Gårdsguiden täcker just nu fyra län — Stockholm, Uppsala,
+            Västmanland och Södermanland — och expanderar löpande till fler
+            delar av Sverige.
           </p>
           <ul className="space-y-2">
             {COUNTIES.map(({ name, count, href }) => (
@@ -84,6 +86,13 @@ export default function OmPage() {
               </li>
             ))}
           </ul>
+          <p className="text-xs text-stone-400">
+            Vill du se din region på Gårdsguiden?{" "}
+            <Link href="/kontakt" className="underline hover:text-stone-600 transition-colors">
+              Hör av dig
+            </Link>
+            {" "}— vi prioriterar områden där intresset är störst.
+          </p>
         </div>
 
         {/* ── Gårdsägare ────────────────────────────────────────────────────── */}

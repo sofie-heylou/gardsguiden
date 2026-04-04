@@ -1,7 +1,7 @@
 # Gårdsguiden
 
-En katalog över gårdsbutiker i fyra svenska län:
-**Stockholm**, **Uppsala**, **Västmanland** och **Södermanland**.
+En katalog över gårdsbutiker i Sverige. Just nu täcker vi
+**Stockholm**, **Uppsala**, **Västmanland** och **Södermanland** — med expansion till fler regioner på gång.
 
 - **161 verifierade gårdar** med koordinater, kategorier och kontaktuppgifter
 - Interaktiv karta (Mapbox GL) med klustring och radiussökning

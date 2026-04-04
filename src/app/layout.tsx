@@ -14,7 +14,7 @@ const lora = Lora({
 });
 
 const DESCRIPTION =
-  "Hitta gårdsbutiker och köp lokala råvaror direkt från bonden i Stockholm, Uppsala, Västmanland och Södermanland. 161 verifierade gårdar med kött, grönsaker, mejeriprodukter, honung och mer.";
+  "Hitta gårdsbutiker och köp lokala råvaror direkt från bonden. 161 verifierade gårdar med kött, grönsaker, mejeriprodukter, honung och mer.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

@@ -32,35 +32,15 @@ export default function Image() {
         }}
       />
 
-      {/* County tags */}
-      <div style={{ display: "flex", gap: 10, marginBottom: 44 }}>
-        {["Stockholm", "Uppsala", "Västmanland", "Södermanland"].map((lan) => (
-          <div
-            key={lan}
-            style={{
-              padding: "6px 18px",
-              borderRadius: 999,
-              background: "#f5f5f4",
-              border: "1px solid #e7e5e4",
-              color: "#78716c",
-              fontSize: 22,
-              letterSpacing: 0.2,
-            }}
-          >
-            {lan}
-          </div>
-        ))}
-      </div>
-
       {/* App name */}
       <div
         style={{
-          fontSize: 100,
+          fontSize: 104,
           fontWeight: 700,
           color: "#1c1917",
           letterSpacing: -3,
           lineHeight: 1,
-          marginBottom: 28,
+          marginBottom: 32,
         }}
       >
         Gårdsguiden
@@ -69,14 +49,25 @@ export default function Image() {
       {/* Tagline */}
       <div
         style={{
-          fontSize: 32,
-          color: "#78716c",
+          fontSize: 38,
+          color: "#44403c",
           fontWeight: 400,
-          lineHeight: 1.45,
-          maxWidth: 720,
+          lineHeight: 1,
+          marginBottom: 20,
         }}
       >
-        161 gårdsbutiker i Mälardalen — köp lokalt direkt från bonden.
+        Hitta gårdsbutiker nära dig
+      </div>
+
+      {/* Subtitle */}
+      <div
+        style={{
+          fontSize: 26,
+          color: "#a8a29e",
+          fontWeight: 400,
+        }}
+      >
+        161 gårdar med lokalproducerad mat
       </div>
 
       {/* Bottom domain badge */}
