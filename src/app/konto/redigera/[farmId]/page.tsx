@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
-import { getServerUser } from "../../../../lib/auth";
+import { auth } from "@clerk/nextjs/server";
 import { getDb } from "../../../../lib/db";
 import EditFarmForm from "./EditFarmForm";
 
@@ -29,15 +29,15 @@ type Props = { params: Promise<{ farmId: string }> };
 export default async function RedigeraPage({ params }: Props) {
   const { farmId } = await params;
 
-  const user = await getServerUser();
-  if (!user) redirect("/logga-in");
+  const { userId } = await auth();
+  if (!userId) redirect("/logga-in");
 
   const db = getDb();
   const row = db.prepare(
     "SELECT id, name, description, address, website, phone, email, products, openingHours, season, onSiteSales, tastingRoom, claimed_by FROM farms WHERE id = ?"
   ).get(farmId) as (FarmData & { claimed_by: string | null }) | undefined;
 
-  if (!row || row.claimed_by !== user.id) redirect("/konto");
+  if (!row || row.claimed_by !== userId) redirect("/konto");
 
   const farm: FarmData = {
     id: row.id,

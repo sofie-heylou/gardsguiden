@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import { getDb } from "../../../../../lib/db";
-import { getCurrentUser } from "../../../../../lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -19,11 +19,11 @@ export async function GET(
     return NextResponse.json({ error: "Inte hittad" }, { status: 404 });
   }
 
-  const user = getCurrentUser(req);
+  const { userId } = await auth();
 
   return NextResponse.json({
     isClaimed: Boolean(farm.claimed_by),
-    isClaimedByMe: Boolean(farm.claimed_by && user && farm.claimed_by === user.id),
-    isLoggedIn: Boolean(user),
+    isClaimedByMe: Boolean(farm.claimed_by && userId && farm.claimed_by === userId),
+    isLoggedIn: Boolean(userId),
   });
 }

@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { currentUser } from "@clerk/nextjs/server";
 import { MapPin, BadgeCheck, ArrowRight, PlusCircle, Search, Clock } from "lucide-react";
-import { getServerUser } from "../../lib/auth";
 import { getDb } from "../../lib/db";
 import { farmPath } from "../../lib/counties";
 import LogoutButton from "../../components/LogoutButton";
@@ -31,21 +31,19 @@ interface PendingClaimRow {
 type Props = { searchParams: Promise<{ betalat?: string }> };
 
 export default async function KontoPage({ searchParams }: Props) {
-  const user = await getServerUser();
+  const user = await currentUser();
   if (!user) redirect("/logga-in");
 
   const { betalat } = await searchParams;
+  const userId = user.id;
+  const userEmail = user.primaryEmailAddress?.emailAddress ?? "";
 
   const db = getDb();
 
-  // Confirmed farms (payment confirmed, claimed_by set)
   const claimedFarms = db
-    .prepare(
-      `SELECT id, name, lan, kommun FROM farms WHERE claimed_by = ? ORDER BY name`
-    )
-    .all(user.id) as ClaimedFarmRow[];
+    .prepare(`SELECT id, name, lan, kommun FROM farms WHERE claimed_by = ? ORDER BY name`)
+    .all(userId) as ClaimedFarmRow[];
 
-  // Claims awaiting payment confirmation
   const pendingClaims = db
     .prepare(
       `SELECT fc.id as claim_id, f.id, f.name, f.lan, f.kommun
@@ -54,9 +52,8 @@ export default async function KontoPage({ searchParams }: Props) {
        WHERE fc.user_id = ? AND fc.payment_status = 'pending_payment'
        ORDER BY fc.created_at DESC`
     )
-    .all(user.id) as PendingClaimRow[];
+    .all(userId) as PendingClaimRow[];
 
-  // Deduplicate: don't show a farm as both confirmed and pending
   const confirmedIds = new Set(claimedFarms.map((f) => f.id));
   const pendingOnly = pendingClaims.filter((c) => !confirmedIds.has(c.id));
 
@@ -66,7 +63,6 @@ export default async function KontoPage({ searchParams }: Props) {
     <div className="h-full overflow-y-auto" style={{ background: "#FAFAF8" }}>
       <div className="max-w-lg mx-auto px-4 py-6 pb-12 space-y-8">
 
-        {/* ── Payment confirmation banner ──────────────────────────────────── */}
         {betalat && (
           <div className="rounded-xl bg-amber-50 border border-amber-100 px-4 py-3">
             <p className="text-sm font-medium text-amber-800">Tack!</p>
@@ -76,18 +72,14 @@ export default async function KontoPage({ searchParams }: Props) {
           </div>
         )}
 
-        {/* ── User header ─────────────────────────────────────────────────── */}
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-stone-400 mb-1">
             Inloggad
           </p>
-          <h1 className="font-display text-2xl text-stone-900">
-            {user.name ?? "Mitt konto"}
-          </h1>
-          <p className="text-sm text-stone-500 mt-0.5">{user.email}</p>
+          <h1 className="font-display text-2xl text-stone-900">Mitt konto</h1>
+          <p className="text-sm text-stone-500 mt-0.5">{userEmail}</p>
         </div>
 
-        {/* ── Mina gårdar ─────────────────────────────────────────────────── */}
         <section className="space-y-3">
           <h2 className="text-xs font-semibold uppercase tracking-wide text-stone-400">
             Mina gårdar
@@ -95,7 +87,6 @@ export default async function KontoPage({ searchParams }: Props) {
 
           {hasAnyFarms ? (
             <ul className="space-y-2">
-              {/* Confirmed / active farms */}
               {claimedFarms.map((farm) => (
                 <li
                   key={farm.id}
@@ -134,7 +125,6 @@ export default async function KontoPage({ searchParams }: Props) {
                 </li>
               ))}
 
-              {/* Pending payment claims */}
               {pendingOnly.map((claim) => (
                 <li
                   key={claim.claim_id}
@@ -192,7 +182,6 @@ export default async function KontoPage({ searchParams }: Props) {
           )}
         </section>
 
-        {/* ── Logout ──────────────────────────────────────────────────────── */}
         <LogoutButton />
 
       </div>

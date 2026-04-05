@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import { getDb } from "../../../../../lib/db";
-import { getCurrentUser, generateId } from "../../../../../lib/auth";
+import { generateId } from "../../../../../lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -28,8 +29,8 @@ export async function POST(
 ) {
   const { id } = await context.params;
 
-  const user = getCurrentUser(req);
-  if (!user) {
+  const { userId } = await auth();
+  if (!userId) {
     return NextResponse.json({ error: "Inte inloggad" }, { status: 401 });
   }
 
@@ -43,7 +44,7 @@ export async function POST(
     return NextResponse.json({ error: "Gården hittades inte" }, { status: 404 });
   }
 
-  if (farm.claimed_by !== user.id) {
+  if (farm.claimed_by !== userId) {
     return NextResponse.json({ error: "Åtkomst nekad" }, { status: 403 });
   }
 
@@ -54,7 +55,6 @@ export async function POST(
     return NextResponse.json({ error: "Ogiltig förfrågan" }, { status: 400 });
   }
 
-  // Build SET clause and collect audit entries
   const setClauses: string[] = [];
   const setValues: unknown[] = [];
   const auditRows: { field: string; oldVal: string; newVal: string }[] = [];
@@ -63,11 +63,9 @@ export async function POST(
     if (!(field in body)) continue;
 
     let newVal: unknown = body[field as keyof UpdateBody];
-    let oldRaw: unknown = farm[field];
+    const oldRaw: unknown = farm[field];
 
-    // Normalise for comparison and storage
     if (field === "products") {
-      // Stored as JSON in DB
       const oldStr = typeof oldRaw === "string" ? oldRaw : JSON.stringify(oldRaw ?? []);
       const newStr = JSON.stringify(Array.isArray(newVal) ? newVal : []);
       if (oldStr === newStr) continue;
@@ -95,18 +93,16 @@ export async function POST(
     return NextResponse.json({ ok: true, changes: 0 });
   }
 
-  // Apply update
   db.prepare(
     `UPDATE farms SET ${setClauses.join(", ")} WHERE id = ?`
   ).run(...setValues, id);
 
-  // Write audit log
   const insertAudit = db.prepare(`
     INSERT INTO farm_edits (id, farm_id, user_id, field_name, old_value, new_value)
     VALUES (?, ?, ?, ?, ?, ?)
   `);
-  for (const row of auditRows) {
-    insertAudit.run(generateId(), id, user.id, row.field, row.oldVal, row.newVal);
+  for (const r of auditRows) {
+    insertAudit.run(generateId(), id, userId, r.field, r.oldVal, r.newVal);
   }
 
   return NextResponse.json({ ok: true, changes: auditRows.length });

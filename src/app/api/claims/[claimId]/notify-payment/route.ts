@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import { getDb } from "../../../../../lib/db";
-import { getCurrentUser } from "../../../../../lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -10,8 +10,8 @@ export async function POST(
 ) {
   const { claimId } = await context.params;
 
-  const user = getCurrentUser(req);
-  if (!user) {
+  const { userId } = await auth();
+  if (!userId) {
     return NextResponse.json({ error: "Inte inloggad" }, { status: 401 });
   }
 
@@ -27,12 +27,12 @@ export async function POST(
     return NextResponse.json({ error: "Anspråket hittades inte" }, { status: 404 });
   }
 
-  if (claim.user_id !== user.id) {
+  if (claim.user_id !== userId) {
     return NextResponse.json({ error: "Åtkomst nekad" }, { status: 403 });
   }
 
   if (claim.payment_status === "confirmed") {
-    return NextResponse.json({ ok: true }); // already confirmed, idempotent
+    return NextResponse.json({ ok: true });
   }
 
   db.prepare(`

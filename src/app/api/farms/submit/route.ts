@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import { getDb } from "../../../../lib/db";
-import { generateId, getCurrentUser } from "../../../../lib/auth";
+import { generateId } from "../../../../lib/utils";
 import { sendEmail, emailHtml, table, row, ADMIN_EMAIL } from "../../../../lib/email";
 
 export const dynamic = "force-dynamic";
@@ -36,8 +37,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Ogiltigt län" }, { status: 400 });
   }
 
-  const user = getCurrentUser(req);
-  const db   = getDb();
+  const { userId } = await auth();
+  const db = getDb();
 
   db.prepare(`
     INSERT INTO farm_submissions
@@ -64,7 +65,7 @@ export async function POST(req: NextRequest) {
     onSiteSales  ? 1 : 0,
     tastingRoom  ? 1 : 0,
     (submittedEmail as string).trim(),
-    user?.id ?? null,
+    userId ?? null,
   );
 
   const productList = Array.isArray(products) ? (products as string[]).join(", ") : null;

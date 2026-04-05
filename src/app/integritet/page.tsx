@@ -25,7 +25,7 @@ export default function IntegritetPage() {
         {/* ── Header ────────────────────────────────────────────────────────── */}
         <div className="space-y-2">
           <h1 className="font-display text-3xl text-stone-900">Integritetspolicy</h1>
-          <p className="text-xs text-stone-400">Senast uppdaterad: april 2025</p>
+          <p className="text-xs text-stone-400">Senast uppdaterad: april 2026</p>
         </div>
 
         <hr className="border-stone-100" />
@@ -55,7 +55,8 @@ export default function IntegritetPage() {
           </ul>
           <p>
             Besökare som enbart söker eller tittar på gårdar lämnar inga
-            personuppgifter till oss.
+            personuppgifter till oss. Däremot samlas anonymiserad användningsdata
+            in via Google Analytics — se avsnittet om kakor nedan för detaljer.
           </p>
         </Section>
 
@@ -63,15 +64,45 @@ export default function IntegritetPage() {
           <p>
             Uppgifterna används uteslutande för att låta gårdsägare logga in,
             bekräfta ägarskap och hålla sin gårds information aktuell.
-            Vi säljer eller delar inte uppgifter med tredje part för
+            Anonymiserad analysdata används för att förbättra webbplatsen och
+            förstå hur den används — den delas inte med tredje part för
             marknadsföringsändamål.
           </p>
         </Section>
 
         <Section title="Kakor (cookies)">
           <p>
-            Vi använder inga spårningskakor eller analysverktyg. Den enda kaka
-            vi sätter är en funktionskaka för inloggningssessionen
+            Vi använder Google Tag Manager (GTM) för att hantera skript på
+            webbplatsen. Via GTM använder vi Google Analytics 4 (GA4) för att
+            förstå hur besökare använder webbplatsen — till exempel vilka sidor
+            som besöks mest och hur användare navigerar.
+          </p>
+          <p>
+            GA4 sätter kakor (<code className="text-xs bg-stone-100 px-1 py-0.5 rounded">_ga</code>{" "}
+            och <code className="text-xs bg-stone-100 px-1 py-0.5 rounded">_ga_*</code>) som
+            lagras i upp till 2 år. IP-adresser anonymiseras. Data behandlas av
+            Google — läs mer i{" "}
+            <a
+              href="https://policies.google.com/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-stone-900 transition-colors"
+            >
+              Googles integritetspolicy
+            </a>
+            . Du kan avsäga dig spårning genom att installera{" "}
+            <a
+              href="https://tools.google.com/dlpage/gaoptout"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-stone-900 transition-colors"
+            >
+              Googles webbläsartillägg för att avsäga dig
+            </a>
+            .
+          </p>
+          <p>
+            Vi sätter också en funktionskaka för inloggningssessionen
             (<code className="text-xs bg-stone-100 px-1 py-0.5 rounded">gg_session</code>).
             Den tas bort när du loggar ut eller efter 30 dagar.
           </p>

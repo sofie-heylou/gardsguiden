@@ -146,6 +146,32 @@ function initSchema(db: Database.Database): void {
     CREATE INDEX IF NOT EXISTS idx_removals_farm   ON farm_removal_requests(farm_id);
     CREATE INDEX IF NOT EXISTS idx_removals_status ON farm_removal_requests(status);
 
+    -- ── Farm ownership (new subscription model) ───────────────────────────────
+    CREATE TABLE IF NOT EXISTS farm_ownership (
+      id         INTEGER PRIMARY KEY AUTOINCREMENT,
+      farm_id    TEXT NOT NULL REFERENCES farms(id) ON DELETE CASCADE,
+      user_id    TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      status     TEXT NOT NULL DEFAULT 'pending',   -- pending | approved
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_ownership_farm   ON farm_ownership(farm_id);
+    CREATE INDEX IF NOT EXISTS idx_ownership_user   ON farm_ownership(user_id);
+    CREATE INDEX IF NOT EXISTS idx_ownership_status ON farm_ownership(status);
+
+    -- ── Stripe subscriptions ───────────────────────────────────────────────────
+    CREATE TABLE IF NOT EXISTS subscriptions (
+      id                     INTEGER PRIMARY KEY AUTOINCREMENT,
+      farm_id                TEXT NOT NULL REFERENCES farms(id) ON DELETE CASCADE,
+      stripe_subscription_id TEXT,
+      status                 TEXT NOT NULL,          -- active | cancelled | past_due
+      current_period_end     INTEGER,                -- unix timestamp
+      created_at             TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_subscriptions_farm   ON subscriptions(farm_id);
+    CREATE INDEX IF NOT EXISTS idx_subscriptions_status ON subscriptions(status);
+
     -- ── Edit audit log ─────────────────────────────────────────────────────────
     CREATE TABLE IF NOT EXISTS farm_edits (
       id         TEXT PRIMARY KEY,
@@ -161,7 +187,7 @@ function initSchema(db: Database.Database): void {
     CREATE INDEX IF NOT EXISTS idx_edits_user ON farm_edits(user_id);
   `);
 
-  // ── Add new columns to farms (ALTER TABLE does not support IF NOT EXISTS) ──
+  // ── Add new columns (ALTER TABLE does not support IF NOT EXISTS) ────────────
   if (!columnExists(db, "farms", "claimed_by")) {
     db.exec(`ALTER TABLE farms ADD COLUMN claimed_by TEXT REFERENCES users(id)`);
   }
@@ -170,6 +196,12 @@ function initSchema(db: Database.Database): void {
   }
   if (!columnExists(db, "farms", "boost_expires_at")) {
     db.exec(`ALTER TABLE farms ADD COLUMN boost_expires_at TEXT`);
+  }
+  if (!columnExists(db, "farms", "tier")) {
+    db.exec(`ALTER TABLE farms ADD COLUMN tier TEXT NOT NULL DEFAULT 'free'`);
+  }
+  if (!columnExists(db, "users", "role")) {
+    db.exec(`ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'farmer'`);
   }
   if (!columnExists(db, "farm_claims", "payment_status")) {
     db.exec(`ALTER TABLE farm_claims ADD COLUMN payment_status TEXT NOT NULL DEFAULT 'unpaid'`);

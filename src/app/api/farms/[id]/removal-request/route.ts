@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "../../../../../lib/db";
-import { generateId } from "../../../../../lib/auth";
+import { generateId } from "../../../../../lib/utils";
 import { sendEmail, emailHtml, table, row, btn, ADMIN_EMAIL } from "../../../../../lib/email";
 import { SITE_URL } from "../../../../../lib/site";
 import { COUNTY_TO_SLUG } from "../../../../../lib/counties";

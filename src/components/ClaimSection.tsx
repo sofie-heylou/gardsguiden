@@ -129,9 +129,7 @@ export default function ClaimSection({ farmId, farmName }: Props) {
     setError("");
 
     if (!status?.isLoggedIn) {
-      // Not logged in — redirect to login with claim + redirect params
-      const url = `/logga-in?claim=${encodeURIComponent(farmId)}&redirect=/konto`;
-      router.push(url);
+      router.push("/logga-in");
       return;
     }
 

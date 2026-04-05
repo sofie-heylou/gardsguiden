@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "../../../lib/db";
-import { generateId } from "../../../lib/auth";
+import { generateId } from "../../../lib/utils";
 import { sendEmail, emailHtml, table, row, ADMIN_EMAIL } from "../../../lib/email";
 
 export const dynamic = "force-dynamic";
