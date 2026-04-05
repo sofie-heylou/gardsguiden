@@ -32,6 +32,7 @@ const inputCls =
 interface FarmData {
   id: string;
   name: string;
+  description: string;
   address: string;
   website: string;
   phone: string;
@@ -51,6 +52,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 export default function MinGardForm({ farm }: { farm: FarmData }) {
   const [name, setName] = useState(farm.name);
+  const [description, setDescription] = useState(farm.description);
   const [address, setAddress] = useState(farm.address);
   const [website, setWebsite] = useState(farm.website);
   const [phone, setPhone] = useState(farm.phone);
@@ -76,7 +78,7 @@ export default function MinGardForm({ farm }: { farm: FarmData }) {
       const res = await fetch(`/api/farms/${farm.id}/update`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, address, website, phone, openingHours, products }),
+        body: JSON.stringify({ name, description, address, website, phone, openingHours, products }),
       });
       const data = await res.json() as { ok?: boolean; error?: string };
       if (!res.ok) { setError(data.error ?? "Något gick fel"); return; }
@@ -111,6 +113,16 @@ export default function MinGardForm({ farm }: { farm: FarmData }) {
             onChange={(e) => setName(e.target.value)}
             required
             className={inputCls}
+          />
+        </Field>
+
+        <Field label="Beskrivning">
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={4}
+            placeholder="Berätta om gården…"
+            className={inputCls + " resize-none"}
           />
         </Field>
 

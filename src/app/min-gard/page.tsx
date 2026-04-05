@@ -16,6 +16,7 @@ export const metadata: Metadata = {
 interface FarmRow {
   id: string;
   name: string;
+  description: string;
   address: string;
   website: string;
   phone: string;
@@ -56,7 +57,7 @@ export default async function MinGardPage() {
 
   const row = db
     .prepare(
-      `SELECT id, name, address, website, phone, products, openingHours, tier
+      `SELECT id, name, description, address, website, phone, products, openingHours, tier
        FROM farms WHERE id = ?`
     )
     .get(ownership.farm_id) as FarmRow | undefined;
@@ -66,6 +67,7 @@ export default async function MinGardPage() {
   const farm = {
     id: row.id,
     name: row.name ?? "",
+    description: row.description ?? "",
     address: row.address ?? "",
     website: row.website ?? "",
     phone: row.phone ?? "",

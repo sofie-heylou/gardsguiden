@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { auth } from "@clerk/nextjs/server";
 import { getDb } from "../../../../../lib/db";
 import { generateId } from "../../../../../lib/utils";
+import { COUNTY_TO_SLUG } from "../../../../../lib/counties";
 
 export const dynamic = "force-dynamic";
 
@@ -37,7 +39,7 @@ export async function POST(
   const db = getDb();
 
   const farm = db.prepare(
-    "SELECT id, name, description, address, website, phone, email, products, openingHours, onSiteSales, tastingRoom, claimed_by FROM farms WHERE id = ?"
+    "SELECT id, name, lan, description, address, website, phone, email, products, openingHours, onSiteSales, tastingRoom, claimed_by FROM farms WHERE id = ?"
   ).get(id) as Record<string, unknown> | undefined;
 
   if (!farm) {
@@ -109,6 +111,10 @@ export async function POST(
   for (const r of auditRows) {
     insertAudit.run(generateId(), id, userId, r.field, r.oldVal, r.newVal);
   }
+
+  // Revalidate the public farm page so edits appear immediately
+  const countySlug = COUNTY_TO_SLUG[farm.lan as string];
+  if (countySlug) revalidatePath(`/${countySlug}/${id}`);
 
   return NextResponse.json({ ok: true, changes: auditRows.length });
 }
