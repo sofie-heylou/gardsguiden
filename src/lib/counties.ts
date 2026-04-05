@@ -5,6 +5,9 @@ const COUNTIES = [
   { name: "Uppsala",      slug: "uppsala",      gardarSlug: "uppsala-lan",       displayName: "Uppsala län" },
   { name: "Västmanland",  slug: "vastmanland",  gardarSlug: "vastmanlands-lan",  displayName: "Västmanlands län" },
   { name: "Södermanland", slug: "sodermanland", gardarSlug: "sodermanlands-lan", displayName: "Södermanlands län" },
+  { name: "Skåne",        slug: "skane",        gardarSlug: "skane-lan",         displayName: "Skåne län" },
+  { name: "Kalmar",       slug: "kalmar",       gardarSlug: "kalmar-lan",        displayName: "Kalmar län" },
+  { name: "Gotland",      slug: "gotland",      gardarSlug: "gotlands-lan",      displayName: "Gotlands län" },
 ] as const;
 
 type CountyName = (typeof COUNTIES)[number]["name"];

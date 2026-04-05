@@ -4,7 +4,7 @@ export interface Farm {
   description: string;
   address: string;
   kommun: string;
-  lan: "Stockholm" | "Uppsala" | "Västmanland" | "Södermanland";
+  lan: "Stockholm" | "Uppsala" | "Västmanland" | "Södermanland" | "Skåne" | "Kalmar" | "Gotland";
   lat: number;
   lng: number;
   website: string;
