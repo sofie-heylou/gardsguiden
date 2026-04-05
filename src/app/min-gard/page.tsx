@@ -61,17 +61,17 @@ export default async function MinGardPage() {
             <p className="text-sm text-stone-500">Du har ingen kopplad gård ännu.</p>
           )}
 
-          <div className="flex flex-col items-center gap-2 pt-2">
+          <div className="flex flex-col items-center gap-2 pt-2 w-full max-w-xs mx-auto">
             <Link
               href="/lista"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-stone-800 text-white text-sm font-semibold hover:bg-stone-700 transition-colors"
+              className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-stone-300 text-stone-700 text-sm font-semibold hover:border-stone-500 hover:text-stone-900 transition-colors"
             >
               <Search size={15} />
-              Hitta och ansök om din gård
+              Hitta din gård
             </Link>
             <Link
               href="/lagg-till"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-stone-300 text-stone-700 text-sm font-semibold hover:border-stone-500 hover:text-stone-900 transition-colors"
+              className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-stone-300 text-stone-700 text-sm font-semibold hover:border-stone-500 hover:text-stone-900 transition-colors"
             >
               <PlusCircle size={15} />
               Lägg till din gård
