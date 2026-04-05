@@ -1,21 +1,32 @@
 import type { Farm } from "../types/farm";
 
-export const COUNTY_TO_SLUG: Record<Farm["lan"], string> = {
-  Stockholm: "stockholm",
-  Uppsala: "uppsala",
-  Västmanland: "vastmanland",
-  Södermanland: "sodermanland",
-};
+const COUNTIES = [
+  { name: "Stockholm",    slug: "stockholm",    gardarSlug: "stockholms-lan",    displayName: "Stockholms län" },
+  { name: "Uppsala",      slug: "uppsala",      gardarSlug: "uppsala-lan",       displayName: "Uppsala län" },
+  { name: "Västmanland",  slug: "vastmanland",  gardarSlug: "vastmanlands-lan",  displayName: "Västmanlands län" },
+  { name: "Södermanland", slug: "sodermanland", gardarSlug: "sodermanlands-lan", displayName: "Södermanlands län" },
+] as const;
 
-export const SLUG_TO_COUNTY: Record<string, Farm["lan"]> = {
-  stockholm: "Stockholm",
-  uppsala: "Uppsala",
-  vastmanland: "Västmanland",
-  sodermanland: "Södermanland",
-};
+type CountyName = (typeof COUNTIES)[number]["name"];
 
-/** All valid county URL slugs. */
-export const COUNTY_SLUGS = Object.keys(SLUG_TO_COUNTY) as Array<keyof typeof SLUG_TO_COUNTY>;
+export const COUNTY_TO_SLUG: Record<Farm["lan"], string> =
+  Object.fromEntries(COUNTIES.map((c) => [c.name, c.slug])) as Record<CountyName, string>;
+
+export const SLUG_TO_COUNTY: Record<string, Farm["lan"]> =
+  Object.fromEntries(COUNTIES.map((c) => [c.slug, c.name]));
+
+export const COUNTY_SLUGS = COUNTIES.map((c) => c.slug);
+
+export const GARDAR_COUNTY_TO_SLUG: Record<Farm["lan"], string> =
+  Object.fromEntries(COUNTIES.map((c) => [c.name, c.gardarSlug])) as Record<CountyName, string>;
+
+export const GARDAR_SLUG_TO_COUNTY: Record<string, Farm["lan"]> =
+  Object.fromEntries(COUNTIES.map((c) => [c.gardarSlug, c.name]));
+
+export const GARDAR_COUNTY_SLUGS = COUNTIES.map((c) => c.gardarSlug);
+
+export const COUNTY_LAN_NAME: Record<Farm["lan"], string> =
+  Object.fromEntries(COUNTIES.map((c) => [c.name, c.displayName])) as Record<CountyName, string>;
 
 /** Canonical URL path for a farm: /stockholm/farm-slug */
 export function farmPath(farm: Farm): string {

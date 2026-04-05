@@ -2,13 +2,14 @@
 
 import { useState, useEffect, useMemo, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Search, X, ShoppingBag, GlassWater, Clock,
   MapPin, LocateFixed, Loader2, BadgeCheck,
 } from "lucide-react";
-import type { Farm } from "../types/farm";
 import { CATEGORIES, farmMatchesCategory } from "../lib/categories";
-import { farmPath } from "../lib/counties";
+import { farmPath, GARDAR_COUNTY_TO_SLUG } from "../lib/counties";
+import type { Farm } from "../types/farm";
 import { useGeolocation } from "../hooks/useGeolocation";
 
 type SortKey = "name" | "lan" | "distance";
@@ -50,13 +51,16 @@ function getTodayHours(openingHours: string): { open: boolean; label: string } |
 
 interface Props {
   initialFarms?: Farm[];
+  initialCounty?: string | null;
+  countyBasePath?: string;
 }
 
-export default function FarmList({ initialFarms }: Props) {
+export default function FarmList({ initialFarms, initialCounty, countyBasePath }: Props) {
+  const router = useRouter();
   const [farms, setFarms] = useState<Farm[]>(initialFarms ?? []);
   const [loading, setLoading] = useState(initialFarms === undefined);
   const [query, setQuery] = useState("");
-  const [county, setCounty] = useState<string | null>(null);
+  const [county, setCounty] = useState<string | null>(initialCounty ?? null);
   const [category, setCategory] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<SortKey>("name");
 
@@ -80,11 +84,27 @@ export default function FarmList({ initialFarms }: Props) {
     else { setWantsNearMe(true); requestLocation(); }
   }, [sortBy, pos, requestLocation]);
 
-  const toggleCounty   = useCallback((c: string) => setCounty((p) => (p === c ? null : c)), []);
+  const toggleCounty = useCallback((c: string) => {
+    if (countyBasePath) {
+      if (county === c) {
+        router.push(countyBasePath);
+      } else {
+        router.push(`${countyBasePath}/${GARDAR_COUNTY_TO_SLUG[c as Farm["lan"]]}`);
+      }
+    } else {
+      setCounty((p) => (p === c ? null : c));
+    }
+  }, [county, countyBasePath, router]);
   const toggleCategory = useCallback((s: string) => setCategory((p) => (p === s ? null : s)), []);
   const clearAll = useCallback(() => {
-    setQuery(""); setCounty(null); setCategory(null); setSortBy("name"); setWantsNearMe(false);
-  }, []);
+    setQuery(""); setCategory(null); setSortBy("name"); setWantsNearMe(false);
+    if (countyBasePath && county) {
+      setCounty(null);
+      router.push(countyBasePath);
+    } else {
+      setCounty(null);
+    }
+  }, [county, countyBasePath, router]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
