@@ -11,7 +11,7 @@ import { SITE_URL } from "../../../lib/site";
 
 export const revalidate = 3600;
 
-export const dynamicParams = false;
+export const dynamicParams = true;
 
 export function generateStaticParams() {
   return GARDAR_COUNTY_SLUGS.map((lan) => ({ lan }));

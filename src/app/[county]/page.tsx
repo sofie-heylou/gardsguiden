@@ -7,8 +7,8 @@ import { SLUG_TO_COUNTY, COUNTY_SLUGS, farmPath } from "../../lib/counties";
 import { SITE_URL } from "../../lib/site";
 import type { Farm } from "../../types/farm";
 
-// Only the 4 valid county slugs are served — anything else is 404.
-export const dynamicParams = false;
+// Unknown slugs fall through to notFound() in the component below.
+export const dynamicParams = true;
 
 export function generateStaticParams() {
   return COUNTY_SLUGS.map((county) => ({ county }));
