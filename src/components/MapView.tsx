@@ -271,7 +271,7 @@ export default function MapView() {
               </button>
               <h3 className="font-display text-[14px] text-stone-900 leading-snug mb-0.5">{selected.name}</h3>
               <div className="flex items-center gap-2 mb-2">
-                <p className="text-[11px] text-stone-400">{selected.kommun}, {selected.lan}</p>
+                <p className="text-[11px] text-stone-400">{selected.kommun ? `${selected.kommun}, ` : ""}{selected.lan}</p>
                 {selected.isClaimed && (
                   <span className="flex items-center gap-0.5 text-[10px] font-medium text-emerald-600">
                     <BadgeCheck size={11} />

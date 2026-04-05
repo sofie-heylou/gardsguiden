@@ -283,7 +283,7 @@ export default function FarmList({ initialFarms, initialCounty, countyBasePath }
                     </div>
 
                     {/* Location */}
-                    <p className="text-[11px] text-stone-400 mb-2.5">{farm.kommun} · {farm.lan}</p>
+                    <p className="text-[11px] text-stone-400 mb-2.5">{farm.kommun ? `${farm.kommun} · ` : ""}{farm.lan}</p>
 
                     {/* Product tags */}
                     {visibleProducts.length > 0 && (
