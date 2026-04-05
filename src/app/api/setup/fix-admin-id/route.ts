@@ -20,15 +20,26 @@ export async function POST() {
     | undefined;
 
   if (!emailRow) {
-    // Row already has correct Clerk ID or doesn't exist
+    // Check if correct row already exists
     const existing = db.prepare("SELECT id, role FROM users WHERE id = ?").get(userId) as
       | { id: string; role: string }
       | undefined;
-    return NextResponse.json({ ok: true, message: "No fix needed", existing });
+
+    if (existing) {
+      if (existing.role !== "admin") {
+        db.prepare("UPDATE users SET role = 'admin' WHERE id = ?").run(userId);
+        return NextResponse.json({ ok: true, message: "Promoted existing row to admin", userId });
+      }
+      return NextResponse.json({ ok: true, message: "Already correct", role: existing.role });
+    }
+
+    // No row at all — insert with correct Clerk ID
+    db.prepare("INSERT OR REPLACE INTO users (id, email, role) VALUES (?, ?, 'admin')").run(userId, email);
+    return NextResponse.json({ ok: true, message: "Inserted admin row", userId, email });
   }
 
   // Update the row: replace id=email with id=clerkUserId
-  db.prepare("UPDATE users SET id = ? WHERE id = ?").run(userId, email);
+  db.prepare("UPDATE users SET id = ?, role = 'admin' WHERE id = ?").run(userId, email);
 
-  return NextResponse.json({ ok: true, fixed: { from: email, to: userId, role: emailRow.role } });
+  return NextResponse.json({ ok: true, fixed: { from: email, to: userId } });
 }
