@@ -9,7 +9,6 @@ import {
 } from "../../../lib/counties";
 import { SITE_URL } from "../../../lib/site";
 
-export const revalidate = 3600;
 
 export const dynamicParams = true;
 

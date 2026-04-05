@@ -3,7 +3,6 @@ import { getAllFarms } from "../../lib/farms";
 import FarmList from "../../components/FarmList";
 import { SITE_URL } from "../../lib/site";
 
-export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "Alla gårdar",

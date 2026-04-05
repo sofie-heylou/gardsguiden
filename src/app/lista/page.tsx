@@ -3,8 +3,6 @@ import { getAllFarms } from "../../lib/farms";
 import FarmList from "../../components/FarmList";
 import { SITE_URL } from "../../lib/site";
 
-// Farm data is static — revalidate once per hour.
-export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "Alla gårdar",
