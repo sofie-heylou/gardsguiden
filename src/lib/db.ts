@@ -213,11 +213,13 @@ function initSchema(db: Database.Database): void {
   // Seed farms from build-time DB if the runtime DB has none (e.g. fresh Railway volume)
   if (DB_PATH !== BUILD_DB_PATH) {
     const count = (db.prepare("SELECT COUNT(*) as n FROM farms").get() as { n: number }).n;
+    console.log(`[db] Runtime DB has ${count} farms. BUILD_DB_PATH=${BUILD_DB_PATH}`);
     if (count === 0) {
       try {
         const buildDb = new Database(BUILD_DB_PATH, { readonly: true });
         const farms = buildDb.prepare("SELECT * FROM farms").all() as Record<string, unknown>[];
         buildDb.close();
+        console.log(`[db] Seeding ${farms.length} farms from build DB…`);
         if (farms.length > 0) {
           const cols = Object.keys(farms[0]).join(", ");
           const placeholders = Object.keys(farms[0]).map(() => "?").join(", ");
@@ -225,9 +227,10 @@ function initSchema(db: Database.Database): void {
           db.transaction((rows: Record<string, unknown>[]) => {
             for (const r of rows) insert.run(Object.values(r));
           })(farms);
+          console.log(`[db] Seeding complete.`);
         }
-      } catch {
-        // Build-time DB not accessible — farms must be inserted by other means
+      } catch (err) {
+        console.error(`[db] Seeding failed:`, err);
       }
     }
   }
