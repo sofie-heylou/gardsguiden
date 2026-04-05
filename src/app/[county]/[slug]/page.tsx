@@ -26,10 +26,12 @@ export const dynamicParams = true;
 
 export function generateStaticParams() {
   const farms = getAllFarms();
-  return farms.map((farm) => ({
-    county: COUNTY_TO_SLUG[farm.lan],
-    slug: farm.id,
-  }));
+  return farms
+    .filter((farm) => COUNTY_TO_SLUG[farm.lan])
+    .map((farm) => ({
+      county: COUNTY_TO_SLUG[farm.lan],
+      slug: farm.id,
+    }));
 }
 
 type Props = { params: Promise<{ county: string; slug: string }> };
