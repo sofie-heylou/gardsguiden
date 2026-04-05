@@ -4,6 +4,8 @@ import path from "path";
 const DB_PATH =
   process.env.DB_PATH ?? path.join(process.cwd(), "data", "gardsguiden.db");
 
+const BUILD_DB_PATH = path.join(process.cwd(), "data", "gardsguiden.db");
+
 let db: Database.Database | null = null;
 
 export function getDb(): Database.Database {
@@ -207,4 +209,26 @@ function initSchema(db: Database.Database): void {
     db.exec(`ALTER TABLE farm_claims ADD COLUMN payment_status TEXT NOT NULL DEFAULT 'unpaid'`);
   }
   db.exec(`CREATE INDEX IF NOT EXISTS idx_claims_payment ON farm_claims(payment_status)`);
+
+  // Seed farms from build-time DB if the runtime DB has none (e.g. fresh Railway volume)
+  if (DB_PATH !== BUILD_DB_PATH) {
+    const count = (db.prepare("SELECT COUNT(*) as n FROM farms").get() as { n: number }).n;
+    if (count === 0) {
+      try {
+        const buildDb = new Database(BUILD_DB_PATH, { readonly: true });
+        const farms = buildDb.prepare("SELECT * FROM farms").all() as Record<string, unknown>[];
+        buildDb.close();
+        if (farms.length > 0) {
+          const cols = Object.keys(farms[0]).join(", ");
+          const placeholders = Object.keys(farms[0]).map(() => "?").join(", ");
+          const insert = db.prepare(`INSERT OR IGNORE INTO farms (${cols}) VALUES (${placeholders})`);
+          db.transaction((rows: Record<string, unknown>[]) => {
+            for (const r of rows) insert.run(Object.values(r));
+          })(farms);
+        }
+      } catch {
+        // Build-time DB not accessible — farms must be inserted by other means
+      }
+    }
+  }
 }
