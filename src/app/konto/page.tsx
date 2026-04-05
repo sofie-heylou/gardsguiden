@@ -20,57 +20,48 @@ interface ClaimedFarmRow {
   kommun: string;
 }
 
-interface PendingClaimRow {
-  claim_id: string;
+interface PendingOwnershipRow {
+  ownership_id: number;
   id: string;
   name: string;
   lan: Farm["lan"];
   kommun: string;
 }
 
-type Props = { searchParams: Promise<{ betalat?: string }> };
-
-export default async function KontoPage({ searchParams }: Props) {
+export default async function KontoPage() {
   const user = await currentUser();
   if (!user) redirect("/logga-in");
 
-  const { betalat } = await searchParams;
   const userId = user.id;
   const userEmail = user.primaryEmailAddress?.emailAddress ?? "";
 
   const db = getDb();
 
+  // Confirmed farms (ownership approved + claimed_by set)
   const claimedFarms = db
     .prepare(`SELECT id, name, lan, kommun FROM farms WHERE claimed_by = ? ORDER BY name`)
     .all(userId) as ClaimedFarmRow[];
 
-  const pendingClaims = db
+  // Pending ownership requests
+  const pendingOwnerships = db
     .prepare(
-      `SELECT fc.id as claim_id, f.id, f.name, f.lan, f.kommun
-       FROM farm_claims fc
-       JOIN farms f ON f.id = fc.farm_id
-       WHERE fc.user_id = ? AND fc.payment_status = 'pending_payment'
-       ORDER BY fc.created_at DESC`
+      `SELECT fo.id as ownership_id, f.id, f.name, f.lan, f.kommun
+       FROM farm_ownership fo
+       JOIN farms f ON f.id = fo.farm_id
+       WHERE fo.user_id = ? AND fo.status = 'pending'
+       ORDER BY fo.created_at DESC`
     )
-    .all(userId) as PendingClaimRow[];
+    .all(userId) as PendingOwnershipRow[];
 
+  // Don't show pending if already confirmed
   const confirmedIds = new Set(claimedFarms.map((f) => f.id));
-  const pendingOnly = pendingClaims.filter((c) => !confirmedIds.has(c.id));
+  const pendingOnly = pendingOwnerships.filter((r) => !confirmedIds.has(r.id));
 
   const hasAnyFarms = claimedFarms.length > 0 || pendingOnly.length > 0;
 
   return (
     <div className="h-full overflow-y-auto" style={{ background: "#FAFAF8" }}>
       <div className="max-w-lg mx-auto px-4 py-6 pb-12 space-y-8">
-
-        {betalat && (
-          <div className="rounded-xl bg-amber-50 border border-amber-100 px-4 py-3">
-            <p className="text-sm font-medium text-amber-800">Tack!</p>
-            <p className="text-xs text-amber-600 mt-0.5">
-              Vi verifierar din betalning och aktiverar ditt konto inom 24 timmar.
-            </p>
-          </div>
-        )}
 
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-stone-400 mb-1">
@@ -125,30 +116,30 @@ export default async function KontoPage({ searchParams }: Props) {
                 </li>
               ))}
 
-              {pendingOnly.map((claim) => (
+              {pendingOnly.map((item) => (
                 <li
-                  key={claim.claim_id}
+                  key={item.ownership_id}
                   className="bg-white rounded-xl border border-stone-100 shadow-sm px-4 py-4"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <h3 className="font-display text-[15px] text-stone-900 leading-snug truncate">
-                        {claim.name}
+                        {item.name}
                       </h3>
                       <p className="flex items-center gap-1 text-[11px] text-stone-400 mt-0.5">
                         <MapPin size={10} />
-                        {claim.kommun} · {claim.lan}
+                        {item.kommun} · {item.lan}
                       </p>
                     </div>
                     <span className="shrink-0 flex items-center gap-1 text-[11px] font-medium text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full">
                       <Clock size={11} />
-                      Inväntar betalning
+                      Ansökan skickad
                     </span>
                   </div>
 
                   <div className="flex items-center gap-4 mt-3 pt-3 border-t border-stone-50">
                     <Link
-                      href={farmPath({ id: claim.id, lan: claim.lan } as Farm)}
+                      href={farmPath({ id: item.id, lan: item.lan } as Farm)}
                       className="flex items-center gap-1 text-xs text-stone-400 hover:text-stone-700 transition-colors"
                     >
                       Visa sida <ArrowRight size={11} />

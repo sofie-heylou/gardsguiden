@@ -1,0 +1,81 @@
+import { notFound, redirect } from "next/navigation";
+import type { Metadata } from "next";
+import { auth } from "@clerk/nextjs/server";
+import { getDb } from "../../lib/db";
+import OwnershipActions from "./OwnershipActions";
+
+export const metadata: Metadata = {
+  title: "Admin",
+  robots: { index: false, follow: false },
+};
+
+interface PendingRow {
+  id: number;
+  farm_name: string;
+  user_email: string;
+  created_at: string;
+}
+
+export default async function AdminPage() {
+  const { userId } = await auth();
+  if (!userId) redirect("/logga-in");
+
+  const db = getDb();
+  const adminUser = db.prepare("SELECT role FROM users WHERE id = ?").get(userId) as
+    | { role: string }
+    | undefined;
+  if (adminUser?.role !== "admin") notFound();
+
+  const pending = db.prepare(`
+    SELECT fo.id, f.name as farm_name, COALESCE(u.email, fo.user_id) as user_email, fo.created_at
+    FROM farm_ownership fo
+    JOIN farms f ON f.id = fo.farm_id
+    LEFT JOIN users u ON u.id = fo.user_id
+    WHERE fo.status = 'pending'
+    ORDER BY fo.created_at ASC
+  `).all() as PendingRow[];
+
+  return (
+    <div className="h-full overflow-y-auto" style={{ background: "#FAFAF8" }}>
+      <div className="max-w-2xl mx-auto px-4 py-8 pb-14">
+        <h1 className="font-display text-2xl text-stone-900 mb-6">Admin</h1>
+
+        <section className="space-y-3">
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+            Väntande ägarskapsansökningar ({pending.length})
+          </h2>
+
+          {pending.length === 0 ? (
+            <p className="text-sm text-stone-500">Inga väntande ansökningar.</p>
+          ) : (
+            <ul className="space-y-2">
+              {pending.map((row) => (
+                <li
+                  key={row.id}
+                  className="bg-white rounded-xl border border-stone-100 shadow-sm px-4 py-4"
+                >
+                  <div className="flex items-start justify-between gap-4 flex-wrap">
+                    <div className="space-y-0.5 min-w-0">
+                      <p className="font-display text-[15px] text-stone-900 leading-snug truncate">
+                        {row.farm_name}
+                      </p>
+                      <p className="text-[11px] text-stone-400">{row.user_email}</p>
+                      <p className="text-[11px] text-stone-300">
+                        {new Date(row.created_at).toLocaleDateString("sv-SE", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })}
+                      </p>
+                    </div>
+                    <OwnershipActions id={row.id} />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      </div>
+    </div>
+  );
+}
