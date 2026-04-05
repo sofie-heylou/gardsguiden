@@ -114,7 +114,7 @@ export async function POST(
 
   // Revalidate the public farm page so edits appear immediately
   try {
-    const countySlug = COUNTY_TO_SLUG[farm.lan as string];
+    const countySlug = COUNTY_TO_SLUG[farm.lan as keyof typeof COUNTY_TO_SLUG];
     if (countySlug) revalidatePath(`/${countySlug}/${id}`);
   } catch {
     // revalidatePath can throw NoFallbackError if the page hasn't been cached yet — safe to ignore
