@@ -45,13 +45,12 @@ export default function IntegritetPage() {
 
         <Section title="Vilka uppgifter samlas in">
           <p>
-            Vi samlar bara in uppgifter från gårdsägare som väljer att göra
-            anspråk på sin gård eller lägga till en ny gård:
+            Vi samlar bara in uppgifter från gårdsägare som väljer att skapa ett
+            konto, göra anspråk på sin gård eller lägga till en ny gård:
           </p>
           <ul className="list-disc list-inside space-y-1 text-stone-600">
-            <li><strong>E-postadress</strong> — används för inloggning med engångskod.</li>
+            <li><strong>E-postadress</strong> — används för att skapa konto och logga in via Clerk.</li>
             <li><strong>Namn</strong> — valfritt, visas inte publikt.</li>
-            <li><strong>Telefonnummer</strong> — valfritt, används inte av oss.</li>
           </ul>
           <p>
             Besökare som enbart söker eller tittar på gårdar lämnar inga
@@ -62,11 +61,30 @@ export default function IntegritetPage() {
 
         <Section title="Varför behandlas uppgifterna">
           <p>
-            Uppgifterna används uteslutande för att låta gårdsägare logga in,
-            bekräfta ägarskap och hålla sin gårds information aktuell.
+            Uppgifterna används för att låta gårdsägare skapa konto, logga in
+            och hålla sin gårds information aktuell.
             Anonymiserad analysdata används för att förbättra webbplatsen och
             förstå hur den används — den delas inte med tredje part för
             marknadsföringsändamål.
+          </p>
+        </Section>
+
+        <Section title="Konto och inloggning">
+          <p>
+            Konton för gårdsägare skapas och hanteras via{" "}
+            <a
+              href="https://clerk.com/legal/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-stone-900 transition-colors"
+            >
+              Clerk
+            </a>
+            {" "}(clerk.com), en tredjepartstjänst för autentisering. När du skapar
+            ett konto lagrar Clerk din e-postadress och kontoinformation på sina
+            servrar. Vi lagrar även ditt användar-ID och din e-postadress i vår
+            egen databas för att koppla ditt konto till din gård. Clerk är
+            GDPR-kompatibelt och behandlar data inom EU/EES.
           </p>
         </Section>
 
@@ -102,9 +120,17 @@ export default function IntegritetPage() {
             .
           </p>
           <p>
-            Vi sätter också en funktionskaka för inloggningssessionen
-            (<code className="text-xs bg-stone-100 px-1 py-0.5 rounded">gg_session</code>).
-            Den tas bort när du loggar ut eller efter 30 dagar.
+            Inloggning hanteras av Clerk (clerk.com). Clerk sätter kakor för att
+            hantera din session — dessa tas bort när du loggar ut. Läs mer i{" "}
+            <a
+              href="https://clerk.com/legal/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-stone-900 transition-colors"
+            >
+              Clerks integritetspolicy
+            </a>
+            .
           </p>
         </Section>
 
@@ -122,15 +148,6 @@ export default function IntegritetPage() {
             . När kartan laddas skickas din IP-adress till Mapbox i enlighet
             med deras integritetspolicy. Vi har ingen kontroll över den
             behandlingen.
-          </p>
-        </Section>
-
-        <Section title="Betalning via Swish">
-          <p>
-            Om du gör anspråk på en gård sker betalningen via Swish, direkt
-            mellan dig och oss. Vi lagrar inte några kortuppgifter. Det enda
-            vi sparar är ditt Swish-referensnummer för att kunna matcha din
-            betalning mot ditt konto.
           </p>
         </Section>
 
