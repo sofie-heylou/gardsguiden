@@ -3,6 +3,7 @@ import { Lora } from "next/font/google";
 import Script from "next/script";
 import { ClerkProvider } from "@clerk/nextjs";
 import { svSE } from "@clerk/localizations";
+import { clerkAppearance } from "../lib/clerkAppearance";
 import Header from "../components/Header";
 import BottomNav from "../components/BottomNav";
 import SiteFooter from "../components/SiteFooter";
@@ -80,11 +81,40 @@ export const viewport: Viewport = {
   themeColor: "#ffffff",
 };
 
+const clerkLocalization = {
+  ...svSE,
+  signIn: {
+    ...svSE.signIn,
+    start: {
+      ...svSE.signIn?.start,
+      title: "Logga in som gårdsägare",
+      subtitle:
+        "Här loggar du in för att hantera din gårds visning på Gårdsguiden. Letar du efter gårdar? Inget konto behövs — gå till kartan eller listan.",
+    },
+  },
+  signUp: {
+    ...svSE.signUp,
+    start: {
+      ...svSE.signUp?.start,
+      title: "Registrera din gård",
+      subtitle:
+        "Skapa ett konto för att lägga till och hantera din gårds visning på Gårdsguiden.",
+    },
+  },
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="sv" className={lora.variable}>
       <body className="h-dvh flex flex-col overflow-hidden" style={{ background: "#FAFAF8", color: "#2c2c2c" }}>
-        <ClerkProvider localization={svSE} signInUrl="/logga-in" signUpUrl="/registrera" signInFallbackRedirectUrl="/" signUpFallbackRedirectUrl="/">
+        <ClerkProvider
+          localization={clerkLocalization}
+          appearance={clerkAppearance}
+          signInUrl="/logga-in"
+          signUpUrl="/registrera"
+          signInFallbackRedirectUrl="/"
+          signUpFallbackRedirectUrl="/"
+        >
           <Script
             id="gtm-script"
             strategy="afterInteractive"

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { SignUp } from "@clerk/nextjs";
-import { clerkAppearance } from "../../../lib/clerkAppearance";
 
 export const metadata: Metadata = {
   title: "Skapa konto",
@@ -10,7 +9,7 @@ export const metadata: Metadata = {
 export default function RegistreraPage() {
   return (
     <div className="h-full overflow-y-auto flex items-center justify-center py-12" style={{ background: "#FAFAF8" }}>
-      <SignUp appearance={clerkAppearance} />
+      <SignUp />
     </div>
   );
 }

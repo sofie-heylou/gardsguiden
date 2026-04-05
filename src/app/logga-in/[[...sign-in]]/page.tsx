@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { SignIn, ClerkLoading, ClerkLoaded } from "@clerk/nextjs";
-import { clerkAppearance } from "../../../lib/clerkAppearance";
 
 export const metadata: Metadata = {
   title: "Logga in",
@@ -14,7 +13,7 @@ export default function LoggaInPage() {
         <div className="w-96 h-96 rounded-2xl bg-stone-100 animate-pulse" />
       </ClerkLoading>
       <ClerkLoaded>
-        <SignIn appearance={clerkAppearance} />
+        <SignIn />
       </ClerkLoaded>
     </div>
   );
