@@ -83,7 +83,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="sv" className={lora.variable}>
       <body className="h-dvh flex flex-col overflow-hidden" style={{ background: "#FAFAF8", color: "#2c2c2c" }}>
-        <ClerkProvider>
+        <ClerkProvider signInUrl="/logga-in" signUpUrl="/registrera" signInFallbackRedirectUrl="/" signUpFallbackRedirectUrl="/">
           <Script
             id="gtm-script"
             strategy="afterInteractive"
