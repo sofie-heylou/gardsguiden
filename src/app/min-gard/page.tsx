@@ -6,6 +6,8 @@ import { getDb } from "../../lib/db";
 import { Search } from "lucide-react";
 import MinGardForm from "./MinGardForm";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Min gård",
   robots: { index: false, follow: false },
