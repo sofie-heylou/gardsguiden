@@ -47,7 +47,7 @@ function Field({ label, required, children }: {
   );
 }
 
-export default function SubmitFarmForm() {
+export default function SubmitFarmForm({ userEmail }: { userEmail: string }) {
   const [name,          setName]          = useState("");
   const [description,   setDescription]   = useState("");
   const [address,       setAddress]       = useState("");
@@ -59,7 +59,6 @@ export default function SubmitFarmForm() {
   const [products,      setProducts]      = useState<string[]>([]);
   const [onSiteSales,   setOnSiteSales]   = useState(false);
   const [tastingRoom,   setTastingRoom]   = useState(false);
-  const [submittedEmail, setSubmittedEmail] = useState("");
 
   const [saving,  setSaving]  = useState(false);
   const [sent,    setSent]    = useState(false);
@@ -83,7 +82,7 @@ export default function SubmitFarmForm() {
           name, description, address, kommun, lan,
           website, phone, email, products,
           onSiteSales, tastingRoom,
-          submittedEmail,
+          submittedEmail: userEmail,
         }),
       });
       const data = await res.json() as { ok?: boolean; error?: string };
@@ -275,32 +274,11 @@ export default function SubmitFarmForm() {
         ))}
       </section>
 
-      {/* ── Din e-post ─────────────────────────────────────────────────────── */}
-      <section className="bg-white rounded-xl border border-stone-100 shadow-sm p-5 space-y-4">
-        <h2 className="text-xs font-semibold uppercase tracking-wide text-stone-400">
-          Dina uppgifter
-        </h2>
-        <Field label="Din e-postadress" required>
-          <input
-            type="email"
-            required
-            value={submittedEmail}
-            onChange={(e) => setSubmittedEmail(e.target.value)}
-            placeholder="din@epost.se"
-            className={inputCls}
-          />
-        </Field>
-        <p className="text-xs text-stone-400">
-          Vi hör av oss när gården är publicerad. Du kan sedan logga in och
-          göra anspråk på den.
-        </p>
-      </section>
-
       {error && <p className="text-sm text-red-500">{error}</p>}
 
       <button
         type="submit"
-        disabled={saving || !name || !lan || !submittedEmail}
+        disabled={saving || !name || !lan}
         className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-stone-800 text-white text-sm font-semibold hover:bg-stone-700 active:bg-stone-900 transition-colors disabled:opacity-50"
       >
         {saving ? <Loader2 size={15} className="animate-spin" /> : "Skicka in gård"}

@@ -38,6 +38,8 @@ export async function POST(req: NextRequest) {
   }
 
   const { userId } = await auth();
+  if (!userId) return NextResponse.json({ error: "Inte inloggad" }, { status: 401 });
+
   const db = getDb();
 
   db.prepare(`
