@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth, currentUser } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 import { getDb } from "../../../../../../lib/db";
 import { sendEmail, emailHtml } from "../../../../../../lib/email";
 
@@ -12,13 +12,10 @@ export async function POST(
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "Inte inloggad" }, { status: 401 });
 
-  const clerkUser = await currentUser();
-  const email = clerkUser?.primaryEmailAddress?.emailAddress ?? "";
-
   const db = getDb();
-  const adminUser = db
-    .prepare("SELECT role FROM users WHERE id = ? OR (email = ? AND email != '')")
-    .get(userId, email) as { role: string } | undefined;
+  const adminUser = db.prepare("SELECT role FROM users WHERE id = ?").get(userId) as
+    | { role: string }
+    | undefined;
   if (adminUser?.role !== "admin") {
     return NextResponse.json({ error: "Åtkomst nekad" }, { status: 403 });
   }
