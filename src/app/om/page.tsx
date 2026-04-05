@@ -16,10 +16,13 @@ export const metadata: Metadata = {
 };
 
 const COUNTIES = [
+  { name: "Skåne",        count: 120, href: "/skane" },
   { name: "Stockholm",    count: 57,  href: "/stockholm" },
   { name: "Södermanland", count: 50,  href: "/sodermanland" },
+  { name: "Gotland",      count: 43,  href: "/gotland" },
   { name: "Västmanland",  count: 30,  href: "/vastmanland" },
   { name: "Uppsala",      count: 24,  href: "/uppsala" },
+  { name: "Kalmar",       count: 19,  href: "/kalmar" },
 ];
 
 export default function OmPage() {
@@ -34,7 +37,7 @@ export default function OmPage() {
           </h1>
           <p className="text-[15px] text-stone-600 leading-relaxed">
             Gårdsguiden är en katalog över gårdsbutiker och gårdar med
-            direktförsäljning i Mälardalen. Här hittar du lokalt producerat
+            direktförsäljning i Sverige. Här hittar du lokalt producerat
             kött, grönsaker, mejeriprodukter, frukt, honung, bröd och mycket
             mer — köpt direkt från den som odlat eller uppfött det.
           </p>
@@ -66,9 +69,9 @@ export default function OmPage() {
         <div className="space-y-3">
           <h2 className="font-display text-xl text-stone-900">Täckning</h2>
           <p className="text-sm text-stone-600 leading-relaxed">
-            Gårdsguiden täcker just nu fyra län — Stockholm, Uppsala,
-            Västmanland och Södermanland — och expanderar löpande till fler
-            delar av Sverige.
+            Gårdsguiden täcker just nu sju län — Skåne, Stockholm,
+            Södermanland, Gotland, Västmanland, Uppsala och Kalmar — och
+            expanderar löpande till fler delar av Sverige.
           </p>
           <ul className="space-y-2">
             {COUNTIES.map(({ name, count, href }) => (
