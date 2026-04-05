@@ -210,28 +210,28 @@ function initSchema(db: Database.Database): void {
   }
   db.exec(`CREATE INDEX IF NOT EXISTS idx_claims_payment ON farm_claims(payment_status)`);
 
-  // Seed farms from build-time DB if the runtime DB has none (e.g. fresh Railway volume)
+  // Sync farms from build-time DB into runtime DB on every startup.
+  // Uses INSERT OR IGNORE so existing rows (with farmer edits) are preserved,
+  // but new farms added in the latest build are picked up automatically.
   if (DB_PATH !== BUILD_DB_PATH) {
-    const count = (db.prepare("SELECT COUNT(*) as n FROM farms").get() as { n: number }).n;
-    console.log(`[db] Runtime DB has ${count} farms. BUILD_DB_PATH=${BUILD_DB_PATH}`);
-    if (count === 0) {
-      try {
-        const buildDb = new Database(BUILD_DB_PATH, { readonly: true });
-        const farms = buildDb.prepare("SELECT * FROM farms").all() as Record<string, unknown>[];
-        buildDb.close();
-        console.log(`[db] Seeding ${farms.length} farms from build DB…`);
-        if (farms.length > 0) {
-          const cols = Object.keys(farms[0]).join(", ");
-          const placeholders = Object.keys(farms[0]).map(() => "?").join(", ");
-          const insert = db.prepare(`INSERT OR IGNORE INTO farms (${cols}) VALUES (${placeholders})`);
-          db.transaction((rows: Record<string, unknown>[]) => {
-            for (const r of rows) insert.run(Object.values(r));
-          })(farms);
-          console.log(`[db] Seeding complete.`);
-        }
-      } catch (err) {
-        console.error(`[db] Seeding failed:`, err);
+    try {
+      const buildDb = new Database(BUILD_DB_PATH, { readonly: true });
+      const farms = buildDb.prepare("SELECT * FROM farms").all() as Record<string, unknown>[];
+      buildDb.close();
+      const runtimeCount = (db.prepare("SELECT COUNT(*) as n FROM farms").get() as { n: number }).n;
+      console.log(`[db] Runtime DB has ${runtimeCount} farms, build DB has ${farms.length} farms.`);
+      if (farms.length > 0) {
+        const cols = Object.keys(farms[0]).join(", ");
+        const placeholders = Object.keys(farms[0]).map(() => "?").join(", ");
+        const insert = db.prepare(`INSERT OR IGNORE INTO farms (${cols}) VALUES (${placeholders})`);
+        db.transaction((rows: Record<string, unknown>[]) => {
+          for (const r of rows) insert.run(Object.values(r));
+        })(farms);
+        const newCount = (db.prepare("SELECT COUNT(*) as n FROM farms").get() as { n: number }).n;
+        console.log(`[db] Sync complete. Runtime DB now has ${newCount} farms.`);
       }
+    } catch (err) {
+      console.error(`[db] Farm sync failed:`, err);
     }
   }
 }
