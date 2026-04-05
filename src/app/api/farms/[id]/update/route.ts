@@ -44,7 +44,12 @@ export async function POST(
     return NextResponse.json({ error: "Gården hittades inte" }, { status: 404 });
   }
 
-  if (farm.claimed_by !== userId) {
+  const hasOwnership = farm.claimed_by === userId ||
+    !!db.prepare(
+      `SELECT 1 FROM farm_ownership WHERE farm_id = ? AND user_id = ? AND status = 'approved'`
+    ).get(id, userId);
+
+  if (!hasOwnership) {
     return NextResponse.json({ error: "Åtkomst nekad" }, { status: 403 });
   }
 

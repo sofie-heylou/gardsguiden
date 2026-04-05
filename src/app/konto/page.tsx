@@ -101,7 +101,7 @@ export default async function KontoPage() {
 
                   <div className="flex items-center gap-4 mt-3 pt-3 border-t border-stone-50">
                     <Link
-                      href={`/konto/redigera/${farm.id}`}
+                      href="/min-gard"
                       className="text-xs font-medium text-stone-600 hover:text-stone-900 transition-colors"
                     >
                       Redigera
