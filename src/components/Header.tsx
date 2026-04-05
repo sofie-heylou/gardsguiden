@@ -1,3 +1,4 @@
+import Link from "next/link";
 import HeaderAuth from "./HeaderAuth";
 
 export default function Header() {
@@ -6,7 +7,15 @@ export default function Header() {
       <span className="font-display text-xl text-stone-700 leading-none tracking-tight">
         Gårdsguiden
       </span>
-      <HeaderAuth />
+      <div className="flex items-center gap-4">
+        <Link
+          href="/om"
+          className="text-xs text-stone-500 hover:text-stone-800 transition-colors hidden sm:block"
+        >
+          Om Gårdsguiden
+        </Link>
+        <HeaderAuth />
+      </div>
     </header>
   );
 }

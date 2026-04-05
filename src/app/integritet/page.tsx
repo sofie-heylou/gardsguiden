@@ -167,8 +167,8 @@ export default function IntegritetPage() {
               hej@gardsguiden.se
             </a>
             {" "}eller via{" "}
-            <Link href="/kontakt" className="underline hover:text-stone-900 transition-colors">
-              kontaktformuläret
+            <Link href="/om" className="underline hover:text-stone-900 transition-colors">
+              kontaktformuläret på Om-sidan
             </Link>
             .
           </p>

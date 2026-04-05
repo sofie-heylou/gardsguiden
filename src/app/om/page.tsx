@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { MapPin, PlusCircle, BadgeCheck } from "lucide-react";
+import ContactForm from "./ContactForm";
 
 export const metadata: Metadata = {
   title: "Om Gårdsguiden",
@@ -44,7 +45,6 @@ export default function OmPage() {
           </p>
         </div>
 
-        {/* ── Divider ───────────────────────────────────────────────────────── */}
         <hr className="border-stone-100" />
 
         {/* ── Hur gårdar listas ─────────────────────────────────────────────── */}
@@ -86,13 +86,6 @@ export default function OmPage() {
               </li>
             ))}
           </ul>
-          <p className="text-xs text-stone-400">
-            Vill du se din region på Gårdsguiden?{" "}
-            <Link href="/kontakt" className="underline hover:text-stone-600 transition-colors">
-              Hör av dig
-            </Link>
-            {" "}— vi prioriterar områden där intresset är störst.
-          </p>
         </div>
 
         {/* ── Gårdsägare ────────────────────────────────────────────────────── */}
@@ -121,13 +114,17 @@ export default function OmPage() {
           </div>
         </div>
 
-        {/* ── Kontakt-nudge ─────────────────────────────────────────────────── */}
-        <p className="text-sm text-stone-500 text-center">
-          Frågor eller synpunkter?{" "}
-          <Link href="/kontakt" className="underline hover:text-stone-800 transition-colors">
-            Kontakta oss
-          </Link>
-        </p>
+        <hr className="border-stone-100" />
+
+        {/* ── Kontakta oss ──────────────────────────────────────────────────── */}
+        <div className="space-y-4">
+          <h2 className="font-display text-xl text-stone-900">Kontakta oss</h2>
+          <p className="text-sm text-stone-500 leading-relaxed">
+            Har du frågor, vill rapportera felaktig information, eller saknar
+            din gård i katalogen? Hör gärna av dig.
+          </p>
+          <ContactForm />
+        </div>
 
       </div>
     </div>

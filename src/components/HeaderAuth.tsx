@@ -1,29 +1,28 @@
 "use client";
 
 import Link from "next/link";
-import { Show, UserButton, SignInButton } from "@clerk/nextjs";
+import { Show, UserButton } from "@clerk/nextjs";
 
 export default function HeaderAuth() {
   return (
-    <>
+    <div className="flex items-center gap-2">
       <Show when="signed-out">
-        <SignInButton mode="redirect">
-          <button className="text-xs text-stone-400 hover:text-stone-700 transition-colors">
-            Logga in
-          </button>
-        </SignInButton>
+        <Link
+          href="/logga-in"
+          className="px-3.5 py-1.5 rounded-lg bg-amber-400 text-stone-900 text-xs font-semibold hover:bg-amber-300 active:bg-amber-500 transition-colors"
+        >
+          Logga in
+        </Link>
       </Show>
       <Show when="signed-in">
-        <div className="flex items-center gap-3">
-          <Link
-            href="/konto"
-            className="text-xs text-stone-500 hover:text-stone-800 transition-colors hidden sm:block"
-          >
-            Min gård
-          </Link>
-          <UserButton />
-        </div>
+        <Link
+          href="/min-gard"
+          className="px-3.5 py-1.5 rounded-lg bg-amber-400 text-stone-900 text-xs font-semibold hover:bg-amber-300 active:bg-amber-500 transition-colors"
+        >
+          Min gård
+        </Link>
+        <UserButton />
       </Show>
-    </>
+    </div>
   );
 }
