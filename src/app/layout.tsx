@@ -131,6 +131,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
               style={{ display: 'none', visibility: 'hidden' }}
             />
           </noscript>
+          <div className="shrink-0 bg-amber-400 text-stone-900 text-xs text-center py-1.5 px-4 leading-snug">
+            Vi håller på att bygga klart — tack för tålamodet!
+          </div>
           <Header />
           <main className="flex-1 overflow-hidden">{children}</main>
           <SiteFooter />
