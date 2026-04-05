@@ -70,15 +70,13 @@ export default async function MinGardPage() {
               <Search size={15} />
               Hitta och ansök om din gård
             </Link>
-            {!pending && (
-              <Link
-                href="/lagg-till"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-stone-300 text-stone-700 text-sm font-semibold hover:border-stone-500 hover:text-stone-900 transition-colors"
-              >
-                <PlusCircle size={15} />
-                Lägg till din gård
-              </Link>
-            )}
+            <Link
+              href="/lagg-till"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-stone-300 text-stone-700 text-sm font-semibold hover:border-stone-500 hover:text-stone-900 transition-colors"
+            >
+              <PlusCircle size={15} />
+              Lägg till din gård
+            </Link>
           </div>
         </div>
       </div>
