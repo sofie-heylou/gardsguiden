@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { getDb } from "../../lib/db";
 import OwnershipActions from "./OwnershipActions";
 
@@ -20,10 +20,13 @@ export default async function AdminPage() {
   const { userId } = await auth();
   if (!userId) redirect("/logga-in");
 
+  const clerkUser = await currentUser();
+  const email = clerkUser?.primaryEmailAddress?.emailAddress ?? "";
+
   const db = getDb();
-  const adminUser = db.prepare("SELECT role FROM users WHERE id = ?").get(userId) as
-    | { role: string }
-    | undefined;
+  const adminUser = db
+    .prepare("SELECT role FROM users WHERE id = ? OR (email = ? AND email != '')")
+    .get(userId, email) as { role: string } | undefined;
   if (adminUser?.role !== "admin") notFound();
 
   const pending = db.prepare(`
