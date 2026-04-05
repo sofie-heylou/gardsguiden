@@ -32,18 +32,30 @@ export default function Image() {
         }}
       />
 
-      {/* App name */}
-      <div
-        style={{
-          fontSize: 104,
-          fontWeight: 700,
-          color: "#1c1917",
-          letterSpacing: -3,
-          lineHeight: 1,
-          marginBottom: 32,
-        }}
-      >
-        Gårdsguiden
+      {/* Icon + App name */}
+      <div style={{ display: "flex", alignItems: "center", gap: 28, marginBottom: 32 }}>
+        {/* Flower icon — petals as explicit paths (satori doesn't support SVG <use>) */}
+        <svg width="96" height="96" viewBox="0 0 100 100">
+          <path d="M 46 36 C 41 26 34 12 40 5 C 45 0 55 0 60 5 C 66 12 59 26 54 36 C 52 39 48 39 46 36 Z" fill="#1c1917" />
+          <path d="M 46 36 C 41 26 34 12 40 5 C 45 0 55 0 60 5 C 66 12 59 26 54 36 C 52 39 48 39 46 36 Z" fill="#1c1917" transform="rotate(45 50 50)" />
+          <path d="M 46 36 C 41 26 34 12 40 5 C 45 0 55 0 60 5 C 66 12 59 26 54 36 C 52 39 48 39 46 36 Z" fill="#1c1917" transform="rotate(90 50 50)" />
+          <path d="M 46 36 C 41 26 34 12 40 5 C 45 0 55 0 60 5 C 66 12 59 26 54 36 C 52 39 48 39 46 36 Z" fill="#1c1917" transform="rotate(135 50 50)" />
+          <path d="M 46 36 C 41 26 34 12 40 5 C 45 0 55 0 60 5 C 66 12 59 26 54 36 C 52 39 48 39 46 36 Z" fill="#1c1917" transform="rotate(180 50 50)" />
+          <path d="M 46 36 C 41 26 34 12 40 5 C 45 0 55 0 60 5 C 66 12 59 26 54 36 C 52 39 48 39 46 36 Z" fill="#1c1917" transform="rotate(225 50 50)" />
+          <path d="M 46 36 C 41 26 34 12 40 5 C 45 0 55 0 60 5 C 66 12 59 26 54 36 C 52 39 48 39 46 36 Z" fill="#1c1917" transform="rotate(270 50 50)" />
+          <path d="M 46 36 C 41 26 34 12 40 5 C 45 0 55 0 60 5 C 66 12 59 26 54 36 C 52 39 48 39 46 36 Z" fill="#1c1917" transform="rotate(315 50 50)" />
+        </svg>
+        <div
+          style={{
+            fontSize: 104,
+            fontWeight: 700,
+            color: "#1c1917",
+            letterSpacing: -3,
+            lineHeight: 1,
+          }}
+        >
+          Gårdsguiden
+        </div>
       </div>
 
       {/* Tagline */}

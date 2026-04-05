@@ -42,6 +42,13 @@ export const metadata: Metadata = {
   authors: [{ name: "Gårdsguiden" }],
   creator: "Gårdsguiden",
   alternates: { canonical: "/" },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "32x32", type: "image/x-icon" },
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+  },
   openGraph: {
     type: "website",
     locale: "sv_SE",
