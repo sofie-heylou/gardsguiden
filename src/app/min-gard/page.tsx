@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import { getDb } from "../../lib/db";
-import { Search } from "lucide-react";
+import { Search, PlusCircle, Clock } from "lucide-react";
 import MinGardForm from "./MinGardForm";
 
 export const dynamic = "force-dynamic";
@@ -38,18 +38,48 @@ export default async function MinGardPage() {
     .get(userId) as { farm_id: string } | undefined;
 
   if (!ownership) {
+    const pending = db
+      .prepare(
+        `SELECT name FROM farm_submissions WHERE user_id = ? AND status = 'pending' LIMIT 1`
+      )
+      .get(userId) as { name: string } | undefined;
+
     return (
       <div className="h-full overflow-y-auto" style={{ background: "#FAFAF8" }}>
         <div className="max-w-lg mx-auto px-4 py-12 space-y-4 text-center">
           <h1 className="font-display text-2xl text-stone-900">Min gård</h1>
-          <p className="text-sm text-stone-500">Du har ingen kopplad gård ännu.</p>
-          <Link
-            href="/lista"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-stone-800 text-white text-sm font-semibold hover:bg-stone-700 transition-colors"
-          >
-            <Search size={15} />
-            Hitta och ansök om din gård
-          </Link>
+
+          {pending ? (
+            <>
+              <div className="inline-flex items-center gap-2 px-4 py-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm">
+                <Clock size={15} className="shrink-0" />
+                <span>
+                  Din ansökan för <strong>{pending.name}</strong> behandlas — vi återkommer snart.
+                </span>
+              </div>
+            </>
+          ) : (
+            <p className="text-sm text-stone-500">Du har ingen kopplad gård ännu.</p>
+          )}
+
+          <div className="flex flex-col items-center gap-2 pt-2">
+            <Link
+              href="/lista"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-stone-800 text-white text-sm font-semibold hover:bg-stone-700 transition-colors"
+            >
+              <Search size={15} />
+              Hitta och ansök om din gård
+            </Link>
+            {!pending && (
+              <Link
+                href="/lagg-till"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-stone-300 text-stone-700 text-sm font-semibold hover:border-stone-500 hover:text-stone-900 transition-colors"
+              >
+                <PlusCircle size={15} />
+                Lägg till din gård
+              </Link>
+            )}
+          </div>
         </div>
       </div>
     );

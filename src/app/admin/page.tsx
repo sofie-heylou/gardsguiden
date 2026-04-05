@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { auth } from "@clerk/nextjs/server";
 import { getDb } from "../../lib/db";
 import OwnershipActions from "./OwnershipActions";
+import SubmissionActions from "./SubmissionActions";
 
 export const metadata: Metadata = {
   title: "Admin",
@@ -13,6 +14,15 @@ interface PendingRow {
   id: number;
   farm_name: string;
   user_email: string;
+  created_at: string;
+}
+
+interface SubmissionRow {
+  id: string;
+  name: string;
+  submitted_email: string;
+  lan: string | null;
+  kommun: string | null;
   created_at: string;
 }
 
@@ -35,10 +45,57 @@ export default async function AdminPage() {
     ORDER BY fo.created_at ASC
   `).all() as PendingRow[];
 
+  const submissions = db.prepare(`
+    SELECT id, name, submitted_email, lan, kommun, created_at
+    FROM farm_submissions WHERE status = 'pending'
+    ORDER BY created_at ASC
+  `).all() as SubmissionRow[];
+
   return (
     <div className="h-full overflow-y-auto" style={{ background: "#FAFAF8" }}>
       <div className="max-w-2xl mx-auto px-4 py-8 pb-14">
         <h1 className="font-display text-2xl text-stone-900 mb-6">Admin</h1>
+
+        <section className="space-y-3">
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+            Väntande listningsansökningar ({submissions.length})
+          </h2>
+
+          {submissions.length === 0 ? (
+            <p className="text-sm text-stone-500">Inga väntande listningar.</p>
+          ) : (
+            <ul className="space-y-2">
+              {submissions.map((sub) => (
+                <li
+                  key={sub.id}
+                  className="bg-white rounded-xl border border-stone-100 shadow-sm px-4 py-4"
+                >
+                  <div className="flex items-start justify-between gap-4 flex-wrap">
+                    <div className="space-y-0.5 min-w-0">
+                      <p className="font-display text-[15px] text-stone-900 leading-snug truncate">
+                        {sub.name}
+                      </p>
+                      <p className="text-[11px] text-stone-400">{sub.submitted_email}</p>
+                      {(sub.kommun || sub.lan) && (
+                        <p className="text-[11px] text-stone-400">
+                          {[sub.kommun, sub.lan].filter(Boolean).join(", ")}
+                        </p>
+                      )}
+                      <p className="text-[11px] text-stone-300">
+                        {new Date(sub.created_at).toLocaleDateString("sv-SE", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })}
+                      </p>
+                    </div>
+                    <SubmissionActions id={sub.id} />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
 
         <section className="space-y-3">
           <h2 className="text-xs font-semibold uppercase tracking-wide text-stone-400">
