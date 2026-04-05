@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { Loader2 } from "lucide-react";
 
 interface OwnershipStatus {
@@ -33,23 +32,8 @@ export default function ClaimSection({ farmId, farmName }: Props) {
   // State 3: approved ownership — hide block entirely
   if (ownershipStatus.status === "approved") return null;
 
-  // State 1: signed out
-  if (!ownershipStatus.isLoggedIn) {
-    return (
-      <section className="rounded-xl border border-stone-200 bg-white px-4 py-4 space-y-2">
-        <h2 className="text-sm font-semibold text-stone-800">Är detta din gård?</h2>
-        <p className="text-xs text-stone-500 leading-relaxed">
-          Skapa ett konto för att hantera din listning i Gårdsguiden.
-        </p>
-        <Link
-          href="/registrera"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-stone-700 border border-stone-300 rounded-lg px-3 py-1.5 hover:border-stone-500 hover:text-stone-900 transition-colors"
-        >
-          Skapa konto
-        </Link>
-      </section>
-    );
-  }
+  // State 1: signed out — hide entirely
+  if (!ownershipStatus.isLoggedIn) return null;
 
   // State 2: signed in, pending request already submitted
   if (ownershipStatus.status === "pending" || submitted) {
