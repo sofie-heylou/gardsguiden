@@ -1,6 +1,4 @@
-import type { Appearance } from "@clerk/nextjs/server";
-
-export const clerkAppearance: Appearance = {
+export const clerkAppearance = {
   variables: {
     colorPrimary: "#fbbf24",        // amber-400 — matches header CTA
     colorBackground: "#FAFAF8",     // site body background
