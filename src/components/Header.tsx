@@ -109,7 +109,7 @@ export default function Header() {
         }`}
         style={{ top: "calc(var(--banner-h, 1.75rem) + 3.5rem)" }}
       >
-        <nav className="flex flex-col py-2">
+        <nav className="flex flex-col py-2 overflow-y-auto max-h-[calc(100dvh-var(--banner-h,1.75rem)-3.5rem)]">
           {/* County section */}
           <div className="px-5 pt-3 pb-1">
             <p className="text-[10px] uppercase tracking-wide text-stone-400 mb-1">Utforska per län</p>

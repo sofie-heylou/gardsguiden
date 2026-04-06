@@ -425,7 +425,7 @@ export default function MapView() {
       {/* Owner CTA */}
       <Link
         href="/registrera"
-        className="absolute bottom-4 left-4 flex items-center gap-1.5 text-sm font-medium text-green-800 bg-green-100 border border-green-300 rounded-full px-3 py-2 shadow-lg hover:bg-green-200 transition-colors"
+        className="absolute top-14 left-3 flex items-center gap-1.5 text-sm font-medium text-green-800 bg-green-100 border border-green-300 rounded-full px-3 py-2 shadow-lg hover:bg-green-200 transition-colors"
       >
         Är du gårdsägare? Lägg till din gård
         <ArrowRight size={11} />
