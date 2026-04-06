@@ -66,10 +66,16 @@ interface FarmJson {
 // ── County slug mapping ───────────────────────────────────────────────────────
 
 const COUNTY_TO_SLUG: Record<string, string> = {
-  Stockholm:   "stockholm",
-  Uppsala:     "uppsala",
-  Västmanland: "vastmanland",
-  Södermanland: "sodermanland",
+  Stockholm:        "stockholm",
+  Uppsala:          "uppsala",
+  Västmanland:      "vastmanland",
+  Södermanland:     "sodermanland",
+  Skåne:            "skane",
+  Kalmar:           "kalmar",
+  Gotland:          "gotland",
+  "Västra Götaland": "vastra-gotaland",
+  Halland:          "halland",
+  Blekinge:         "blekinge",
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

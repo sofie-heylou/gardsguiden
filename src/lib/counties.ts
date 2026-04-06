@@ -7,7 +7,10 @@ const COUNTIES = [
   { name: "Södermanland", slug: "sodermanland", gardarSlug: "sodermanlands-lan", displayName: "Södermanlands län" },
   { name: "Skåne",        slug: "skane",        gardarSlug: "skane-lan",         displayName: "Skåne län" },
   { name: "Kalmar",       slug: "kalmar",       gardarSlug: "kalmar-lan",        displayName: "Kalmar län" },
-  { name: "Gotland",      slug: "gotland",      gardarSlug: "gotlands-lan",      displayName: "Gotlands län" },
+  { name: "Gotland",        slug: "gotland",        gardarSlug: "gotlands-lan",        displayName: "Gotlands län" },
+  { name: "Västra Götaland", slug: "vastra-gotaland", gardarSlug: "vastra-gotalands-lan", displayName: "Västra Götalands län" },
+  { name: "Halland",         slug: "halland",         gardarSlug: "hallands-lan",          displayName: "Hallands län" },
+  { name: "Blekinge",        slug: "blekinge",        gardarSlug: "blekinge-lan",          displayName: "Blekinge län" },
 ] as const;
 
 type CountyName = (typeof COUNTIES)[number]["name"];

@@ -6,7 +6,6 @@ import { svSE } from "@clerk/localizations";
 import { clerkAppearance } from "../lib/clerkAppearance";
 import Header from "../components/Header";
 import BottomNav from "../components/BottomNav";
-import SiteFooter from "../components/SiteFooter";
 import { SITE_URL } from "../lib/site";
 import "./globals.css";
 
@@ -106,7 +105,7 @@ const clerkLocalization = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="sv" className={lora.variable}>
-      <body className="h-dvh flex flex-col overflow-hidden" style={{ background: "#FAFAF8", color: "#2c2c2c" }}>
+      <body className="h-dvh flex flex-col overflow-hidden" style={{ background: "#FAFAF8", color: "#2c2c2c", "--banner-h": "1.75rem" } as React.CSSProperties}>
         <ClerkProvider
           localization={clerkLocalization}
           appearance={clerkAppearance}
@@ -136,7 +135,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           </div>
           <Header />
           <main className="flex-1 overflow-hidden">{children}</main>
-          <SiteFooter />
           <BottomNav />
         </ClerkProvider>
       </body>
