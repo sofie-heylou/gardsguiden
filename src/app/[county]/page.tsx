@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { ChevronLeft, ShoppingBag, GlassWater } from "lucide-react";
 import { getFarmsByCounty } from "../../lib/farms";
 import { SLUG_TO_COUNTY, COUNTY_SLUGS, farmPath } from "../../lib/counties";
+import { COUNTY_DESCRIPTIONS } from "../../lib/county-descriptions";
 import { SITE_URL } from "../../lib/site";
 import type { Farm } from "../../types/farm";
 
@@ -92,6 +93,9 @@ export default async function CountyPage({ params }: Props) {
           <div className="mb-6">
             <h1 className="font-display text-2xl text-stone-900">{lan}</h1>
             <p className="mt-1 text-sm text-stone-500">{sorted.length} gårdar</p>
+            {COUNTY_DESCRIPTIONS[lan] && (
+              <p className="mt-2 text-sm text-stone-600 leading-relaxed">{COUNTY_DESCRIPTIONS[lan]}</p>
+            )}
           </div>
 
           <ul className="space-y-2">
