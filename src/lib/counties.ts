@@ -28,6 +28,8 @@ export const GARDAR_SLUG_TO_COUNTY: Record<string, Farm["lan"]> =
 
 export const GARDAR_COUNTY_SLUGS = COUNTIES.map((c) => c.gardarSlug);
 
+export const COUNTY_NAMES = COUNTIES.map((c) => c.name);
+
 export const COUNTY_LAN_NAME: Record<Farm["lan"], string> =
   Object.fromEntries(COUNTIES.map((c) => [c.name, c.displayName])) as Record<CountyName, string>;
 

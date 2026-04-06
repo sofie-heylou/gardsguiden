@@ -10,12 +10,11 @@ import { LocateFixed, SlidersHorizontal, X, Loader2, AlertTriangle, ArrowRight, 
 import Link from "next/link";
 import type { Farm } from "../types/farm";
 import { CATEGORIES, farmMatchesCategory } from "../lib/categories";
-import { farmPath } from "../lib/counties";
+import { farmPath, COUNTY_NAMES } from "../lib/counties";
 import { useGeolocation } from "../hooks/useGeolocation";
 
 const TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
 const SWEDEN = { latitude: 59.3, longitude: 16.5, zoom: 7 };
-const COUNTIES = ["Stockholm", "Uppsala", "Västmanland", "Södermanland"] as const;
 const RADIUS_OPTIONS = [10, 25, 50, 100] as const;
 
 type FarmPoint = Supercluster.PointFeature<{ farm: Farm }>;
@@ -78,8 +77,8 @@ export default function MapView() {
 
   // Filters
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [county, setCounty] = useState<string | null>(null);
-  const [category, setCategory] = useState<string | null>(null);
+  const [county, setCounty] = useState<Set<string>>(new Set());
+  const [category, setCategory] = useState<Set<string>>(new Set());
 
   // Near me
   const { pos, status: geoStatus, request: requestLocation } = useGeolocation();
@@ -104,8 +103,8 @@ export default function MapView() {
 
   const farms = useMemo(() => {
     return allFarms.filter((f) => {
-      if (county && f.lan !== county) return false;
-      if (category && !farmMatchesCategory(f.products, category)) return false;
+      if (county.size > 0 && !county.has(f.lan)) return false;
+      if (category.size > 0 && ![...category].some((s) => farmMatchesCategory(f.products, s))) return false;
       if (nearMeActive && pos && haversineKm(pos.lat, pos.lng, f.lat, f.lng) > radius) return false;
       return true;
     });
@@ -166,18 +165,21 @@ export default function MapView() {
     [sc]
   );
 
-  const toggleCounty = useCallback(
-    (c: string) => setCounty((prev) => (prev === c ? null : c)), []
-  );
-  const toggleCategory = useCallback(
-    (s: string) => setCategory((prev) => (prev === s ? null : s)), []
-  );
+  const toggleCounty = useCallback((c: string) => setCounty((prev) => {
+    const next = new Set(prev);
+    next.has(c) ? next.delete(c) : next.add(c);
+    return next;
+  }), []);
+  const toggleCategory = useCallback((s: string) => setCategory((prev) => {
+    const next = new Set(prev);
+    next.has(s) ? next.delete(s) : next.add(s);
+    return next;
+  }), []);
   const clearFilters = useCallback(() => {
-    setCounty(null); setCategory(null);
+    setCounty(new Set()); setCategory(new Set());
   }, []);
 
-  const activeFilterCount =
-    (county ? 1 : 0) + (category ? 1 : 0) + (nearMeActive ? 1 : 0);
+  const activeFilterCount = county.size + category.size + (nearMeActive ? 1 : 0);
 
   const circleData = useMemo(
     () => (nearMeActive && pos ? geoCircle(pos.lat, pos.lng, radius) : null),
@@ -334,10 +336,10 @@ export default function MapView() {
           <div className="space-y-2">
             <p className="text-xs font-medium text-stone-500 uppercase tracking-wide">Län</p>
             <div className="flex flex-wrap gap-1.5">
-              {COUNTIES.map((c) => (
+              {COUNTY_NAMES.map((c) => (
                 <button key={c} onClick={() => toggleCounty(c)}
                   className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                    county === c ? "bg-stone-800 text-white" : "bg-white text-stone-500 border border-stone-200 hover:border-stone-400"
+                    county.has(c) ? "bg-stone-800 text-white" : "bg-white text-stone-500 border border-stone-200 hover:border-stone-400"
                   }`}>
                   {c}
                 </button>
@@ -351,7 +353,7 @@ export default function MapView() {
               {CATEGORIES.map((cat) => (
                 <button key={cat.slug} onClick={() => toggleCategory(cat.slug)}
                   className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                    category === cat.slug ? "bg-stone-800 text-white" : "bg-white text-stone-500 border border-stone-200 hover:border-stone-400"
+                    category.has(cat.slug) ? "bg-stone-800 text-white" : "bg-white text-stone-500 border border-stone-200 hover:border-stone-400"
                   }`}>
                   {cat.label}
                 </button>
@@ -364,7 +366,7 @@ export default function MapView() {
               {farms.length} av {allFarms.length} gårdar visas
             </span>
             <div className="flex gap-3">
-              {(county || category) && (
+              {(county.size > 0 || category.size > 0) && (
                 <button onClick={clearFilters} className="text-xs text-stone-500 underline">Rensa</button>
               )}
               <button onClick={() => setFiltersOpen(false)}

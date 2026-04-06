@@ -2,19 +2,16 @@
 
 import { useState, useEffect, useMemo, useCallback } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   Search, X, ShoppingBag, GlassWater, Clock,
   MapPin, LocateFixed, Loader2, BadgeCheck,
 } from "lucide-react";
 import { CATEGORIES, farmMatchesCategory } from "../lib/categories";
-import { farmPath, GARDAR_COUNTY_TO_SLUG } from "../lib/counties";
+import { farmPath, COUNTY_NAMES } from "../lib/counties";
 import type { Farm } from "../types/farm";
 import { useGeolocation } from "../hooks/useGeolocation";
 
 type SortKey = "name" | "lan" | "distance";
-
-const COUNTIES = ["Stockholm", "Uppsala", "Västmanland", "Södermanland"] as const;
 
 function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const R = 6371;
@@ -52,16 +49,14 @@ function getTodayHours(openingHours: string): { open: boolean; label: string } |
 interface Props {
   initialFarms?: Farm[];
   initialCounty?: string | null;
-  countyBasePath?: string;
 }
 
-export default function FarmList({ initialFarms, initialCounty, countyBasePath }: Props) {
-  const router = useRouter();
+export default function FarmList({ initialFarms, initialCounty }: Props) {
   const [farms, setFarms] = useState<Farm[]>(initialFarms ?? []);
   const [loading, setLoading] = useState(initialFarms === undefined);
   const [query, setQuery] = useState("");
-  const [county, setCounty] = useState<string | null>(initialCounty ?? null);
-  const [category, setCategory] = useState<string | null>(null);
+  const [county, setCounty] = useState<Set<string>>(new Set(initialCounty ? [initialCounty] : []));
+  const [category, setCategory] = useState<Set<string>>(new Set());
   const [sortBy, setSortBy] = useState<SortKey>("name");
 
   const { pos, status: geoStatus, request: requestLocation } = useGeolocation();
@@ -84,33 +79,25 @@ export default function FarmList({ initialFarms, initialCounty, countyBasePath }
     else { setWantsNearMe(true); requestLocation(); }
   }, [sortBy, pos, requestLocation]);
 
-  const toggleCounty = useCallback((c: string) => {
-    if (countyBasePath) {
-      if (county === c) {
-        router.push(countyBasePath);
-      } else {
-        router.push(`${countyBasePath}/${GARDAR_COUNTY_TO_SLUG[c as Farm["lan"]]}`);
-      }
-    } else {
-      setCounty((p) => (p === c ? null : c));
-    }
-  }, [county, countyBasePath, router]);
-  const toggleCategory = useCallback((s: string) => setCategory((p) => (p === s ? null : s)), []);
+  const toggleCounty = useCallback((c: string) => setCounty((prev) => {
+    const next = new Set(prev);
+    next.has(c) ? next.delete(c) : next.add(c);
+    return next;
+  }), []);
+  const toggleCategory = useCallback((s: string) => setCategory((prev) => {
+    const next = new Set(prev);
+    next.has(s) ? next.delete(s) : next.add(s);
+    return next;
+  }), []);
   const clearAll = useCallback(() => {
-    setQuery(""); setCategory(null); setSortBy("name"); setWantsNearMe(false);
-    if (countyBasePath && county) {
-      setCounty(null);
-      router.push(countyBasePath);
-    } else {
-      setCounty(null);
-    }
-  }, [county, countyBasePath, router]);
+    setQuery(""); setCounty(new Set()); setCategory(new Set()); setSortBy("name"); setWantsNearMe(false);
+  }, []);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return farms.filter((f) => {
-      if (county && f.lan !== county) return false;
-      if (category && !farmMatchesCategory(f.products, category)) return false;
+      if (county.size > 0 && !county.has(f.lan)) return false;
+      if (category.size > 0 && ![...category].some((s) => farmMatchesCategory(f.products, s))) return false;
       if (q && !f.name.toLowerCase().includes(q) && !f.products.some((p) => p.toLowerCase().includes(q))) return false;
       return true;
     });
@@ -129,7 +116,7 @@ export default function FarmList({ initialFarms, initialCounty, countyBasePath }
   }, [filtered, sortBy, pos]);
 
   const nearMeActive = sortBy === "distance";
-  const activeFilters = (county ? 1 : 0) + (category ? 1 : 0) + (query ? 1 : 0) + (nearMeActive ? 1 : 0);
+  const activeFilters = county.size + category.size + (query ? 1 : 0) + (nearMeActive ? 1 : 0);
 
   return (
     <div className="h-full flex flex-col overflow-hidden" style={{ background: "#FAFAF8" }}>
@@ -156,12 +143,12 @@ export default function FarmList({ initialFarms, initialCounty, countyBasePath }
 
         {/* County chips */}
         <div className="flex gap-1.5 overflow-x-auto pb-0.5 no-scrollbar">
-          {COUNTIES.map((c) => (
+          {COUNTY_NAMES.map((c) => (
             <button
               key={c}
               onClick={() => toggleCounty(c)}
               className={`shrink-0 px-3 py-1 rounded-full text-[11px] font-medium transition-colors ${
-                county === c
+                county.has(c)
                   ? "bg-stone-800 text-white"
                   : "bg-white text-stone-500 border border-stone-200 hover:border-stone-400"
               }`}
@@ -178,7 +165,7 @@ export default function FarmList({ initialFarms, initialCounty, countyBasePath }
               key={cat.slug}
               onClick={() => toggleCategory(cat.slug)}
               className={`shrink-0 px-3 py-1 rounded-full text-[11px] font-medium transition-colors ${
-                category === cat.slug
+                category.has(cat.slug)
                   ? "bg-stone-800 text-white"
                   : "bg-white text-stone-500 border border-stone-200 hover:border-stone-400"
               }`}

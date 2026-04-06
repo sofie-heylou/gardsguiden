@@ -27,5 +27,5 @@ export const metadata: Metadata = {
 
 export default function GardarPage() {
   const farms = getAllFarms();
-  return <FarmList initialFarms={farms} countyBasePath="/gardar" />;
+  return <FarmList initialFarms={farms} />;
 }

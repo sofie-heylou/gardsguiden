@@ -33,7 +33,7 @@ for (const farm of farms) {
 fs.writeFileSync(JSON_PATH, JSON.stringify(kept, null, 2), "utf-8");
 
 // Summary by county
-const counties = ["Stockholm", "Uppsala", "Västmanland", "Södermanland"] as const;
+const counties = ["Stockholm", "Uppsala", "Västmanland", "Södermanland", "Västra Götaland", "Halland", "Blekinge"] as const;
 
 console.log("\n── Summary ─────────────────────────────────────────────────────");
 console.log(`Total input:  ${farms.length}`);

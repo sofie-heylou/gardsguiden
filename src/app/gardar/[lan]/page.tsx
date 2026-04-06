@@ -53,5 +53,5 @@ export default async function GardarLanPage({ params }: Props) {
   if (!county) notFound();
 
   const farms = getAllFarms();
-  return <FarmList initialFarms={farms} initialCounty={county} countyBasePath="/gardar" />;
+  return <FarmList initialFarms={farms} initialCounty={county} />;
 }

@@ -85,7 +85,7 @@ function normalizeFarm(raw, index) {
   if (!name || name.length < 2 || name.length > 120) return null;
 
   const lan = normalizeCounty(raw.lan || '');
-  if (!['Stockholm', 'Uppsala', 'Västmanland', 'Södermanland'].includes(lan)) return null;
+  if (!['Stockholm', 'Uppsala', 'Västmanland', 'Södermanland', 'Västra Götaland', 'Halland', 'Blekinge'].includes(lan)) return null;
 
   // Apply farm filter
   const rawWithNormalizedLan = { ...raw, lan };
@@ -180,6 +180,7 @@ async function main() {
     { file: path.join(TMP_DIR, 'smaka-farms.json'), label: 'Smaka på Sverige' },
     { file: path.join(TMP_DIR, 'eldrimner-farms.json'), label: 'Eldrimner' },
     { file: path.join(TMP_DIR, 'systembolaget-farms.json'), label: 'Systembolaget' },
+    { file: path.join(TMP_DIR, 'google-places-farms-expansion-2.json'), label: 'Google Places (Västra Götaland, Halland, Blekinge)' },
   ];
 
   const allRaw = [];

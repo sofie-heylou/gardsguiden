@@ -28,7 +28,7 @@ export default function Header() {
       <div className="flex items-center gap-4">
         <Link
           href="/om"
-          className="text-xs text-stone-500 hover:text-stone-800 transition-colors hidden sm:block"
+          className="text-xs text-stone-500 hover:text-stone-800 transition-colors"
         >
           Om Gårdsguiden
         </Link>
