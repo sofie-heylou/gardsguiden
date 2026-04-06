@@ -62,6 +62,11 @@ export default function SubmitFarmForm({ userEmail }: { userEmail: string }) {
   const [products,      setProducts]      = useState<string[]>([]);
   const [onSiteSales,   setOnSiteSales]   = useState(false);
   const [tastingRoom,   setTastingRoom]   = useState(false);
+  const [hasOpeningHours, setHasOpeningHours] = useState(false);
+  const [hours, setHours] = useState({
+    monday: "", tuesday: "", wednesday: "", thursday: "",
+    friday: "", saturday: "", sunday: "",
+  });
 
   const [saving,  setSaving]  = useState(false);
   const [sent,    setSent]    = useState(false);
@@ -99,6 +104,18 @@ export default function SubmitFarmForm({ userEmail }: { userEmail: string }) {
           name, description, address, kommun, lan,
           website, phone, email, products,
           onSiteSales, tastingRoom,
+          openingHours: hasOpeningHours ? [
+            { key: "monday",    sv: "måndag"  },
+            { key: "tuesday",   sv: "tisdag"  },
+            { key: "wednesday", sv: "onsdag"  },
+            { key: "thursday",  sv: "torsdag" },
+            { key: "friday",    sv: "fredag"  },
+            { key: "saturday",  sv: "lördag"  },
+            { key: "sunday",    sv: "söndag"  },
+          ]
+            .filter(({ key }) => hours[key as keyof typeof hours].trim())
+            .map(({ key, sv }) => `${sv}: ${hours[key as keyof typeof hours].trim()}`)
+            .join(", ") : "",
           submittedEmail: userEmail,
         }),
       });
@@ -270,6 +287,58 @@ export default function SubmitFarmForm({ userEmail }: { userEmail: string }) {
         </div>
       </section>
 
+      {/* ── Öppettider ─────────────────────────────────────────────────────── */}
+      <section className="bg-white rounded-xl border border-stone-100 shadow-sm p-5 space-y-4">
+        <h2 className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+          Öppettider
+        </h2>
+
+        <button
+          type="button"
+          onClick={() => setHasOpeningHours((v) => !v)}
+          className="w-full flex items-center justify-between gap-4 py-1 outline-none"
+        >
+          <div className="text-left">
+            <p className="text-sm text-stone-800">Fasta öppettider</p>
+            <p className="text-xs text-stone-400">Gården har fasta öppettider</p>
+          </div>
+          <div className={`shrink-0 w-10 h-6 rounded-full transition-colors relative ${hasOpeningHours ? "bg-stone-800" : "bg-stone-200"}`}>
+            <span className={`absolute top-1 left-0 w-4 h-4 bg-white rounded-full shadow transition-transform ${hasOpeningHours ? "translate-x-5" : "translate-x-1"}`} />
+          </div>
+        </button>
+
+        {!hasOpeningHours && (
+          <p className="text-xs text-stone-400">
+            Besökare ser &quot;Kontakta gården för mer information&quot;
+          </p>
+        )}
+
+        {hasOpeningHours && (
+          <div className="space-y-2">
+            {([
+              { key: "monday",    label: "Måndag"  },
+              { key: "tuesday",   label: "Tisdag"  },
+              { key: "wednesday", label: "Onsdag"  },
+              { key: "thursday",  label: "Torsdag" },
+              { key: "friday",    label: "Fredag"  },
+              { key: "saturday",  label: "Lördag"  },
+              { key: "sunday",    label: "Söndag"  },
+            ] as const).map(({ key, label }) => (
+              <div key={key} className="grid items-center gap-3" style={{ gridTemplateColumns: "100px 1fr" }}>
+                <span className="text-sm text-stone-600">{label}</span>
+                <input
+                  type="text"
+                  value={hours[key]}
+                  onChange={(e) => setHours((h) => ({ ...h, [key]: e.target.value }))}
+                  placeholder="t.ex. 10:00–16:00"
+                  className={inputCls}
+                />
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
       {/* ── Egenskaper ─────────────────────────────────────────────────────── */}
       <section className="bg-white rounded-xl border border-stone-100 shadow-sm p-5 space-y-3">
         <h2 className="text-xs font-semibold uppercase tracking-wide text-stone-400">
@@ -285,14 +354,14 @@ export default function SubmitFarmForm({ userEmail }: { userEmail: string }) {
             key={label}
             type="button"
             onClick={() => set(!value)}
-            className="w-full flex items-center justify-between gap-4 py-1"
+            className="w-full flex items-center justify-between gap-4 py-1 outline-none"
           >
             <div className="text-left">
               <p className="text-sm text-stone-800">{label}</p>
               <p className="text-xs text-stone-400">{desc}</p>
             </div>
             <div className={`shrink-0 w-10 h-6 rounded-full transition-colors relative ${value ? "bg-stone-800" : "bg-stone-200"}`}>
-              <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${value ? "translate-x-5" : "translate-x-1"}`} />
+              <span className={`absolute top-1 left-0 w-4 h-4 bg-white rounded-full shadow transition-transform ${value ? "translate-x-5" : "translate-x-1"}`} />
             </div>
           </button>
         ))}

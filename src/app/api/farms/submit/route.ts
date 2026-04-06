@@ -10,7 +10,8 @@ function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-const VALID_LAN = ["Stockholm", "Uppsala", "Västmanland", "Södermanland"];
+import { COUNTY_NAMES } from "../../../../lib/counties";
+const VALID_LAN: readonly string[] = COUNTY_NAMES;
 
 export async function POST(req: NextRequest) {
   let body: unknown;
