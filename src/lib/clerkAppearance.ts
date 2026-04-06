@@ -18,10 +18,10 @@ export const clerkAppearance = {
   },
   elements: {
     // Card
-    card: "bg-white border border-stone-100 shadow-sm rounded-xl",
+    card: "bg-white border border-stone-100 shadow-sm rounded-xl p-6",
 
     // Header — title uses Lora serif to match site branding
-    headerTitle: "font-display tracking-tight text-stone-800",
+    headerTitle: "font-display tracking-tight text-stone-800 mb-2",
     headerSubtitle: "text-stone-500 text-xs leading-relaxed",
 
     // Social/OAuth buttons — secondary outline style, same as "Skapa konto" / "Ansök om ägarskap"
