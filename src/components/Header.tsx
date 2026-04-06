@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ChevronDown, ChevronUp } from "lucide-react";
 import HeaderAuth from "./HeaderAuth";
 import { COUNTIES } from "../lib/counties";
 
@@ -39,11 +39,17 @@ const menuLinks = [
 
 export default function Header() {
   const [open, setOpen] = useState(false);
+  const [lansOpen, setLansOpen] = useState(false);
   const pathname = usePathname();
+
+  function closeMenu() {
+    setOpen(false);
+    setLansOpen(false);
+  }
 
   // Close menu on route change
   useEffect(() => {
-    setOpen(false);
+    closeMenu();
   }, [pathname]);
 
   // Prevent body scroll when menu is open
@@ -83,7 +89,7 @@ export default function Header() {
       {open && (
         <div
           className="fixed inset-0 bg-black/20 z-40"
-          onClick={() => setOpen(false)}
+          onClick={() => closeMenu()}
           aria-hidden="true"
         />
       )}
@@ -99,12 +105,18 @@ export default function Header() {
       >
         <nav className="flex flex-col py-2">
           <div className="px-5 pt-3 pb-2">
-            <p className="text-[10px] uppercase tracking-wide text-stone-400 mb-2">Gårdar per län</p>
-            {COUNTIES.map(({ slug, displayName }) => (
+            <button
+              onClick={() => setLansOpen((o) => !o)}
+              className="flex items-center justify-between w-full cursor-pointer text-[10px] uppercase tracking-wide text-stone-400 mb-2"
+            >
+              Gårdar per län
+              {lansOpen ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+            </button>
+            {lansOpen && COUNTIES.map(({ slug, displayName }) => (
               <Link
                 key={slug}
                 href={`/${slug}`}
-                onClick={() => setOpen(false)}
+                onClick={() => closeMenu()}
                 className="block py-1.5 text-sm text-stone-700 hover:text-stone-900 transition-colors"
               >
                 {displayName}
