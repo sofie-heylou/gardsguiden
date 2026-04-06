@@ -97,7 +97,7 @@ export default async function AdminPage() {
           )}
         </section>
 
-        <section className="space-y-3">
+        <section className="space-y-3 mt-8">
           <h2 className="text-xs font-semibold uppercase tracking-wide text-stone-400">
             Väntande ägarskapsansökningar ({pending.length})
           </h2>

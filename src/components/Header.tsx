@@ -40,12 +40,20 @@ const menuLinks = [
 export default function Header() {
   const [open, setOpen] = useState(false);
   const [lansOpen, setLansOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const pathname = usePathname();
 
   function closeMenu() {
     setOpen(false);
     setLansOpen(false);
   }
+
+  useEffect(() => {
+    fetch("/api/me/role")
+      .then((r) => r.json())
+      .then((data) => setIsAdmin(data.role === "admin"))
+      .catch(() => {});
+  }, []);
 
   // Close menu on route change
   useEffect(() => {
@@ -136,6 +144,18 @@ export default function Header() {
               {label}
             </Link>
           ))}
+          {isAdmin && (
+            <Link
+              href="/admin"
+              className={`px-5 py-3 text-sm transition-colors ${
+                pathname === "/admin"
+                  ? "text-stone-900 font-medium"
+                  : "text-stone-600 hover:text-stone-900 hover:bg-stone-50"
+              }`}
+            >
+              Admin
+            </Link>
+          )}
           <div className="px-5 py-3 border-t border-stone-100 mt-1">
             <HeaderAuth />
           </div>
