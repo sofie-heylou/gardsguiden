@@ -25,6 +25,7 @@ export async function POST(req: NextRequest) {
     name, description, address, kommun, lan,
     website, phone, email, products,
     openingHours, season, onSiteSales, tastingRoom,
+    facebook, instagram,
     submittedEmail,
   } = body as Record<string, unknown>;
 
@@ -47,11 +48,11 @@ export async function POST(req: NextRequest) {
     INSERT INTO farm_submissions
       (id, name, description, address, kommun, lan, website, phone, email,
        products, opening_hours, season, on_site_sales, tasting_room,
-       submitted_email, user_id)
+       facebook, instagram, submitted_email, user_id)
     VALUES
       (?, ?, ?, ?, ?, ?, ?, ?, ?,
        ?, ?, ?, ?, ?,
-       ?, ?)
+       ?, ?, ?, ?)
   `).run(
     generateId(),
     (name as string).trim(),
@@ -67,6 +68,8 @@ export async function POST(req: NextRequest) {
     typeof season      === "string" ? season.trim()      : null,
     onSiteSales  ? 1 : 0,
     tastingRoom  ? 1 : 0,
+    typeof facebook    === "string" && facebook.trim()   ? facebook.trim()    : null,
+    typeof instagram   === "string" && instagram.trim()  ? instagram.trim()   : null,
     (submittedEmail as string).trim(),
     userId ?? null,
   );

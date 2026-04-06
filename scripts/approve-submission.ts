@@ -34,6 +34,8 @@ interface Submission {
   season: string | null;
   on_site_sales: number;
   tasting_room: number;
+  facebook: string | null;
+  instagram: string | null;
   submitted_email: string;
   user_id: string | null;
   status: string;
@@ -197,6 +199,8 @@ const farmRecord = {
   season:                sub.season ?? "",
   source:                "submission",
   claimed_by:            sub.user_id ?? null,
+  facebook:              sub.facebook ?? null,
+  instagram:             sub.instagram ?? null,
 };
 
 // 4. Insert into SQLite (transaction covers everything)
@@ -206,12 +210,12 @@ const approveTx = db.transaction(() => {
       id, name, description, address, kommun, lan, lat, lng,
       website, phone, email, products, onSiteSales, tastingRoom,
       "gardsförsäljningLicense", isArchipelago, openingHours, season,
-      source, claimed_by
+      source, claimed_by, facebook, instagram
     ) VALUES (
       @id, @name, @description, @address, @kommun, @lan, @lat, @lng,
       @website, @phone, @email, @products, @onSiteSales, @tastingRoom,
       @gardsförsäljningLicense, @isArchipelago, @openingHours, @season,
-      @source, @claimed_by
+      @source, @claimed_by, @facebook, @instagram
     )
   `).run(farmRecord);
 

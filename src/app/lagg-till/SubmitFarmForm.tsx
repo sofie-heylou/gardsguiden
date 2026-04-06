@@ -60,6 +60,8 @@ export default function SubmitFarmForm({ userEmail }: { userEmail: string }) {
   const [phone,         setPhone]         = useState("");
   const [email,         setEmail]         = useState("");
   const [products,      setProducts]      = useState<string[]>([]);
+  const [facebook,      setFacebook]      = useState("");
+  const [instagram,     setInstagram]     = useState("");
   const [onSiteSales,   setOnSiteSales]   = useState(false);
   const [tastingRoom,   setTastingRoom]   = useState(false);
   const [hasOpeningHours, setHasOpeningHours] = useState(false);
@@ -103,6 +105,7 @@ export default function SubmitFarmForm({ userEmail }: { userEmail: string }) {
         body: JSON.stringify({
           name, description, address, kommun, lan,
           website, phone, email, products,
+          facebook, instagram,
           onSiteSales, tastingRoom,
           openingHours: hasOpeningHours ? [
             { key: "monday",    sv: "måndag"  },
@@ -259,6 +262,33 @@ export default function SubmitFarmForm({ userEmail }: { userEmail: string }) {
             />
           </Field>
         </div>
+      </section>
+
+      {/* ── Sociala medier ─────────────────────────────────────────────────── */}
+      <section className="bg-white rounded-xl border border-stone-100 shadow-sm p-5 space-y-4">
+        <h2 className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+          Sociala medier
+        </h2>
+
+        <Field label="Facebook">
+          <input
+            type="url"
+            value={facebook}
+            onChange={(e) => setFacebook(e.target.value)}
+            placeholder="https://facebook.com/din-gard"
+            className={inputCls}
+          />
+        </Field>
+
+        <Field label="Instagram">
+          <input
+            type="url"
+            value={instagram}
+            onChange={(e) => setInstagram(e.target.value)}
+            placeholder="https://instagram.com/din-gard"
+            className={inputCls}
+          />
+        </Field>
       </section>
 
       {/* ── Produkter ──────────────────────────────────────────────────────── */}

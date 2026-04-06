@@ -209,6 +209,18 @@ function initSchema(db: Database.Database): void {
     db.exec(`ALTER TABLE farm_claims ADD COLUMN payment_status TEXT NOT NULL DEFAULT 'unpaid'`);
   }
   db.exec(`CREATE INDEX IF NOT EXISTS idx_claims_payment ON farm_claims(payment_status)`);
+  if (!columnExists(db, "farms", "facebook")) {
+    db.exec(`ALTER TABLE farms ADD COLUMN facebook TEXT`);
+  }
+  if (!columnExists(db, "farms", "instagram")) {
+    db.exec(`ALTER TABLE farms ADD COLUMN instagram TEXT`);
+  }
+  if (!columnExists(db, "farm_submissions", "facebook")) {
+    db.exec(`ALTER TABLE farm_submissions ADD COLUMN facebook TEXT`);
+  }
+  if (!columnExists(db, "farm_submissions", "instagram")) {
+    db.exec(`ALTER TABLE farm_submissions ADD COLUMN instagram TEXT`);
+  }
 
   // Sync farms from build-time DB into runtime DB on every startup.
   // Uses INSERT OR IGNORE so existing rows (with farmer edits) are preserved,

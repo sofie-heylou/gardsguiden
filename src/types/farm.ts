@@ -19,4 +19,6 @@ export interface Farm {
   season: string;
   source: string;
   isClaimed: boolean;
+  facebook: string | null;
+  instagram: string | null;
 }
