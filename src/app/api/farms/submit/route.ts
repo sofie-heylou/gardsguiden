@@ -44,6 +44,13 @@ export async function POST(req: NextRequest) {
 
   const db = getDb();
 
+  // Ensure the user row exists — the Clerk webhook may not have fired yet.
+  db.prepare(`
+    INSERT INTO users (id, email, role)
+    VALUES (?, ?, 'farmer')
+    ON CONFLICT (id) DO NOTHING
+  `).run(userId, (submittedEmail as string).trim());
+
   db.prepare(`
     INSERT INTO farm_submissions
       (id, name, description, address, kommun, lan, website, phone, email,
