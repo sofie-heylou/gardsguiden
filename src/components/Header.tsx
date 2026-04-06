@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, ChevronDown, ChevronUp } from "lucide-react";
+import { Menu, X, ChevronRight } from "lucide-react";
 import HeaderAuth from "./HeaderAuth";
 import { COUNTIES } from "../lib/counties";
 
@@ -39,13 +39,11 @@ const menuLinks = [
 
 export default function Header() {
   const [open, setOpen] = useState(false);
-  const [lansOpen, setLansOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const pathname = usePathname();
 
   function closeMenu() {
     setOpen(false);
-    setLansOpen(false);
   }
 
   useEffect(() => {
@@ -112,51 +110,63 @@ export default function Header() {
         style={{ top: "calc(var(--banner-h, 1.75rem) + 3.5rem)" }}
       >
         <nav className="flex flex-col py-2">
-          <div className="px-5 pt-3 pb-2">
-            <button
-              onClick={() => setLansOpen((o) => !o)}
-              className="flex items-center justify-between w-full cursor-pointer text-[10px] uppercase tracking-wide text-stone-400 mb-2"
-            >
-              Gårdar per län
-              {lansOpen ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-            </button>
-            {lansOpen && COUNTIES.map(({ slug, displayName }) => (
+          {/* County section */}
+          <div className="px-5 pt-3 pb-1">
+            <p className="text-[10px] uppercase tracking-wide text-stone-400 mb-1">Utforska per län</p>
+            {COUNTIES.map(({ slug, displayName }) => (
               <Link
                 key={slug}
                 href={`/${slug}`}
                 onClick={() => closeMenu()}
-                className="block py-1.5 text-sm text-stone-700 hover:text-stone-900 transition-colors"
+                className="flex items-center justify-between py-2 text-sm text-stone-700 hover:text-stone-900 transition-colors"
               >
                 {displayName}
+                <ChevronRight size={14} className="text-stone-400" />
               </Link>
             ))}
           </div>
-          {menuLinks.map(({ href, label }) => (
-            <Link
-              key={href}
-              href={href}
-              className={`px-5 py-3 text-sm transition-colors ${
-                pathname === href
-                  ? "text-stone-900 font-medium"
-                  : "text-stone-600 hover:text-stone-900 hover:bg-stone-50"
-              }`}
-            >
-              {label}
-            </Link>
-          ))}
-          {isAdmin && (
-            <Link
-              href="/admin"
-              className={`px-5 py-3 text-sm transition-colors ${
-                pathname === "/admin"
-                  ? "text-stone-900 font-medium"
-                  : "text-stone-600 hover:text-stone-900 hover:bg-stone-50"
-              }`}
-            >
-              Admin
-            </Link>
-          )}
-          <div className="px-5 py-3 border-t border-stone-100 mt-1">
+
+          {/* Other nav links */}
+          <div className="border-t border-stone-100 mt-1">
+            {menuLinks.map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                className={`px-5 py-3 text-sm transition-colors block ${
+                  pathname === href
+                    ? "text-stone-900 font-medium"
+                    : "text-stone-600 hover:text-stone-900 hover:bg-stone-50"
+                }`}
+              >
+                {label}
+              </Link>
+            ))}
+            {isAdmin && (
+              <Link
+                href="/admin"
+                className={`px-5 py-3 text-sm transition-colors block ${
+                  pathname === "/admin"
+                    ? "text-stone-900 font-medium"
+                    : "text-stone-600 hover:text-stone-900 hover:bg-stone-50"
+                }`}
+              >
+                Admin
+              </Link>
+            )}
+          </div>
+
+          {/* Owner CTA + auth */}
+          <div className="px-5 pt-3 pb-3 border-t border-stone-100 mt-1 space-y-3">
+            <div className="rounded-lg bg-green-100 border border-green-300 px-4 py-3">
+              <p className="text-xs font-medium text-green-800 mb-1.5">Är du gårdsägare?</p>
+              <Link
+                href="/registrera"
+                onClick={() => closeMenu()}
+                className="text-xs font-semibold text-green-800 underline underline-offset-2 hover:text-green-900 transition-colors"
+              >
+                Lägg till din gård
+              </Link>
+            </div>
             <HeaderAuth />
           </div>
         </nav>
