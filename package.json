@@ -16,6 +16,7 @@
   "dependencies": {
     "@clerk/localizations": "^4.3.0",
     "@clerk/nextjs": "^7.0.8",
+    "@mapbox/search-js-react": "^1.5.1",
     "@next/bundle-analyzer": "^16.2.2",
     "@tailwindcss/postcss": "^4.2.2",
     "@types/better-sqlite3": "^7.6.13",

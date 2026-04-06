@@ -3,6 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Loader2, Check } from "lucide-react";
+import { AddressAutofill } from "@mapbox/search-js-react";
+import type { AddressAutofillRetrieveResponse } from "@mapbox/search-js-core";
+import { COUNTY_NAMES } from "../../lib/counties";
 
 const inputCls =
   "w-full px-3.5 py-2.5 rounded-lg border border-stone-200 bg-white text-sm text-stone-900 placeholder:text-stone-400 outline-none focus:ring-2 focus:ring-stone-300 transition";
@@ -30,7 +33,7 @@ const ALL_PRODUCTS = [
   { value: "annat",     label: "Annat" },
 ];
 
-const COUNTIES = ["Stockholm", "Uppsala", "Västmanland", "Södermanland"];
+const TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
 
 function Field({ label, required, children }: {
   label: string;
@@ -63,6 +66,20 @@ export default function SubmitFarmForm({ userEmail }: { userEmail: string }) {
   const [saving,  setSaving]  = useState(false);
   const [sent,    setSent]    = useState(false);
   const [error,   setError]   = useState("");
+
+  function handleAutofill(res: AddressAutofillRetrieveResponse) {
+    const feature = res.features[0];
+    if (!feature) return;
+    const props = feature.properties;
+    setAddress(props.full_address ?? props.place_name ?? "");
+    const ctx = props.context ?? [];
+    const placeText  = ctx.find((c) => c.id.startsWith("place"))?.text  ?? "";
+    const regionText = ctx.find((c) => c.id.startsWith("region"))?.text ?? "";
+    // Mapbox returns Swedish counties in genitive (e.g. "Stockholms") — strip trailing "s"
+    const normalizedLan = regionText.endsWith("s") ? regionText.slice(0, -1) : regionText;
+    if (placeText)      setKommun(placeText);
+    if (normalizedLan)  setLan(normalizedLan);
+  }
 
   function toggleProduct(value: string) {
     setProducts((prev) =>
@@ -147,13 +164,20 @@ export default function SubmitFarmForm({ userEmail }: { userEmail: string }) {
         </Field>
 
         <Field label="Adress">
-          <input
-            type="text"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            placeholder="Gårdsvägen 1, 123 45 Orten"
-            className={inputCls}
-          />
+          <AddressAutofill
+            accessToken={TOKEN}
+            options={{ language: "sv", country: "SE" }}
+            onRetrieve={handleAutofill}
+          >
+            <input
+              type="text"
+              autoComplete="shipping address-line1"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="Gårdsvägen 1, 123 45 Orten"
+              className={inputCls}
+            />
+          </AddressAutofill>
         </Field>
 
         <div className="grid grid-cols-2 gap-4">
@@ -174,7 +198,7 @@ export default function SubmitFarmForm({ userEmail }: { userEmail: string }) {
               className={inputCls + " cursor-pointer"}
             >
               <option value="">Välj län…</option>
-              {COUNTIES.map((c) => (
+              {COUNTY_NAMES.map((c) => (
                 <option key={c} value={c}>{c}</option>
               ))}
             </select>
