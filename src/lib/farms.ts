@@ -49,7 +49,10 @@ export function getFilteredFarms(filters: FarmFilters = {}): Farm[] {
   const db = getDb();
   const { lan, category, q } = filters;
 
-  const conditions: string[] = [];
+  const conditions: string[] = [
+    "f.address IS NOT NULL AND f.address != ''",
+    "f.website IS NOT NULL AND f.website != ''",
+  ];
   const params: unknown[] = [];
 
   if (category) {
@@ -112,7 +115,9 @@ export function getFarmsByCounty(county: string): Farm[] {
 
 export function getFarmById(id: string): Farm | null {
   const db = getDb();
-  const row = db.prepare("SELECT * FROM farms WHERE id = ?").get(id) as FarmRow | undefined;
+  const row = db.prepare(
+    "SELECT * FROM farms WHERE id = ? AND address IS NOT NULL AND address != '' AND website IS NOT NULL AND website != ''"
+  ).get(id) as FarmRow | undefined;
   return row ? rowToFarm(row) : null;
 }
 

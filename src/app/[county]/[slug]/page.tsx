@@ -6,14 +6,13 @@ import {
   GlassWater,
   BadgeCheck,
   Sailboat,
-  MapPin,
   Phone,
   Mail,
   Globe,
   Navigation,
 } from "lucide-react";
 import { getFarmById, getAllFarms } from "../../../lib/farms";
-import { SLUG_TO_COUNTY, COUNTY_TO_SLUG, COUNTY_SLUGS, farmPath } from "../../../lib/counties";
+import { SLUG_TO_COUNTY, COUNTY_TO_SLUG, farmPath } from "../../../lib/counties";
 import BackButton from "../../../components/BackButton";
 import FarmDetailMapLoader from "../../../components/FarmDetailMapLoader";
 import OpeningHoursTable from "../../../components/OpeningHoursTable";
@@ -81,7 +80,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 // ── JSON-LD ───────────────────────────────────────────────────────────────────
 
-function FarmJsonLd({ farm, county }: { farm: Farm; county: string }) {
+function FarmJsonLd({ farm }: { farm: Farm }) {
   const url = `${SITE_URL}${farmPath(farm)}`;
   const jsonLd: Record<string, unknown> = {
     "@context": "https://schema.org",
@@ -131,80 +130,99 @@ export default async function FarmDetailPage({ params }: Props) {
 
   const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${farm.lat},${farm.lng}`;
 
-  const badges = [
-    farm.onSiteSales       && { label: "Gårdsförsäljning",        icon: ShoppingBag },
-    farm.tastingRoom       && { label: "Provsmakning",             icon: GlassWater  },
+  const labels = [
+    farm.tastingRoom            && { label: "Provsmakning",             icon: GlassWater  },
+    farm.onSiteSales            && { label: "Gårdsförsäljning",         icon: ShoppingBag },
     farm.gardsförsäljningLicense && { label: "Gårdsförsäljningslicens", icon: BadgeCheck  },
-    farm.isArchipelago     && { label: "Skärgård",                 icon: Sailboat    },
+    farm.isArchipelago          && { label: "Skärgård",                 icon: Sailboat    },
   ].filter(Boolean) as { label: string; icon: React.ElementType }[];
+
+  const visibleProducts = farm.products.filter((p) => p !== "annat");
 
   return (
     <>
-      <FarmJsonLd farm={farm} county={county} />
+      <FarmJsonLd farm={farm} />
       <div className="h-full overflow-y-auto" style={{ background: "#FAFAF8" }}>
-        <div className="max-w-lg mx-auto px-4 py-4 pb-8 space-y-6">
+        <div className="max-w-lg mx-auto pb-10">
 
-          <BackButton />
+          {/* Map — full bleed, no padding */}
+          <div className="relative">
+            <FarmDetailMapLoader lat={farm.lat} lng={farm.lng} name={farm.name} />
+            <div className="absolute top-3 left-3">
+              <BackButton />
+            </div>
+          </div>
 
-          <FarmDetailMapLoader lat={farm.lat} lng={farm.lng} name={farm.name} />
+          <div className="px-4 pt-5 space-y-5">
 
-          <div>
+            {/* Farm name */}
             <h1 className="font-display text-2xl text-stone-900 leading-tight">
               {farm.name}
             </h1>
-            <p className="mt-1 text-sm text-stone-500 flex items-center gap-1">
-              <MapPin size={13} />
-              {farm.address || `${farm.kommun}, ${farm.lan}`}
-            </p>
-          </div>
 
-          {badges.length > 0 && (
-            <div className="flex flex-wrap gap-3">
-              {badges.map(({ label, icon: Icon }) => (
-                <span key={label} className="flex items-center gap-1.5 text-xs text-stone-500">
-                  <Icon size={13} className="text-stone-400" />
-                  {label}
-                </span>
-              ))}
-            </div>
-          )}
-
-          {farm.description && (
-            <p className="text-sm text-stone-700 leading-relaxed">
-              {farm.description}
-            </p>
-          )}
-
-          {farm.products.length > 0 && (
-            <section className="space-y-2">
-              <h2 className="text-xs font-semibold uppercase tracking-wide text-stone-400">
-                Produkter
-              </h2>
+            {/* Labels row */}
+            {labels.length > 0 && (
               <div className="flex flex-wrap gap-2">
-                {farm.products.map((p) => (
+                {labels.map(({ label, icon: Icon }) => (
                   <span
-                    key={p}
-                    className="px-2.5 py-0.5 rounded text-[12px] bg-stone-100 text-stone-500 capitalize"
+                    key={label}
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-stone-100 text-stone-600"
                   >
-                    {p}
+                    <Icon size={12} />
+                    {label}
                   </span>
                 ))}
               </div>
-            </section>
-          )}
+            )}
 
-          {(farm.openingHours || farm.season) && (
+            {/* Products */}
+            {visibleProducts.length > 0 && (
+              <section className="space-y-2">
+                <h2 className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">
+                  Produkter
+                </h2>
+                <div className="flex flex-wrap gap-2">
+                  {visibleProducts.map((p) => (
+                    <span
+                      key={p}
+                      className="px-2.5 py-1 rounded-full text-xs bg-amber-50 text-amber-800 capitalize font-medium"
+                    >
+                      {p}
+                    </span>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* About */}
+            {farm.description && (
+              <section className="space-y-2">
+                <h2 className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">
+                  Om gården
+                </h2>
+                <p className="text-sm text-stone-700 leading-relaxed">
+                  {farm.description}
+                </p>
+              </section>
+            )}
+
+            {/* Opening hours */}
             <section className="space-y-2">
-              <h2 className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+              <h2 className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">
                 Öppettider
               </h2>
-              <OpeningHoursTable openingHours={farm.openingHours} season={farm.season} />
+              {farm.openingHours ? (
+                <OpeningHoursTable openingHours={farm.openingHours} season={farm.season} />
+              ) : (
+                <p className="text-sm text-stone-500">
+                  Kontakta gården för öppettider.
+                </p>
+              )}
             </section>
-          )}
 
-          {(farm.phone || farm.email || farm.website) && (
+            {/* Contact */}
             <section className="space-y-2">
-              <h2 className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+              <h2 className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">
                 Kontakt
               </h2>
               <ul className="space-y-3">
@@ -212,9 +230,9 @@ export default async function FarmDetailPage({ params }: Props) {
                   <li>
                     <a
                       href={`tel:${farm.phone}`}
-                      className="flex items-center gap-3 text-sm text-stone-700 hover:text-stone-900"
+                      className="flex items-center gap-3 text-sm text-stone-700 hover:text-stone-900 transition-colors"
                     >
-                      <Phone size={15} className="shrink-0" />
+                      <Phone size={15} className="shrink-0 text-stone-400" />
                       {farm.phone}
                     </a>
                   </li>
@@ -223,51 +241,51 @@ export default async function FarmDetailPage({ params }: Props) {
                   <li>
                     <a
                       href={`mailto:${farm.email}`}
-                      className="flex items-center gap-3 text-sm text-stone-700 hover:text-stone-900 break-all"
+                      className="flex items-center gap-3 text-sm text-stone-700 hover:text-stone-900 transition-colors break-all"
                     >
-                      <Mail size={15} className="shrink-0" />
+                      <Mail size={15} className="shrink-0 text-stone-400" />
                       {farm.email}
                     </a>
                   </li>
                 )}
-                {farm.website && (
-                  <li>
-                    <a
-                      href={farm.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-3 text-sm text-stone-700 hover:text-stone-900 break-all"
-                    >
-                      <Globe size={15} className="shrink-0" />
-                      {farm.website.replace(/^https?:\/\//, "")}
-                    </a>
-                  </li>
-                )}
+                <li>
+                  <a
+                    href={farm.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 text-sm text-stone-700 hover:text-stone-900 transition-colors break-all"
+                  >
+                    <Globe size={15} className="shrink-0 text-stone-400" />
+                    {farm.website.replace(/^https?:\/\//, "")}
+                  </a>
+                </li>
               </ul>
             </section>
-          )}
 
-          <ClaimSection farmId={farm.id} farmName={farm.name} />
-
-          <a
-            href={mapsUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-stone-800 text-white font-semibold text-sm hover:bg-stone-700 active:bg-stone-900 transition-colors"
-          >
-            <Navigation size={16} />
-            Vägbeskrivning
-          </a>
-
-          <p className="text-center text-[11px] text-stone-400">
-            Stämmer inte informationen?{" "}
-            <Link
-              href={`/ta-bort/${farm.id}`}
-              className="underline hover:text-stone-600 transition-colors"
+            {/* Directions */}
+            <a
+              href={mapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-stone-800 text-white font-semibold text-sm hover:bg-stone-700 active:bg-stone-900 transition-colors"
             >
-              Kontakta oss
-            </Link>
-          </p>
+              <Navigation size={16} />
+              Vägbeskrivning
+            </a>
+
+            <ClaimSection farmId={farm.id} farmName={farm.name} />
+
+            <p className="text-center text-[11px] text-stone-400 pb-2">
+              Stämmer inte informationen?{" "}
+              <Link
+                href={`/ta-bort/${farm.id}`}
+                className="underline hover:text-stone-600 transition-colors"
+              >
+                Kontakta oss
+              </Link>
+            </p>
+
+          </div>
         </div>
       </div>
     </>
