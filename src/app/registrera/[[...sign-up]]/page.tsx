@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import SignUpContent from "./sign-up-content";
+import { SignUp } from "@clerk/nextjs";
 
 export const metadata: Metadata = {
   title: "Skapa konto",
@@ -7,5 +7,9 @@ export const metadata: Metadata = {
 };
 
 export default function RegistreraPage() {
-  return <SignUpContent />;
+  return (
+    <div className="h-full overflow-y-auto flex items-center justify-center py-12" style={{ background: "#FAFAF8" }}>
+      <SignUp />
+    </div>
+  );
 }
