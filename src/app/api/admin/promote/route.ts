@@ -16,10 +16,11 @@ export async function POST(req: NextRequest) {
 
   const db = getDb();
   const existing = db.prepare(`SELECT id FROM users WHERE id = ?`).get(userId);
-  if (!existing) {
-    return NextResponse.json({ error: "User not found — sign in to the app first, then retry." }, { status: 404 });
+  if (existing) {
+    db.prepare(`UPDATE users SET role = 'admin' WHERE id = ?`).run(userId);
+  } else {
+    db.prepare(`INSERT INTO users (id, email, role) VALUES (?, ?, 'admin')`).run(userId, `${userId}@placeholder.local`);
   }
-  db.prepare(`UPDATE users SET role = 'admin' WHERE id = ?`).run(userId);
 
   return NextResponse.json({ ok: true });
 }
