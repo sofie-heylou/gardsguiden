@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import HeaderAuth from "./HeaderAuth";
+import { COUNTIES } from "../lib/counties";
 
 function GardsguidentIcon({ size = 24 }: { size?: number }) {
   const petal =
@@ -97,6 +98,19 @@ export default function Header() {
         style={{ top: "calc(var(--banner-h, 1.75rem) + 3.5rem)" }}
       >
         <nav className="flex flex-col py-2">
+          <div className="px-5 pt-3 pb-2">
+            <p className="text-[10px] uppercase tracking-wide text-stone-400 mb-2">Gårdar per län</p>
+            {COUNTIES.map(({ slug, displayName }) => (
+              <Link
+                key={slug}
+                href={`/${slug}`}
+                onClick={() => setOpen(false)}
+                className="block py-1.5 text-sm text-stone-700 hover:text-stone-900 transition-colors"
+              >
+                {displayName}
+              </Link>
+            ))}
+          </div>
           {menuLinks.map(({ href, label }) => (
             <Link
               key={href}

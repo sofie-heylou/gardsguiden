@@ -1,6 +1,6 @@
 import type { Farm } from "../types/farm";
 
-const COUNTIES = [
+export const COUNTIES = [
   { name: "Stockholm",    slug: "stockholm",    gardarSlug: "stockholms-lan",    displayName: "Stockholms län" },
   { name: "Uppsala",      slug: "uppsala",      gardarSlug: "uppsala-lan",       displayName: "Uppsala län" },
   { name: "Västmanland",  slug: "vastmanland",  gardarSlug: "vastmanlands-lan",  displayName: "Västmanlands län" },
