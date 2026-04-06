@@ -42,7 +42,7 @@ export default function ClaimSection({ farmId, farmName }: Props) {
       <h2 className="text-sm font-semibold text-stone-800">Är det här din gård?</h2>
       <p className="text-xs text-stone-500">Ta över sidan och håll öppettider, kontaktuppgifter och produkter uppdaterade. Lägg till foton och berätta om kommande evenemang.</p>
       <Link
-        href={ownershipStatus.isLoggedIn ? `/konto?farmId=${farmId}` : `/registrera?farmId=${farmId}`}
+        href={ownershipStatus.isLoggedIn ? `/min-gard?farmId=${farmId}` : `/registrera?farmId=${farmId}`}
         className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-emerald-600 rounded-lg px-3 py-1.5 hover:bg-emerald-500 transition-colors"
       >
         Kom igång
