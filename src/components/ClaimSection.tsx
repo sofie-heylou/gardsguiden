@@ -29,14 +29,8 @@ export default function ClaimSection({ farmId, farmName }: Props) {
   // Still loading
   if (!ownershipStatus) return null;
 
-  // State 3: approved ownership — hide block entirely
-  if (ownershipStatus.status === "approved") return null;
-
-  // State 1: signed out — hide entirely
-  if (!ownershipStatus.isLoggedIn) return null;
-
-  // State 2: signed in, pending request already submitted
-  if (ownershipStatus.status === "pending" || submitted) {
+  // Signed in, pending request already submitted
+  if (ownershipStatus.isLoggedIn && (ownershipStatus.status === "pending" || submitted)) {
     return (
       <section className="rounded-xl border border-stone-200 bg-white px-4 py-4">
         <p className="text-xs text-stone-500">
@@ -46,8 +40,11 @@ export default function ClaimSection({ farmId, farmName }: Props) {
     );
   }
 
-  // State 2: signed in, no request yet
   async function handleRequest() {
+    if (!ownershipStatus?.isLoggedIn) {
+      window.location.href = "/logga-in";
+      return;
+    }
     setError("");
     setSubmitting(true);
     try {
@@ -67,7 +64,8 @@ export default function ClaimSection({ farmId, farmName }: Props) {
 
   return (
     <section className="rounded-xl border border-stone-200 bg-white px-4 py-4 space-y-2">
-      <h2 className="text-sm font-semibold text-stone-800">Är detta din gård?</h2>
+      <h2 className="text-sm font-semibold text-stone-800">Är det här din gård?</h2>
+      <p className="text-xs text-stone-500">Ta över sidan och håll öppettider, kontaktuppgifter och produkter uppdaterade. Lägg till foton och berätta om kommande evenemang.</p>
       {error && <p className="text-xs text-red-500">{error}</p>}
       <button
         onClick={handleRequest}
@@ -75,7 +73,7 @@ export default function ClaimSection({ farmId, farmName }: Props) {
         className="inline-flex items-center gap-1.5 text-xs font-semibold text-stone-700 border border-stone-300 rounded-lg px-3 py-1.5 hover:border-stone-500 hover:text-stone-900 transition-colors disabled:opacity-50"
       >
         {submitting ? <Loader2 size={12} className="animate-spin" /> : null}
-        Ansök om ägarskap
+        Kom igång
       </button>
     </section>
   );
