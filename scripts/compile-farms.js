@@ -87,7 +87,7 @@ function normalizeFarm(raw, index) {
   if (!name || name.length < 2 || name.length > 120) return null;
 
   const lan = normalizeCounty(raw.lan || '');
-  if (!['Skåne', 'Kalmar', 'Gotland', 'Västra Götaland', 'Halland', 'Blekinge', 'Kronoberg', 'Jönköping', 'Östergötland'].includes(lan)) return null;
+  if (!['Stockholm', 'Uppsala', 'Västmanland', 'Södermanland', 'Skåne', 'Kalmar', 'Gotland', 'Västra Götaland', 'Halland', 'Blekinge', 'Kronoberg', 'Jönköping', 'Östergötland'].includes(lan)) return null;
 
   // Apply farm filter
   const rawWithNormalizedLan = { ...raw, lan };
@@ -180,6 +180,7 @@ async function main() {
     { file: path.join(TMP_DIR, 'google-places-farms-expansion.json'),   label: 'Google Places (Skåne, Kalmar, Gotland)' },
     { file: path.join(TMP_DIR, 'google-places-farms-expansion-2.json'), label: 'Google Places (Västra Götaland, Halland, Blekinge)' },
     { file: path.join(TMP_DIR, 'google-places-farms-expansion-3.json'), label: 'Google Places (Kronoberg, Jönköping, Östergötland)' },
+    { file: path.join(TMP_DIR, 'google-places-farms-new-terms.json'),   label: 'Google Places (all counties, new terms)' },
   ];
 
   const allRaw = [];

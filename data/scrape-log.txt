@@ -2,39 +2,47 @@ Gårdsguiden — Compile Log
 Generated: 2026-04-07
 =====================================
 
-TOTAL FARMS: 773
+TOTAL FARMS: 1653
 
 BY COUNTY:
-  Blekinge: 51
-  Gotland: 55
-  Halland: 66
-  Jönköping: 31
-  Kalmar: 26
-  Kronoberg: 41
-  Skåne: 161
-  Västra Götaland: 255
-  Östergötland: 87
+  Blekinge: 89
+  Gotland: 95
+  Halland: 120
+  Jönköping: 32
+  Kalmar: 50
+  Kronoberg: 49
+  Skåne: 311
+  Stockholm: 139
+  Södermanland: 76
+  Uppsala: 77
+  Västmanland: 124
+  Västra Götaland: 403
+  Östergötland: 88
 
-  Norrtälje/Roslagen (Stockholm): 0
-  Skärgården (archipelago): 0
+  Norrtälje/Roslagen (Stockholm): 3
+  Skärgården (archipelago): 2
 
 BY PRODUCT TYPE:
-  annat: 263
-  grönsaker: 158
-  öl: 134
-  vin: 85
-  mejeri: 52
-  bakat: 40
-  kött: 40
-  fisk: 6
-  honung: 5
-  sprit: 4
+  kött: 445
+  annat: 384
+  grönsaker: 341
+  bakat: 334
+  öl: 135
+  vin: 89
+  honung: 76
+  mejeri: 60
+  sprit: 45
+  fisk: 8
+  cider: 1
 
 BY DATA SOURCE:
-  google-places: 773
+  google-places: 1653
 
 ARCHIPELAGO FARMS:
-  None tagged
+  - Grinda Gårdsglass (Grinda säteri 1, 642 96 Malmköping, Sverige)
+  - Grinda Säteri AB (GRINDA SÄTERI 1, 642 96 Malmköping, Sverige)
 
 NORRTÄLJE / ROSLAGEN FARMS:
-  None tagged
+  - Mattssons Lamm (Fridhemsstigen 3, 761 74 Norrtälje, Sverige)
+  - Stabby korv & trädgård (Kvarnkärrsvägen 16, 761 74 Norrtälje, Sverige)
+  - Vitsjökrokens gård, gårdsbutik (Vitsjövägen 2, 761 73 Norrtälje, Sverige)
