@@ -16,12 +16,12 @@ const lora = Lora({
 });
 
 const DESCRIPTION =
-  "Hitta gårdsbutiker och köp lokala råvaror direkt från bonden. 161 verifierade gårdar med kött, grönsaker, mejeriprodukter, honung och mer.";
+  "Hitta gårdar som säljer direkt — kött, grönt, mejeri, gårdsförsäljning och vinprovning. Sveriges mest kompletta gårdskarta.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Gårdsguiden — Hitta gårdsbutiker nära dig",
+    default: "Gårdsguiden – Gårdsförsäljning & vinprovning i Sverige",
     template: "%s — Gårdsguiden",
   },
   description: DESCRIPTION,
@@ -45,7 +45,9 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
   icons: {
     icon: [
-      { url: "/favicon.ico", sizes: "32x32", type: "image/x-icon" },
+      { url: "/favicon.ico", sizes: "any", type: "image/x-icon" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
       { url: "/icon.svg", type: "image/svg+xml" },
     ],
     apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
@@ -55,12 +57,12 @@ export const metadata: Metadata = {
     locale: "sv_SE",
     url: SITE_URL,
     siteName: "Gårdsguiden",
-    title: "Gårdsguiden — Hitta gårdsbutiker nära dig",
+    title: "Gårdsguiden – Gårdsförsäljning & vinprovning i Sverige",
     description: DESCRIPTION,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Gårdsguiden — Hitta gårdsbutiker nära dig",
+    title: "Gårdsguiden – Gårdsförsäljning & vinprovning i Sverige",
     description: DESCRIPTION,
   },
   verification: {
