@@ -294,7 +294,7 @@ async function main() {
             onSiteSales: /gårdsbutik|gårdsförsäljning|självplock|café|restaurang|butik/.test(term + name),
             tastingRoom: /gårdscafé|restaurang|musteri|vingård|bryggeri/.test(term + name),
             gardsförsäljningLicense: false,
-            isArchipelago: /skärgård|\bö\b|öar/.test(address.toLowerCase()),
+            isArchipelago: /skärgård|vaxholm|ljusterö|möja|sandhamn|\butö\b|ornö|dalarö|grinda|finnhamn|svartsö|runmarö|nämdö|ingmarsö/.test(address.toLowerCase()),
             openingHours: (detail.opening_hours?.weekday_text || []).join(', '),
             season: '',
             // meta

@@ -11,6 +11,9 @@ export const COUNTIES = [
   { name: "Västra Götaland", slug: "vastra-gotaland", gardarSlug: "vastra-gotalands-lan", displayName: "Västra Götalands län" },
   { name: "Halland",         slug: "halland",         gardarSlug: "hallands-lan",          displayName: "Hallands län" },
   { name: "Blekinge",        slug: "blekinge",        gardarSlug: "blekinge-lan",          displayName: "Blekinge län" },
+  { name: "Kronoberg",       slug: "kronoberg",       gardarSlug: "kronobergs-lan",        displayName: "Kronobergs län" },
+  { name: "Jönköping",       slug: "jonkoping",       gardarSlug: "jonkopings-lan",        displayName: "Jönköpings län" },
+  { name: "Östergötland",    slug: "ostergotland",    gardarSlug: "ostergotlands-lan",     displayName: "Östergötlands län" },
 ] as const;
 
 type CountyName = (typeof COUNTIES)[number]["name"];

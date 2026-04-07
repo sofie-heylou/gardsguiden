@@ -1,91 +1,40 @@
-Gårdsguiden — Scrape Log
-Generated: 2026-03-31
+Gårdsguiden — Compile Log
+Generated: 2026-04-07
 =====================================
 
-TOTAL FARMS: 122
+TOTAL FARMS: 773
 
 BY COUNTY:
-  Stockholm: 30    ✓ (target ≥30)
-  Uppsala: 27      ✓ (target ≥25)
-  Västmanland: 21  ✓ (target ≥20)
-  Södermanland: 44 ✓ (target ≥20)
-  TOTAL: 122       ✓ (target 95–120)
+  Blekinge: 51
+  Gotland: 55
+  Halland: 66
+  Jönköping: 31
+  Kalmar: 26
+  Kronoberg: 41
+  Skåne: 161
+  Västra Götaland: 255
+  Östergötland: 87
 
-  Norrtälje/Roslagen (Stockholm): 11 ✓ (target ≥10)
-  Skärgården/archipelago: 14         ✓ (target ≥10)
+  Norrtälje/Roslagen (Stockholm): 0
+  Skärgården (archipelago): 0
 
 BY PRODUCT TYPE:
-  kött: 62
-  grönsaker: 39
-  annat: 21
-  mejeri: 9
-  öl: 9
-  honung: 8
-  vin: 6
-  fisk: 5
-  bakat: 4
-  sprit: 2
-  cider: 2
-  mjöd: 1
+  annat: 263
+  grönsaker: 158
+  öl: 134
+  vin: 85
+  mejeri: 52
+  bakat: 40
+  kött: 40
+  fisk: 6
+  honung: 5
+  sprit: 4
 
 BY DATA SOURCE:
-  Curated/seed data: 100 raw records → verified real farms
-  visitsormland.se (live scraped): 25 Södermanland farms
-  destinationuppsala.se (live scraped): 6 Uppsala entries
+  google-places: 773
 
-FARMS WITH COORDINATES: 122/122 (100%)
-FARMS WITH ON-SITE SALES: 116/122
-FARMS WITH TASTING ROOM: 16/122
+ARCHIPELAGO FARMS:
+  None tagged
 
-TARGETS MET:
-  ✓ Stockholm (≥30):    30 farms
-  ✓ Uppsala (≥25):      27 farms
-  ✓ Västmanland (≥20):  21 farms
-  ✓ Södermanland (≥20): 44 farms
-  ✓ Norrtälje/Roslagen (≥10): 11 farms
-  ✓ Skärgården (≥10): 14 farms
-  ✓ Total (95–120): 122 farms
-
-ARCHIPELAGO FARMS (14):
-  - Arholma Gård (Arholma, Norrtälje)
-  - Blidö Gård (Blidö, Norrtälje)
-  - Djurö Gård (Djurö, Värmdö)
-  - Furusund Fisk & Skaldjur (Furusund, Norrtälje)
-  - Gålö Gård (Gålö, Haninge)
-  - Ingmarsö Gård (Ingmarsö, Österåker)
-  - Ljusterö Gård (Ljusterö, Österåker)
-  - Möja Brygga Fisk (Möja, Värmdö)
-  - Nämdö Gård (Nämdö, Värmdö)
-  - Ornö Gård (Ornö, Haninge)
-  - Runmarö Gård (Runmarö, Värmdö)
-  - Sandhamn Honung (Sandhamn, Värmdö)
-  - Svartlöga Lantbruk (Svartlöga, Norrtälje)
-  - Utö Bryggeri (Utö, Haninge)
-
-NORRTÄLJE / ROSLAGEN FARMS (11):
-  - Arholma Gård
-  - Blidö Gård
-  - Ekebyholms Gård
-  - Furusund Fisk & Skaldjur
-  - Kapellskär Fiskrökeri
-  - Norrtälje Bränneri
-  - Roslagsgarden
-  - Rånäs Slott
-  - Svartlöga Lantbruk
-  - Väddö Gård
-  - Åshammar Gård
-
-SCRAPERS STATUS:
-  smakapasverige.se    — UNREACHABLE (connection timeout during session)
-  eldrimner.com        — PARTIAL (SM participant list is PDF-only; no county-filterable producer HTML)
-  systembolaget.se API — REQUIRES API KEY (subscription key needed)
-  visitsormland.se     — SUCCESS (curl-based; 25 Södermanland farms)
-  destinationuppsala   — PARTIAL (tourism-focused; limited farm coverage)
-  krav.se              — NO RESULTS (JavaScript-rendered search results)
-  Nominatim OSM        — SUCCESS (122/122 farms geocoded; 1.2s delay per request)
-
-DATA QUALITY NOTES:
-  - Curated seed data covers all four counties with real, publicly documented farms.
-  - Coordinates use Nominatim best-match; farms without specific addresses use commune center.
-  - isArchipelago set only for farms on named islands or with archipelago addresses.
-  - tastingRoom set only for verified bryggerier, vingårdar, and destillerier.
+NORRTÄLJE / ROSLAGEN FARMS:
+  None tagged

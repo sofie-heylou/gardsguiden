@@ -31,6 +31,13 @@ function normalizeCounty(lan) {
     'Västmanland': 'Västmanland', 'Västmanlands': 'Västmanland', 'Västmanlands län': 'Västmanland',
     'Södermanland': 'Södermanland', 'Södermanlands': 'Södermanland', 'Södermanlands län': 'Södermanland',
     'Sörmland': 'Södermanland',
+    'Skåne': 'Skåne', 'Skåne län': 'Skåne',
+    'Kalmar': 'Kalmar', 'Kalmar län': 'Kalmar',
+    'Gotland': 'Gotland', 'Gotlands': 'Gotland', 'Gotlands län': 'Gotland',
+    'Blekinge': 'Blekinge', 'Blekinge län': 'Blekinge',
+    'Kronoberg': 'Kronoberg', 'Kronobergs': 'Kronoberg', 'Kronobergs län': 'Kronoberg',
+    'Jönköping': 'Jönköping', 'Jönköpings': 'Jönköping', 'Jönköpings län': 'Jönköping',
+    'Östergötland': 'Östergötland', 'Östergötlands': 'Östergötland', 'Östergötlands län': 'Östergötland',
   };
   return map[lan] || lan;
 }
@@ -61,12 +68,7 @@ const EXCLUDE_PATTERNS = [
 // Farm inclusion keywords — if name/desc contains these, it's likely a farm
 const FARM_KEYWORDS = /gård|gard|lantbruk|bonde|mejeri|bryggeri|vingård|vingard|cideri|mjöderi|mjoderi|honung|kött|odling|trädgård|tradgard|kvarn|chark|fisk(?:rök|e)|mathantverk|gardsbutik|naturbruk|ekogård|ekogard|lammköt|nötkött|viltkött|destille|bränneri/i;
 
-// Remove clearly non-farm entries from web scrapers (keep all seed entries)
 function isFarmEntry(farm) {
-  if (farm.source === 'seed') return true; // Always keep seed entries
-
-  const nameAndDesc = (farm.name + ' ' + farm.description).toLowerCase();
-
   // Check exclusion patterns
   for (const pat of EXCLUDE_PATTERNS) {
     if (pat.test(farm.name)) return false;
@@ -85,7 +87,7 @@ function normalizeFarm(raw, index) {
   if (!name || name.length < 2 || name.length > 120) return null;
 
   const lan = normalizeCounty(raw.lan || '');
-  if (!['Stockholm', 'Uppsala', 'Västmanland', 'Södermanland', 'Västra Götaland', 'Halland', 'Blekinge'].includes(lan)) return null;
+  if (!['Skåne', 'Kalmar', 'Gotland', 'Västra Götaland', 'Halland', 'Blekinge', 'Kronoberg', 'Jönköping', 'Östergötland'].includes(lan)) return null;
 
   // Apply farm filter
   const rawWithNormalizedLan = { ...raw, lan };
@@ -175,12 +177,9 @@ async function main() {
   console.log('[Compile] Loading all data sources...\n');
 
   const sourceFiles = [
-    { file: path.join(TMP_DIR, 'seed-farms.json'), label: 'Seed (curated)' },
-    { file: path.join(TMP_DIR, 'regional-tourism-farms.json'), label: 'Regional Tourism (visitsormland.se etc)' },
-    { file: path.join(TMP_DIR, 'smaka-farms.json'), label: 'Smaka på Sverige' },
-    { file: path.join(TMP_DIR, 'eldrimner-farms.json'), label: 'Eldrimner' },
-    { file: path.join(TMP_DIR, 'systembolaget-farms.json'), label: 'Systembolaget' },
+    { file: path.join(TMP_DIR, 'google-places-farms-expansion.json'),   label: 'Google Places (Skåne, Kalmar, Gotland)' },
     { file: path.join(TMP_DIR, 'google-places-farms-expansion-2.json'), label: 'Google Places (Västra Götaland, Halland, Blekinge)' },
+    { file: path.join(TMP_DIR, 'google-places-farms-expansion-3.json'), label: 'Google Places (Kronoberg, Jönköping, Östergötland)' },
   ];
 
   const allRaw = [];
@@ -244,13 +243,7 @@ async function main() {
   for (const f of finalFarms) {
     byCountyFinal[f.lan] = (byCountyFinal[f.lan] || 0) + 1;
     for (const p of f.products) byProduct[p] = (byProduct[p] || 0) + 1;
-    const srcLabel = f.source?.includes('seed') ? 'curated/seed' :
-      f.source?.includes('visitsormland') ? 'visitsormland.se' :
-      f.source?.includes('destinationuppsala') ? 'destinationuppsala.se' :
-      f.source?.includes('systembolaget') ? 'systembolaget.se' :
-      f.source?.includes('eldrimner') ? 'eldrimner.com' :
-      f.source?.includes('krav') ? 'krav.se' :
-      f.source?.includes('smaka') ? 'smakapasverige.se' : (f.source || 'unknown');
+    const srcLabel = f.source?.includes('google-places') ? 'google-places' : (f.source || 'unknown');
     bySource[srcLabel] = (bySource[srcLabel] || 0) + 1;
   }
 
@@ -263,7 +256,7 @@ async function main() {
   );
   const skargardFarms = finalFarms.filter(f => f.isArchipelago);
 
-  const log = `Gårdsguiden — Scrape Log
+  const log = `Gårdsguiden — Compile Log
 Generated: ${new Date().toISOString().split('T')[0]}
 =====================================
 
@@ -281,31 +274,11 @@ ${Object.entries(byProduct).sort((a, b) => b[1] - a[1]).map(([k, v]) => `  ${k}:
 BY DATA SOURCE:
 ${Object.entries(bySource).sort((a, b) => b[1] - a[1]).map(([k, v]) => `  ${k}: ${v}`).join('\n')}
 
-TARGETS MET:
-  Stockholm (target ≥30):   ${byCountyFinal['Stockholm'] || 0}  ${(byCountyFinal['Stockholm'] || 0) >= 30 ? '✓' : '⚠ below target'}
-  Uppsala (target ≥25):     ${byCountyFinal['Uppsala'] || 0}  ${(byCountyFinal['Uppsala'] || 0) >= 25 ? '✓' : '⚠ below target'}
-  Västmanland (target ≥20): ${byCountyFinal['Västmanland'] || 0}  ${(byCountyFinal['Västmanland'] || 0) >= 20 ? '✓' : '⚠ below target'}
-  Södermanland (target ≥20): ${byCountyFinal['Södermanland'] || 0}  ${(byCountyFinal['Södermanland'] || 0) >= 20 ? '✓' : '⚠ below target'}
-  Total (target 95–120):    ${finalFarms.length}  ${finalFarms.length >= 95 ? '✓' : '⚠ below target'}
-
 ARCHIPELAGO FARMS:
 ${skargardFarms.map(f => `  - ${f.name} (${f.address || f.lan})`).join('\n') || '  None tagged'}
 
 NORRTÄLJE / ROSLAGEN FARMS:
 ${norrtaljeFarms.map(f => `  - ${f.name} (${f.address || ''})`).join('\n') || '  None tagged'}
-
-SCRAPERS ATTEMPTED:
-  smakapasverige.se — UNREACHABLE (site blocked/down during session)
-  eldrimner.com — PARTIAL (SM results are PDF-only, participant names not in HTML)
-  systembolaget.se — UNREACHABLE (TLS issues with Node.js fetch)
-  visitsormland.se — SUCCESS (curl-based scraping)
-  destinationuppsala.se — PARTIAL (general tourism, limited farm data)
-  Nominatim/OpenStreetMap — SUCCESS (geocoding via curl)
-
-DATA NOTES:
-  Curated seed data covers all four counties with verified real farms.
-  visitsormland.se provided detailed Södermanland farm data (scraped live).
-  Sites with TLS/network issues were retried with curl-based fallback.
 `;
 
   fs.writeFileSync(LOG_FILE, log);

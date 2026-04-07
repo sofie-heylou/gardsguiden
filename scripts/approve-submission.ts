@@ -78,6 +78,9 @@ const COUNTY_TO_SLUG: Record<string, string> = {
   "Västra Götaland": "vastra-gotaland",
   Halland:          "halland",
   Blekinge:         "blekinge",
+  Kronoberg:        "kronoberg",
+  Jönköping:        "jonkoping",
+  Östergötland:     "ostergotland",
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

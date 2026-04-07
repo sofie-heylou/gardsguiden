@@ -2,13 +2,13 @@
 /**
  * Scraper using Google Places Text Search + Place Details APIs.
  * Finds farm shops, local producers, breweries, vineyards etc.
- * in Västra Götaland, Halland, and Blekinge.
+ * in Blekinge, Kronoberg, Jönköping, and Östergötland.
  *
  * Identical setup to scrape-google-places-expansion.js — only the COUNTIES,
- * COUNTY_KEYWORDS, and KOMMUN_LIST differ.
+ * COUNTY_KEYWORDS, KOMMUN_LIST, and OUT_FILE differ.
  *
  * Usage:
- *   node scripts/scrape-google-places-expansion-2.js
+ *   node scripts/scrape-google-places-expansion-3.js
  *
  * Requires GOOGLE_PLACES_API_KEY in .env.local
  */
@@ -21,7 +21,7 @@ const { execSync } = require('child_process');
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
-const OUT_FILE = path.join(__dirname, '../data/tmp/google-places-farms-expansion-2.json');
+const OUT_FILE = path.join(__dirname, '../data/tmp/google-places-farms-expansion-3.json');
 
 // Load .env.local
 const envPath = path.join(__dirname, '../.env.local');
@@ -41,15 +41,14 @@ if (!API_KEY) {
 const TEXT_SEARCH_URL = 'https://maps.googleapis.com/maps/api/place/textsearch/json';
 const DETAILS_URL     = 'https://maps.googleapis.com/maps/api/place/details/json';
 
-// Västra Götaland gets two center points to cover both the Gothenburg coast
-// and the inland (Skövde area). Deduplication by place_id handles overlap.
 const COUNTIES = [
-  { name: 'Västra Götaland', lat: 57.71, lng: 12.00 },
-  { name: 'Västra Götaland', lat: 58.39, lng: 13.85 },
-  { name: 'Halland',         lat: 56.90, lng: 12.80 },
-  { name: 'Blekinge',        lat: 56.17, lng: 15.59 },
+  { name: 'Blekinge',      lat: 56.16, lng: 15.59 },
+  { name: 'Kronoberg',     lat: 56.88, lng: 14.81 },
+  { name: 'Jönköping',     lat: 57.78, lng: 14.16 },
+  { name: 'Östergötland',  lat: 58.41, lng: 15.62 },
 ];
 
+// Identical to scrape-google-places.js — no additions or removals
 const SEARCH_TERMS = [
   'gårdsbutik',
   'gårdsförsäljning',
@@ -91,7 +90,7 @@ function buildUrl(base, params) {
   return `${base}?${qs}`;
 }
 
-// ── Product categorisation (identical to scrape-google-places-expansion.js) ───
+// ── Product categorisation (identical to scrape-google-places.js) ─────────────
 
 function categorizeProducts(text) {
   const t = (text || '').toLowerCase();
@@ -117,21 +116,20 @@ function categorizeProducts(text) {
 // ── County assignment from address ────────────────────────────────────────────
 
 const COUNTY_KEYWORDS = {
-  'Västra Götaland': [
-    'västra götaland', 'göteborg', 'borås', 'trollhättan', 'uddevalla', 'skövde',
-    'lidköping', 'mariestad', 'alingsås', 'partille', 'härryda', 'stenungsund',
-    'tjörn', 'orust', 'lysekil', 'strömstad', 'falköping', 'skara', 'vara',
-    'tidaholm', 'ulricehamn', 'mark', 'bollebygd', 'tranemo', 'svenljunga',
-    'herrljunga', 'vårgårda', 'lilla edet', 'ale', 'öckerö', 'vänersborg',
-    'mellerud', 'bengtsfors', 'åmål', 'dals-ed', 'färgelanda', 'essunga',
-    'grästorp', 'götene', 'karlsborg', 'tibro', 'hjo', 'töreboda', 'munkedal',
-    'tanum', 'sotenäs',
-  ],
-  Halland: [
-    'halland', 'halmstad', 'varberg', 'falkenberg', 'kungsbacka', 'laholm', 'hylte',
-  ],
   Blekinge: [
-    'blekinge', 'karlskrona', 'karlshamn', 'ronneby', 'sölvesborg', 'olofström',
+    'blekinge', 'karlskrona', 'ronneby', 'karlshamn', 'sölvesborg', 'olofström',
+  ],
+  Kronoberg: [
+    'kronoberg', 'växjö', 'ljungby', 'älmhult', 'markaryd', 'tingsryd',
+    'uppvidinge', 'lessebo',
+  ],
+  Jönköping: [
+    'jönköping', 'nässjö', 'vetlanda', 'eksjö', 'tranås', 'värnamo', 'gislaved',
+    'gnosjö', 'vaggeryd', 'sävsjö', 'aneby', 'mullsjö', 'habo',
+  ],
+  Östergötland: [
+    'östergötland', 'linköping', 'norrköping', 'motala', 'mjölby', 'finspång',
+    'vadstena', 'ödeshög', 'valdemarsvik', 'söderköping',
   ],
 };
 
@@ -147,19 +145,16 @@ function guessCounty(address, fallbackCounty) {
 // ── Municipality from address ─────────────────────────────────────────────────
 
 const KOMMUN_LIST = [
-  // Västra Götaland
-  'Göteborg', 'Borås', 'Trollhättan', 'Uddevalla', 'Skövde', 'Lidköping',
-  'Mariestad', 'Alingsås', 'Partille', 'Härryda', 'Stenungsund', 'Tjörn',
-  'Orust', 'Lysekil', 'Strömstad', 'Falköping', 'Skara', 'Vara', 'Tidaholm',
-  'Ulricehamn', 'Mark', 'Bollebygd', 'Tranemo', 'Svenljunga', 'Herrljunga',
-  'Vårgårda', 'Lilla Edet', 'Ale', 'Öckerö', 'Vänersborg', 'Mellerud',
-  'Bengtsfors', 'Åmål', 'Dals-Ed', 'Färgelanda', 'Essunga', 'Grästorp',
-  'Götene', 'Karlsborg', 'Tibro', 'Hjo', 'Töreboda', 'Munkedal', 'Tanum',
-  'Sotenäs',
-  // Halland
-  'Halmstad', 'Varberg', 'Falkenberg', 'Kungsbacka', 'Laholm', 'Hylte',
   // Blekinge
-  'Karlskrona', 'Karlshamn', 'Ronneby', 'Sölvesborg', 'Olofström',
+  'Karlskrona', 'Ronneby', 'Karlshamn', 'Sölvesborg', 'Olofström',
+  // Kronoberg
+  'Växjö', 'Ljungby', 'Älmhult', 'Markaryd', 'Tingsryd', 'Uppvidinge', 'Lessebo',
+  // Jönköping
+  'Jönköping', 'Nässjö', 'Vetlanda', 'Eksjö', 'Tranås', 'Värnamo', 'Gislaved',
+  'Gnosjö', 'Vaggeryd', 'Sävsjö', 'Aneby', 'Mullsjö', 'Habo',
+  // Östergötland
+  'Linköping', 'Norrköping', 'Motala', 'Mjölby', 'Finspång', 'Vadstena',
+  'Ödeshög', 'Valdemarsvik', 'Söderköping',
 ];
 
 function guessKommun(address) {
@@ -170,7 +165,7 @@ function guessKommun(address) {
   return '';
 }
 
-// ── Google Places API calls (identical to scrape-google-places-expansion.js) ──
+// ── Google Places API calls (identical to scrape-google-places.js) ────────────
 
 function textSearch(query, lat, lng, pageToken) {
   const params = {
@@ -200,7 +195,7 @@ function placeDetails(placeId) {
   try { return JSON.parse(raw); } catch { return null; }
 }
 
-// ── Relevance filter (identical to scrape-google-places-expansion.js) ─────────
+// ── Relevance filter (identical to scrape-google-places.js) ──────────────────
 
 const FARM_TYPES = new Set([
   'food', 'bakery', 'cafe', 'restaurant', 'bar', 'grocery_or_supermarket',
@@ -239,7 +234,7 @@ async function main() {
   let totalHits = 0;
 
   for (const county of COUNTIES) {
-    console.log(`\n── ${county.name} (${county.lat}, ${county.lng}) ─────────────────────────────────────`);
+    console.log(`\n── ${county.name} ─────────────────────────────────────`);
 
     for (const term of SEARCH_TERMS) {
       const query    = `${term} ${county.name}`;
@@ -328,7 +323,7 @@ async function main() {
   const byCounty = {};
   farms.forEach(f => { byCounty[f.lan] = (byCounty[f.lan] || 0) + 1; });
   for (const [county, n] of Object.entries(byCounty).sort()) {
-    console.log(`  ${county.padEnd(20)} ${n}`);
+    console.log(`  ${county.padEnd(16)} ${n}`);
   }
   console.log(`\nSaved to ${OUT_FILE}`);
 }

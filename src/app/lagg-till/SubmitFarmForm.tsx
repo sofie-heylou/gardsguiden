@@ -183,7 +183,7 @@ export default function SubmitFarmForm({ userEmail }: { userEmail: string }) {
           />
         </Field>
 
-        <Field label="Adress">
+        <Field label="Adress" required>
           <AddressAutofill
             accessToken={TOKEN}
             options={{ language: "sv", country: "SE" }}
@@ -191,6 +191,7 @@ export default function SubmitFarmForm({ userEmail }: { userEmail: string }) {
           >
             <input
               type="text"
+              required
               autoComplete="shipping address-line1"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
@@ -401,7 +402,7 @@ export default function SubmitFarmForm({ userEmail }: { userEmail: string }) {
 
       <button
         type="submit"
-        disabled={saving || !name || !lan}
+        disabled={saving || !name || !address || !lan}
         className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-stone-800 text-white text-sm font-semibold hover:bg-stone-700 active:bg-stone-900 transition-colors disabled:opacity-50"
       >
         {saving ? <Loader2 size={15} className="animate-spin" /> : "Skicka in gård"}
