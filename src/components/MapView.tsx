@@ -10,12 +10,37 @@ import { LocateFixed, SlidersHorizontal, X, Loader2, AlertTriangle, ArrowRight, 
 import Link from "next/link";
 import type { Farm } from "../types/farm";
 import { CATEGORIES, farmMatchesCategory } from "../lib/categories";
-import { farmPath, COUNTY_NAMES } from "../lib/counties";
+import { farmPath, COUNTY_NAMES, COUNTIES, COUNTY_TO_SLUG } from "../lib/counties";
 import { useGeolocation } from "../hooks/useGeolocation";
 
 const TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
 const SWEDEN = { latitude: 59.3, longitude: 16.5, zoom: 7 };
 const RADIUS_OPTIONS = [10, 25, 50, 100] as const;
+
+function pickFeatured(farms: Farm[], max = 8): Farm[] {
+  const sorted = [...farms].sort(
+    (a, b) => b.products.filter((p) => p !== "annat").length - a.products.filter((p) => p !== "annat").length
+  );
+  const seenCounties = new Set<string>();
+  const seenIds = new Set<string>();
+  const featured: Farm[] = [];
+  for (const farm of sorted) {
+    if (featured.length >= max) break;
+    if (!seenCounties.has(farm.lan)) {
+      seenCounties.add(farm.lan);
+      seenIds.add(farm.id);
+      featured.push(farm);
+    }
+  }
+  for (const farm of sorted) {
+    if (featured.length >= max) break;
+    if (!seenIds.has(farm.id)) {
+      seenIds.add(farm.id);
+      featured.push(farm);
+    }
+  }
+  return featured;
+}
 
 type FarmPoint = Supercluster.PointFeature<{ farm: Farm }>;
 
@@ -188,8 +213,29 @@ export default function MapView() {
 
   const locating = geoStatus === "requesting" && wantsNearMe;
 
+  const stripLabel = useMemo(() => {
+    if (nearMeActive) return `${farms.length} gårdar nära dig`;
+    if (county.size > 0) return `${farms.length} gårdar i ${[...county].join(" · ")}`;
+    return `${allFarms.length} gårdar i Sverige`;
+  }, [farms.length, allFarms.length, county, nearMeActive]);
+
+  const countyChips = useMemo(
+    () =>
+      COUNTIES.map((c) => ({
+        slug: c.slug,
+        name: c.name,
+        count: allFarms.filter((f) => f.lan === c.name).length,
+      }))
+        .filter((c) => c.count > 0)
+        .sort((a, b) => b.count - a.count),
+    [allFarms]
+  );
+
+  const featuredFarms = useMemo(() => pickFeatured(farms), [farms]);
+
   return (
-    <div className="relative h-full w-full">
+    <div className="h-full flex flex-col">
+    <div className="flex-1 min-h-0 relative">
       <Map
         ref={mapRef}
         {...viewState}
@@ -448,6 +494,72 @@ export default function MapView() {
         }
         Nära mig
       </button>
+    </div>
+
+    {/* Discovery strip */}
+    <div className="shrink-0 bg-[#FAFAF8] border-t border-stone-200">
+      {/* County chips row / active filter label */}
+      <div
+        className="flex items-center gap-x-4 overflow-x-auto px-4 pt-2.5 pb-2"
+        style={{ scrollbarWidth: "none" }}
+      >
+        <span className="shrink-0 text-[10px] font-semibold text-stone-400 uppercase tracking-widest">
+          {stripLabel}
+        </span>
+        {county.size === 0 && !nearMeActive && countyChips.map(({ slug, name, count }) => (
+          <Link
+            key={slug}
+            href={`/${slug}`}
+            className="shrink-0 text-[11px] text-stone-500 hover:text-stone-900 transition-colors whitespace-nowrap"
+          >
+            {name}{" "}
+            <span className="text-stone-300 text-[10px]">{count}</span>
+          </Link>
+        ))}
+      </div>
+
+      {/* Divider */}
+      <div className="mx-4 h-px bg-stone-100" />
+
+      {/* Featured farm cards */}
+      <div
+        className="flex gap-2 overflow-x-auto px-4 py-2.5"
+        style={{ scrollbarWidth: "none" }}
+      >
+        {featuredFarms.map((farm) => {
+          const primaryProduct = farm.products.find((p) => p !== "annat");
+          return (
+            <Link
+              key={farm.id}
+              href={farmPath(farm)}
+              className="shrink-0 flex flex-col justify-between bg-white border border-stone-100 rounded-xl px-3 py-2.5 hover:border-stone-300 hover:shadow-sm active:scale-[0.98] transition-all"
+              style={{ width: 152 }}
+            >
+              <span className="text-[12px] font-semibold text-stone-800 leading-snug line-clamp-2">
+                {farm.name}
+              </span>
+              <div className="flex items-center justify-between mt-2">
+                <span className="text-[10px] text-stone-400 truncate pr-1">{farm.lan}</span>
+                {primaryProduct && (
+                  <span className="shrink-0 text-[10px] bg-amber-50 text-amber-800 px-1.5 py-0.5 rounded capitalize">
+                    {primaryProduct}
+                  </span>
+                )}
+              </div>
+            </Link>
+          );
+        })}
+
+        <Link
+          href="/gardar"
+          className="shrink-0 flex flex-col items-center justify-center bg-stone-50 border border-stone-100 rounded-xl px-4 py-2.5 hover:bg-stone-100 transition-colors text-center"
+          style={{ width: 100 }}
+        >
+          <span className="text-[11px] font-medium text-stone-500">Se alla</span>
+          <span className="text-[10px] text-stone-400 mt-0.5">{farms.length} gårdar</span>
+        </Link>
+      </div>
+    </div>
     </div>
   );
 }
