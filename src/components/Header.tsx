@@ -31,10 +31,9 @@ function GardsguidentIcon({ size = 24 }: { size?: number }) {
   );
 }
 
-const menuLinks = [
-  { href: "/om", label: "Om Gårdsguiden" },
-  { href: "/reportage", label: "Gårdsreportage" },
-  { href: "/integritet", label: "Integritetspolicy" },
+const primaryLinks = [
+  { href: "/gardar", label: "Alla gårdar" },
+  { href: "/om",     label: "Om Gårdsguiden" },
 ] as const;
 
 export default function Header() {
@@ -109,33 +108,19 @@ export default function Header() {
         }`}
         style={{ top: "calc(var(--banner-h, 1.75rem) + 3.5rem)" }}
       >
-        <nav className="flex flex-col py-2 overflow-y-auto max-h-[calc(100dvh-var(--banner-h,1.75rem)-3.5rem)]">
-          {/* County section */}
-          <div className="px-5 pt-3 pb-1">
-            <p className="text-[10px] uppercase tracking-wide text-stone-400 mb-1">Utforska per län</p>
-            {COUNTIES.map(({ slug, displayName }) => (
-              <Link
-                key={slug}
-                href={`/${slug}`}
-                onClick={() => closeMenu()}
-                className="flex items-center justify-between py-2 text-sm text-stone-700 hover:text-stone-900 transition-colors"
-              >
-                {displayName}
-                <ChevronRight size={14} className="text-stone-400" />
-              </Link>
-            ))}
-          </div>
+        <nav className="flex flex-col py-4 px-5 gap-5">
 
-          {/* Other nav links */}
-          <div className="border-t border-stone-100 mt-1">
-            {menuLinks.map(({ href, label }) => (
+          {/* Primary links */}
+          <div className="flex flex-col gap-0.5">
+            {primaryLinks.map(({ href, label }) => (
               <Link
                 key={href}
                 href={href}
-                className={`px-5 py-3 text-sm transition-colors block ${
+                onClick={closeMenu}
+                className={`py-2 text-[15px] transition-colors ${
                   pathname === href
-                    ? "text-stone-900 font-medium"
-                    : "text-stone-600 hover:text-stone-900 hover:bg-stone-50"
+                    ? "text-stone-900 font-semibold"
+                    : "text-stone-700 hover:text-stone-900"
                 }`}
               >
                 {label}
@@ -144,31 +129,58 @@ export default function Header() {
             {isAdmin && (
               <Link
                 href="/admin"
-                className={`px-5 py-3 text-sm transition-colors block ${
-                  pathname === "/admin"
-                    ? "text-stone-900 font-medium"
-                    : "text-stone-600 hover:text-stone-900 hover:bg-stone-50"
-                }`}
+                onClick={closeMenu}
+                className="py-2 text-[15px] text-stone-400 hover:text-stone-700 transition-colors"
               >
                 Admin
               </Link>
             )}
           </div>
 
-          {/* Owner CTA + auth */}
-          <div className="px-5 pt-3 pb-3 border-t border-stone-100 mt-1 space-y-3">
-            <div className="rounded-lg bg-green-100 border border-green-300 px-4 py-3">
-              <p className="text-xs font-medium text-green-800 mb-1.5">Är du gårdsägare?</p>
+          {/* County chips */}
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 mb-2.5">
+              Utforska per län
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {COUNTIES.map(({ slug, name }) => (
+                <Link
+                  key={slug}
+                  href={`/${slug}`}
+                  onClick={closeMenu}
+                  className="px-2.5 py-1 rounded-full bg-stone-100 text-[12px] text-stone-600 hover:bg-amber-50 hover:text-amber-900 transition-colors"
+                >
+                  {name}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Farmer CTA + auth */}
+          <div className="border-t border-stone-100 pt-4 flex items-center justify-between gap-4">
+            <div>
+              <p className="text-[11px] text-stone-400 mb-1">Är du gårdsägare?</p>
               <Link
-                href="/registrera"
-                onClick={() => closeMenu()}
-                className="text-xs font-semibold text-green-800 underline underline-offset-2 hover:text-green-900 transition-colors"
+                href="/lagg-till"
+                onClick={closeMenu}
+                className="text-[13px] font-semibold text-stone-800 hover:text-stone-600 transition-colors flex items-center gap-1"
               >
                 Lägg till din gård
+                <ChevronRight size={13} />
               </Link>
             </div>
             <HeaderAuth />
           </div>
+
+          {/* Legal — low visual weight */}
+          <Link
+            href="/integritet"
+            onClick={closeMenu}
+            className="text-[11px] text-stone-300 hover:text-stone-500 transition-colors -mt-3"
+          >
+            Integritetspolicy
+          </Link>
+
         </nav>
       </div>
     </>
