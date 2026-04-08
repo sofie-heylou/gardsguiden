@@ -12,6 +12,7 @@ import type { Farm } from "../types/farm";
 import { CATEGORIES, farmMatchesCategory } from "../lib/categories";
 import { farmPath, COUNTY_NAMES, COUNTIES, COUNTY_TO_SLUG } from "../lib/counties";
 import { useGeolocation } from "../hooks/useGeolocation";
+import { track } from "../lib/analytics";
 
 const TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
 const SWEDEN = { latitude: 59.3, longitude: 16.5, zoom: 7 };
@@ -122,9 +123,10 @@ export default function MapView() {
     if (wantsNearMe && geoStatus === "granted" && pos) {
       setNearMeActive(true);
       setWantsNearMe(false);
+      track("near_me_activated", { radius_km: radius });
       mapRef.current?.flyTo({ center: [pos.lng, pos.lat], zoom: 10, duration: 1400 });
     }
-  }, [wantsNearMe, geoStatus, pos]);
+  }, [wantsNearMe, geoStatus, pos, radius]);
 
   const farms = useMemo(() => {
     return allFarms.filter((f) => {
@@ -175,6 +177,7 @@ export default function MapView() {
     }
     if (pos) {
       setNearMeActive(true);
+      track("near_me_activated", { radius_km: radius });
       mapRef.current?.flyTo({ center: [pos.lng, pos.lat], zoom: 10, duration: 1400 });
     } else {
       setWantsNearMe(true);
@@ -190,16 +193,22 @@ export default function MapView() {
     [sc]
   );
 
-  const toggleCounty = useCallback((c: string) => setCounty((prev) => {
-    const next = new Set(prev);
-    next.has(c) ? next.delete(c) : next.add(c);
-    return next;
-  }), []);
-  const toggleCategory = useCallback((s: string) => setCategory((prev) => {
-    const next = new Set(prev);
-    next.has(s) ? next.delete(s) : next.add(s);
-    return next;
-  }), []);
+  const toggleCounty = useCallback((c: string) => {
+    if (!county.has(c)) track("filter_applied", { filter_type: "county", filter_value: c });
+    setCounty((prev) => {
+      const next = new Set(prev);
+      next.has(c) ? next.delete(c) : next.add(c);
+      return next;
+    });
+  }, [county]);
+  const toggleCategory = useCallback((s: string) => {
+    if (!category.has(s)) track("filter_applied", { filter_type: "product", filter_value: s });
+    setCategory((prev) => {
+      const next = new Set(prev);
+      next.has(s) ? next.delete(s) : next.add(s);
+      return next;
+    });
+  }, [category]);
   const clearFilters = useCallback(() => {
     setCounty(new Set()); setCategory(new Set());
   }, []);
@@ -536,6 +545,7 @@ export default function MapView() {
             <Link
               key={farm.id}
               href={farmPath(farm)}
+              onClick={() => track("farm_card_clicked", { farm_id: farm.id, farm_name: farm.name, farm_county: farm.lan })}
               className="shrink-0 flex flex-col justify-between bg-white border border-stone-100 rounded-xl px-3 py-2.5 hover:border-stone-300 hover:shadow-sm active:scale-[0.98] transition-all"
               style={{ width: 152 }}
             >
