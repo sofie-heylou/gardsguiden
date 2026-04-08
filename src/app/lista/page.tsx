@@ -1,31 +1,5 @@
-import type { Metadata } from "next";
-import { getAllFarms } from "../../lib/farms";
-import FarmList from "../../components/FarmList";
-import { SITE_URL } from "../../lib/site";
-
-
-export const metadata: Metadata = {
-  title: "Alla gårdar",
-  description:
-    "Bläddra bland 161 gårdsbutiker i Stockholm, Uppsala, Västmanland och Södermanland. Filtrera på produkttyp, gårdsförsäljningslicens eller skärgårdsläge.",
-  alternates: { canonical: `${SITE_URL}/lista` },
-  openGraph: {
-    title: "Alla gårdar — Gårdsguiden",
-    description:
-      "Bläddra bland 161 gårdsbutiker i Stockholm, Uppsala, Västmanland och Södermanland. Filtrera på produkttyp, gårdsförsäljningslicens eller skärgårdsläge.",
-    url: `${SITE_URL}/lista`,
-    locale: "sv_SE",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Alla gårdar — Gårdsguiden",
-    description:
-      "Bläddra bland 161 gårdsbutiker i Stockholm, Uppsala, Västmanland och Södermanland.",
-  },
-};
+import { permanentRedirect } from "next/navigation";
 
 export default function ListPage() {
-  const farms = getAllFarms();
-  return <FarmList initialFarms={farms} />;
+  permanentRedirect("/gardar");
 }

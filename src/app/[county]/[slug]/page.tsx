@@ -80,6 +80,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 // ── JSON-LD ───────────────────────────────────────────────────────────────────
 
+function FarmBreadcrumbJsonLd({ farm, countySlug }: { farm: Farm; countySlug: string }) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Gårdsguiden", item: SITE_URL },
+      { "@type": "ListItem", position: 2, name: farm.lan, item: `${SITE_URL}/${countySlug}` },
+      { "@type": "ListItem", position: 3, name: farm.name, item: `${SITE_URL}${farmPath(farm)}` },
+    ],
+  };
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+    />
+  );
+}
+
 function FarmJsonLd({ farm }: { farm: Farm }) {
   const url = `${SITE_URL}${farmPath(farm)}`;
   const jsonLd: Record<string, unknown> = {
@@ -142,6 +160,7 @@ export default async function FarmDetailPage({ params }: Props) {
   return (
     <>
       <FarmJsonLd farm={farm} />
+      <FarmBreadcrumbJsonLd farm={farm} countySlug={county} />
       <div className="h-full overflow-y-auto" style={{ background: "#FAFAF8" }}>
         <div className="max-w-lg mx-auto pb-10">
 
@@ -248,17 +267,19 @@ export default async function FarmDetailPage({ params }: Props) {
                     </a>
                   </li>
                 )}
-                <li>
-                  <a
-                    href={farm.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 text-sm text-stone-700 hover:text-stone-900 transition-colors break-all"
-                  >
-                    <Globe size={15} className="shrink-0 text-stone-400" />
-                    {farm.website.replace(/^https?:\/\//, "")}
-                  </a>
-                </li>
+                {farm.website && (
+                  <li>
+                    <a
+                      href={farm.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 text-sm text-stone-700 hover:text-stone-900 transition-colors break-all"
+                    >
+                      <Globe size={15} className="shrink-0 text-stone-400" />
+                      {farm.website.replace(/^https?:\/\//, "")}
+                    </a>
+                  </li>
+                )}
                 {farm.facebook && (
                   <li>
                     <a

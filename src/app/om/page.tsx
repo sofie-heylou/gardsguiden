@@ -2,12 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { MapPin, PlusCircle, BadgeCheck } from "lucide-react";
 import ContactForm from "./ContactForm";
+import { getAllFarms } from "../../lib/farms";
+import { COUNTIES } from "../../lib/counties";
+import { SITE_URL } from "../../lib/site";
 
 export const metadata: Metadata = {
   title: "Om Gårdsguiden",
   description:
     "Lär dig mer om Gårdsguiden — en katalog över gårdsbutiker och direktförsäljning i hela Sverige.",
-  alternates: { canonical: "/om" },
+  alternates: { canonical: `${SITE_URL}/om` },
   openGraph: {
     title: "Om Gårdsguiden",
     description:
@@ -15,17 +18,12 @@ export const metadata: Metadata = {
   },
 };
 
-const COUNTIES = [
-  { name: "Skåne",        count: 120, href: "/skane" },
-  { name: "Stockholm",    count: 57,  href: "/stockholm" },
-  { name: "Södermanland", count: 50,  href: "/sodermanland" },
-  { name: "Gotland",      count: 43,  href: "/gotland" },
-  { name: "Västmanland",  count: 30,  href: "/vastmanland" },
-  { name: "Uppsala",      count: 24,  href: "/uppsala" },
-  { name: "Kalmar",       count: 19,  href: "/kalmar" },
-];
-
 export default function OmPage() {
+  const farms = getAllFarms();
+  const countyData = COUNTIES
+    .map((c) => ({ name: c.name, count: farms.filter((f) => f.lan === c.name).length, href: `/${c.slug}` }))
+    .filter((c) => c.count > 0)
+    .sort((a, b) => b.count - a.count);
   return (
     <div className="h-full overflow-y-auto" style={{ background: "#FAFAF8" }}>
       <div className="max-w-lg mx-auto px-4 py-8 pb-14 space-y-10">
@@ -69,12 +67,10 @@ export default function OmPage() {
         <div className="space-y-3">
           <h2 className="font-display text-xl text-stone-900">Täckning</h2>
           <p className="text-sm text-stone-600 leading-relaxed">
-            Gårdsguiden täcker just nu sju län — Skåne, Stockholm,
-            Södermanland, Gotland, Västmanland, Uppsala och Kalmar — och
-            expanderar löpande till fler delar av Sverige.
+            Gårdsguiden täcker just nu {countyData.length} län och expanderar löpande till fler delar av Sverige.
           </p>
           <ul className="space-y-2">
-            {COUNTIES.map(({ name, count, href }) => (
+            {countyData.map(({ name, count, href }) => (
               <li key={name}>
                 <Link
                   href={href}

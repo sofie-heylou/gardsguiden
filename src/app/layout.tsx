@@ -104,10 +104,35 @@ const clerkLocalization = {
   },
 };
 
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Gårdsguiden",
+  url: SITE_URL,
+  description:
+    "Sveriges mest kompletta katalog över gårdsbutiker och direktförsäljning. Hitta lokalt producerat kött, grönsaker, mejeriprodukter och mer — direkt från bonden.",
+  sameAs: [],
+};
+
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "Gårdsguiden",
+  url: SITE_URL,
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="sv" className={lora.variable}>
       <body className="h-dvh flex flex-col overflow-hidden" style={{ background: "#FAFAF8", color: "#2c2c2c", "--banner-h": "1.75rem" } as React.CSSProperties}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+        />
         <ClerkProvider
           localization={clerkLocalization}
           appearance={clerkAppearance}

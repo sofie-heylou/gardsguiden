@@ -46,6 +46,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+function CountyBreadcrumbJsonLd({ lan, slug }: { lan: string; slug: string }) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Gårdsguiden", item: SITE_URL },
+      { "@type": "ListItem", position: 2, name: `Gårdar i ${lan}`, item: `${SITE_URL}/${slug}` },
+    ],
+  };
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+    />
+  );
+}
+
 function CountyJsonLd({ lan, slug, farms }: { lan: string; slug: string; farms: Farm[] }) {
   const jsonLd = {
     "@context": "https://schema.org",
@@ -79,6 +96,7 @@ export default async function CountyPage({ params }: Props) {
   return (
     <>
       <CountyJsonLd lan={lan} slug={county} farms={sorted} />
+      <CountyBreadcrumbJsonLd lan={lan} slug={county} />
       <div className="h-full overflow-y-auto" style={{ background: "#FAFAF8" }}>
         <div className="max-w-lg mx-auto px-4 py-4 pb-8">
 

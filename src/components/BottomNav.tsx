@@ -6,7 +6,7 @@ import { Map, List } from "lucide-react";
 
 const tabs = [
   { href: "/", label: "Karta", Icon: Map },
-  { href: "/lista", label: "Lista", Icon: List },
+  { href: "/gardar", label: "Lista", Icon: List },
 ] as const;
 
 export default function BottomNav() {

@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 
+import { SITE_URL } from "../../lib/site";
+
 export const metadata: Metadata = {
   title: "Gårdsreportage",
   description: "Läs reportage och berättelser om Sveriges gårdar och deras producenter.",
-  alternates: { canonical: "/reportage" },
+  alternates: { canonical: `${SITE_URL}/reportage` },
+  robots: { index: false, follow: false },
 };
 
 export default function ReportagePage() {

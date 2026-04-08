@@ -1,0 +1,49 @@
+# Gårdsguiden
+
+> Gårdsguiden är Sveriges mest kompletta katalog över gårdsbutiker och gårdar med direktförsäljning (farm shops with direct-to-consumer sales). Hitta lokalt producerat kött, grönsaker, mejeriprodukter, honung, frukt och mer — köpt direkt från bonden.
+
+Gårdsguiden hjälper konsumenter att hitta gårdar med direktförsäljning nära dem, och hjälper gårdsägare att synas och nå fler kunder utan mellanled. Tjänsten täcker för närvarande 13 svenska län med ~1 000 listade gårdar och expanderar löpande.
+
+## Hitta gårdar
+
+- [Karta](https://www.gardsguiden.se/): Interaktiv karta med alla gårdar i Sverige
+- [Alla gårdar](https://www.gardsguiden.se/gardar): Filtrerbar lista — sortera på produkttyp, gårdsförsäljningslicens eller skärgårdsläge
+
+## Gårdar per län
+
+- [Stockholms län](https://www.gardsguiden.se/stockholm): Gårdsbutiker i Stockholms län, inklusive skärgårdsbruk
+- [Skåne](https://www.gardsguiden.se/skane): Gårdsbutiker i Skåne — Sveriges trädgård med störst utbud av lokala råvaror
+- [Södermanlands län](https://www.gardsguiden.se/sodermanland): Gårdsbutiker i Södermanland (Sörmland)
+- [Gotland](https://www.gardsguiden.se/gotland): Gårdsbutiker på Gotland — lamm, saffran, tryffel och vin
+- [Västmanlands län](https://www.gardsguiden.se/vastmanland): Gårdsbutiker i Västmanland längs Mälaren
+- [Uppsala län](https://www.gardsguiden.se/uppsala): Gårdsbutiker i Uppsala län
+- [Kalmar län](https://www.gardsguiden.se/kalmar): Gårdsbutiker i Kalmar län och på Öland
+- [Östergötlands län](https://www.gardsguiden.se/ostergotland): Gårdsbutiker i Östergötland
+- [Jönköpings län](https://www.gardsguiden.se/jonkoping): Gårdsbutiker i Jönköpings län
+- [Kronobergs län](https://www.gardsguiden.se/kronoberg): Gårdsbutiker i Kronoberg
+- [Blekinge](https://www.gardsguiden.se/blekinge): Gårdsbutiker i Blekinge
+
+## Produktkategorier
+
+Gårdsguiden listar gårdar som säljer:
+
+- **Kött** (beef, pork, lamb, poultry) — direkt från uppfödaren
+- **Grönsaker och rotfrukter** — ofta ekologiskt odlade
+- **Mejeriprodukter** — mjölk, ost, smör och yoghurt
+- **Honung** — lokalt skördad
+- **Frukt och bär** — självplock och direktförsäljning
+- **Ägg** — frilandshöns och frigående
+- **Bröd och charkuterier** — hantverksmässigt producerade
+- **Drycker och vin** — gårdar med gårdsförsäljningslicens
+
+## Nyckelbegrepp
+
+- **Gårdsförsäljning**: Direktförsäljning av egentillverkade produkter från gården, ofta med licens för alkohol
+- **Gårdsbutik**: Butik på eller vid gården där producenten säljer direkt till konsument
+- **Direktförsäljning**: Kortaste möjliga leveranskedja — från producent till konsument utan mellanled
+- **Verifierad gård**: Gårdar vars ägare gjort anspråk på sin sida och håller information aktuell
+
+## Om tjänsten
+
+- [Om Gårdsguiden](https://www.gardsguiden.se/om): Hur tjänsten fungerar och hur gårdar listas
+- [Lägg till din gård](https://www.gardsguiden.se/lagg-till): För gårdsägare som vill listas eller saknar sin gård i katalogen

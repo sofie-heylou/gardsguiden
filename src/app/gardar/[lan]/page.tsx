@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description,
     alternates: { canonical: url },
     openGraph: {
-      title: `${title} – Gårdsguiden`,
+      title: `${title} — Gårdsguiden`,
       description,
       url,
       locale: "sv_SE",
@@ -41,7 +41,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     twitter: {
       card: "summary_large_image",
-      title: `${title} – Gårdsguiden`,
+      title: `${title} — Gårdsguiden`,
       description,
     },
   };
