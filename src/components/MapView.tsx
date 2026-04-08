@@ -468,15 +468,6 @@ export default function MapView() {
         </div>
       )}
 
-      {/* Owner CTA */}
-      <Link
-        href="/registrera"
-        className="absolute top-14 left-3 flex items-center gap-1.5 text-sm font-medium text-green-800 bg-green-100 border border-green-300 rounded-full px-3 py-2 shadow-lg hover:bg-green-200 transition-colors"
-      >
-        Är du gårdsägare? Lägg till din gård
-        <ArrowRight size={11} />
-      </Link>
-
       {/* Hitta mig / Stäng nära mig */}
       <button
         onClick={handleLocate}
