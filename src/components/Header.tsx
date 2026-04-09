@@ -33,8 +33,9 @@ function GardsguidentIcon({ size = 24 }: { size?: number }) {
 }
 
 const primaryLinks = [
-  { href: "/gardar", label: "Alla gårdar" },
-  { href: "/om",     label: "Om Gårdsguiden" },
+  { href: "/gardar",    label: "Alla gårdar" },
+  { href: "/reportage", label: "Reportage" },
+  { href: "/om",        label: "Om Gårdsguiden" },
 ] as const;
 
 export default function Header() {
