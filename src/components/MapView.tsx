@@ -213,7 +213,7 @@ export default function MapView() {
     setCounty(new Set()); setCategory(new Set());
   }, []);
 
-  const activeFilterCount = category.size;
+  const activeFilterCount = county.size + category.size;
 
   const circleData = useMemo(
     () => (nearMeActive && pos ? geoCircle(pos.lat, pos.lng, radius) : null),
@@ -244,35 +244,6 @@ export default function MapView() {
 
   return (
     <div className="h-full flex flex-col">
-
-    {/* County filter strip */}
-    <div
-      className="shrink-0 bg-white border-b border-stone-200 flex items-center gap-2 overflow-x-auto px-3 py-2"
-      style={{ scrollbarWidth: "none" }}
-    >
-      {COUNTY_NAMES.map((c) => (
-        <button
-          key={c}
-          onClick={() => toggleCounty(c)}
-          className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
-            county.has(c)
-              ? "bg-stone-800 text-white"
-              : "bg-stone-100 text-stone-600 hover:bg-stone-200"
-          }`}
-        >
-          {c}
-        </button>
-      ))}
-      {county.size > 0 && (
-        <button
-          onClick={() => setCounty(new Set())}
-          className="shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium text-stone-400 hover:text-stone-700 transition-colors"
-        >
-          <X size={11} />
-          Rensa
-        </button>
-      )}
-    </div>
 
     <div className="flex-1 min-h-0 relative">
       <Map
@@ -412,13 +383,29 @@ export default function MapView() {
       {filtersOpen && (
         <div className="absolute top-14 left-3 right-3 bg-white rounded-2xl shadow-xl border border-stone-200 p-4 space-y-4 z-10">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-semibold text-stone-800">Produktkategori</span>
+            <span className="text-sm font-semibold text-stone-800">Filtrera gårdar</span>
             <button onClick={() => setFiltersOpen(false)} className="text-stone-400 hover:text-stone-700 p-1" aria-label="Stäng">
               <X size={18} />
             </button>
           </div>
 
-          <div className="flex flex-wrap gap-1.5">
+          <div className="space-y-2">
+            <p className="text-xs font-medium text-stone-500 uppercase tracking-wide">Län</p>
+            <div className="flex flex-wrap gap-1.5">
+              {COUNTY_NAMES.map((c) => (
+                <button key={c} onClick={() => toggleCounty(c)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                    county.has(c) ? "bg-stone-800 text-white" : "bg-white text-stone-500 border border-stone-200 hover:border-stone-400"
+                  }`}>
+                  {c}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <p className="text-xs font-medium text-stone-500 uppercase tracking-wide">Produktkategori</p>
+            <div className="flex flex-wrap gap-1.5">
               {CATEGORIES.map((cat) => (
                 <button key={cat.slug} onClick={() => toggleCategory(cat.slug)}
                   className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
@@ -427,6 +414,7 @@ export default function MapView() {
                   {cat.label}
                 </button>
               ))}
+            </div>
           </div>
 
           <div className="flex items-center justify-between pt-1 border-t border-amber-100">
@@ -434,8 +422,8 @@ export default function MapView() {
               {farms.length} av {allFarms.length} gårdar visas
             </span>
             <div className="flex gap-3">
-              {category.size > 0 && (
-                <button onClick={() => setCategory(new Set())} className="text-xs text-stone-500 underline">Rensa</button>
+              {(county.size > 0 || category.size > 0) && (
+                <button onClick={clearFilters} className="text-xs text-stone-500 underline">Rensa</button>
               )}
               <button onClick={() => setFiltersOpen(false)}
                 className="text-xs font-semibold text-white bg-stone-800 px-4 py-1.5 rounded-full hover:bg-stone-700 transition-colors">
