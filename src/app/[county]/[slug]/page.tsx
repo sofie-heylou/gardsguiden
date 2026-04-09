@@ -175,7 +175,7 @@ export default async function FarmDetailPage({ params }: Props) {
           <div className="px-4 pt-5 space-y-6">
 
             {/* Farm name + verified badge + status */}
-            <div className="space-y-2">
+            <div className="space-y-3">
               {farm.isClaimed && (
                 <span className="inline-flex items-center gap-1 text-[11px] font-medium text-stone-400 tracking-wide">
                   <BadgeCheck size={12} className="text-stone-400" />
@@ -185,9 +185,11 @@ export default async function FarmDetailPage({ params }: Props) {
               <h1 className="font-display text-3xl text-stone-900 leading-tight">
                 {farm.name}
               </h1>
-              <div className="space-y-1.5">
+              <div className="flex items-center gap-3 flex-wrap">
                 {farm.openingHours && <OpenStatusBadge openingHours={farm.openingHours} />}
-                <p className="text-xs text-stone-400">{farm.kommun} · {farm.lan} län</p>
+                <p className="text-xs text-stone-400">
+                  {[farm.kommun, `${farm.lan} län`].filter(Boolean).join(" · ")}
+                </p>
               </div>
             </div>
 
