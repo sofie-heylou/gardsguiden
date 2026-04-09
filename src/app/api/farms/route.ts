@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getFilteredFarms, getFarmsNearLocation } from "../../../lib/farms";
 
-// Farm data is static — aggressive caching is safe.
-// - max-age=300: browsers keep it fresh for 5 minutes
-// - s-maxage=3600: CDN/proxy caches keep it for 1 hour
-// - stale-while-revalidate=86400: serve stale for up to 24h while revalidating
-const CACHE_HEADER = "public, max-age=300, s-maxage=3600, stale-while-revalidate=86400";
+// Farm data can change (admin deletions, edits) so we avoid stale caching.
+// no-store ensures every fetch hits the server; SQLite is fast enough for this.
+const CACHE_HEADER = "no-store";
 
-// Proximity queries include user coordinates and should not be shared-cached.
-const PRIVATE_CACHE_HEADER = "private, max-age=300, stale-while-revalidate=600";
+// Proximity queries include user coordinates — also no shared cache.
+const PRIVATE_CACHE_HEADER = "no-store";
 
 export function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;

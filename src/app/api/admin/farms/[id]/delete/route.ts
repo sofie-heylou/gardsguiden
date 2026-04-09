@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
+import { revalidatePath } from "next/cache";
 import { getDb } from "../../../../../../lib/db";
 
 export const dynamic = "force-dynamic";
@@ -29,6 +30,11 @@ export async function DELETE(
   }
 
   db.prepare("DELETE FROM farms WHERE id = ?").run(id);
+
+  // Bust the Next.js full route cache so list/county pages reflect the deletion immediately.
+  revalidatePath("/gardar", "page");
+  revalidatePath("/gardar/[lan]", "page");
+  revalidatePath("/", "page");
 
   return NextResponse.json({ ok: true, deleted: farm.name });
 }
