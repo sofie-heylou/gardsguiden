@@ -26,6 +26,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.5,
     },
+    {
+      url: `${SITE_URL}/reportage`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
+    {
+      url: `${SITE_URL}/reportage/darfor-koper-jag-direkt-fran-bonden`,
+      lastModified: new Date("2026-04-09"),
+      changeFrequency: "never",
+      priority: 0.6,
+    },
   ];
 
   const countyRoutes: MetadataRoute.Sitemap = COUNTY_SLUGS.map((slug) => ({
