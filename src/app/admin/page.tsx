@@ -4,11 +4,20 @@ import { auth } from "@clerk/nextjs/server";
 import { getDb } from "../../lib/db";
 import OwnershipActions from "./OwnershipActions";
 import SubmissionActions from "./SubmissionActions";
+import FlaggedFarmActions from "./FlaggedFarmActions";
 
 export const metadata: Metadata = {
   title: "Admin",
   robots: { index: false, follow: false },
 };
+
+interface FlaggedRow {
+  id: string;
+  name: string;
+  website: string | null;
+  kommun: string | null;
+  lan: string | null;
+}
 
 interface PendingRow {
   id: number;
@@ -36,6 +45,13 @@ export default async function AdminPage() {
     | undefined;
   if (adminUser?.role !== "admin") notFound();
 
+  const flagged = db.prepare(`
+    SELECT id, name, website, kommun, lan
+    FROM farms
+    WHERE needs_review = 1
+    ORDER BY lan, name
+  `).all() as FlaggedRow[];
+
   const pending = db.prepare(`
     SELECT fo.id, f.name as farm_name, COALESCE(u.email, fo.user_id) as user_email, fo.created_at
     FROM farm_ownership fo
@@ -55,6 +71,46 @@ export default async function AdminPage() {
     <div className="h-full overflow-y-auto" style={{ background: "#FAFAF8" }}>
       <div className="max-w-2xl mx-auto px-4 py-8 pb-14">
         <h1 className="font-display text-2xl text-stone-900 mb-6">Admin</h1>
+
+        {flagged.length > 0 && (
+          <section className="space-y-3 mb-8">
+            <h2 className="text-xs font-semibold uppercase tracking-wide text-red-400">
+              Flaggade listningar — ej gårdar ({flagged.length})
+            </h2>
+            <ul className="space-y-2">
+              {flagged.map((row) => (
+                <li
+                  key={row.id}
+                  className="bg-white rounded-xl border border-red-100 shadow-sm px-4 py-4"
+                >
+                  <div className="flex items-start justify-between gap-4 flex-wrap">
+                    <div className="space-y-0.5 min-w-0">
+                      <p className="font-display text-[15px] text-stone-900 leading-snug truncate">
+                        {row.name}
+                      </p>
+                      {(row.kommun || row.lan) && (
+                        <p className="text-[11px] text-stone-400">
+                          {[row.kommun, row.lan].filter(Boolean).join(", ")}
+                        </p>
+                      )}
+                      {row.website && (
+                        <a
+                          href={row.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[11px] text-stone-400 underline hover:text-stone-600 transition-colors"
+                        >
+                          {row.website.replace(/^https?:\/\//, "")}
+                        </a>
+                      )}
+                    </div>
+                    <FlaggedFarmActions id={row.id} name={row.name} />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         <section className="space-y-3">
           <h2 className="text-xs font-semibold uppercase tracking-wide text-stone-400">

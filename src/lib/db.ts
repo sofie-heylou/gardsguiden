@@ -215,6 +215,9 @@ function initSchema(db: Database.Database): void {
   if (!columnExists(db, "farms", "instagram")) {
     db.exec(`ALTER TABLE farms ADD COLUMN instagram TEXT`);
   }
+  if (!columnExists(db, "farms", "needs_review")) {
+    db.exec(`ALTER TABLE farms ADD COLUMN needs_review INTEGER`);
+  }
   if (!columnExists(db, "farm_submissions", "facebook")) {
     db.exec(`ALTER TABLE farm_submissions ADD COLUMN facebook TEXT`);
   }
