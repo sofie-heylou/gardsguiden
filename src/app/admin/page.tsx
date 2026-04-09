@@ -5,6 +5,7 @@ import { getDb } from "../../lib/db";
 import OwnershipActions from "./OwnershipActions";
 import SubmissionActions from "./SubmissionActions";
 import FlaggedFarmActions from "./FlaggedFarmActions";
+import UserFlaggedFarmActions from "./UserFlaggedFarmActions";
 
 export const metadata: Metadata = {
   title: "Admin",
@@ -17,6 +18,15 @@ interface FlaggedRow {
   website: string | null;
   kommun: string | null;
   lan: string | null;
+}
+
+interface UserFlaggedRow {
+  id: string;
+  name: string;
+  website: string | null;
+  kommun: string | null;
+  lan: string | null;
+  user_flag_count: number;
 }
 
 interface PendingRow {
@@ -51,6 +61,13 @@ export default async function AdminPage() {
     WHERE needs_review = 1
     ORDER BY lan, name
   `).all() as FlaggedRow[];
+
+  const userFlagged = db.prepare(`
+    SELECT id, name, website, kommun, lan, user_flag_count
+    FROM farms
+    WHERE user_flag_count > 0
+    ORDER BY user_flag_count DESC, name
+  `).all() as UserFlaggedRow[];
 
   const pending = db.prepare(`
     SELECT fo.id, f.name as farm_name, COALESCE(u.email, fo.user_id) as user_email, fo.created_at
@@ -105,6 +122,49 @@ export default async function AdminPage() {
                       )}
                     </div>
                     <FlaggedFarmActions id={row.id} name={row.name} />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {userFlagged.length > 0 && (
+          <section className="space-y-3 mb-8">
+            <h2 className="text-xs font-semibold uppercase tracking-wide text-orange-400">
+              Flaggade av besökare ({userFlagged.length})
+            </h2>
+            <ul className="space-y-2">
+              {userFlagged.map((row) => (
+                <li
+                  key={row.id}
+                  className="bg-white rounded-xl border border-orange-100 shadow-sm px-4 py-4"
+                >
+                  <div className="flex items-start justify-between gap-4 flex-wrap">
+                    <div className="space-y-0.5 min-w-0">
+                      <p className="font-display text-[15px] text-stone-900 leading-snug truncate">
+                        {row.name}
+                      </p>
+                      {(row.kommun || row.lan) && (
+                        <p className="text-[11px] text-stone-400">
+                          {[row.kommun, row.lan].filter(Boolean).join(", ")}
+                        </p>
+                      )}
+                      {row.website && (
+                        <a
+                          href={row.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[11px] text-stone-400 underline hover:text-stone-600 transition-colors"
+                        >
+                          {row.website.replace(/^https?:\/\//, "")}
+                        </a>
+                      )}
+                      <p className="text-[11px] text-orange-400 font-medium">
+                        {row.user_flag_count} {row.user_flag_count === 1 ? "flaggning" : "flaggningar"}
+                      </p>
+                    </div>
+                    <UserFlaggedFarmActions id={row.id} name={row.name} />
                   </div>
                 </li>
               ))}

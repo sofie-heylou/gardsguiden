@@ -19,6 +19,7 @@ import OpenStatusBadge from "../../../components/OpenStatusBadge";
 import FarmStickyBar from "../../../components/FarmStickyBar";
 import ClaimSection from "../../../components/ClaimSection";
 import AdminDeleteFarmButton from "../../../components/AdminDeleteFarmButton";
+import FlagFarmButton from "../../../components/FlagFarmButton";
 import { SITE_URL } from "../../../lib/site";
 import type { Farm } from "../../../types/farm";
 
@@ -276,6 +277,8 @@ export default async function FarmDetailPage({ params }: Props) {
             />
 
             <ClaimSection farmId={farm.id} farmName={farm.name} />
+
+            <FlagFarmButton farmId={farm.id} />
 
             <p className="text-center text-[11px] text-stone-400 pb-2">
               Stämmer inte informationen?{" "}
