@@ -163,42 +163,32 @@ export default async function FarmDetailPage({ params }: Props) {
       <div className="h-full overflow-y-auto" style={{ background: "#FAFAF8" }}>
         <div className="max-w-lg mx-auto pb-24">
 
-          {/* ── Hero: map + overlaid farm name ──────────────────────────────── */}
+          {/* ── Map ─────────────────────────────────────────────────────────── */}
           <div className="relative">
             <FarmDetailMapLoader lat={farm.lat} lng={farm.lng} name={farm.name} />
-
-            {/* Gradient overlay */}
-            <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-stone-900/85 via-stone-900/30 to-transparent pointer-events-none" />
-
-            {/* Back button */}
             <div className="absolute top-3 left-3">
               <BackButton />
-            </div>
-
-            {/* Farm name + verified badge */}
-            <div className="absolute bottom-0 inset-x-0 px-4 pb-5 space-y-1">
-              {farm.isClaimed && (
-                <span className="inline-flex items-center gap-1 text-[11px] font-medium text-white/70 tracking-wide">
-                  <BadgeCheck size={12} />
-                  Verifierad gård
-                </span>
-              )}
-              <h1
-                className="font-display text-2xl sm:text-3xl text-white leading-tight"
-                style={{ textShadow: "0 2px 8px rgba(0,0,0,0.5)" }}
-              >
-                {farm.name}
-              </h1>
             </div>
           </div>
 
           {/* ── Content ─────────────────────────────────────────────────────── */}
           <div className="px-4 pt-5 space-y-6">
 
-            {/* Open/closed status + location */}
-            <div className="space-y-1.5">
-              {farm.openingHours && <OpenStatusBadge openingHours={farm.openingHours} />}
-              <p className="text-xs text-stone-400">{farm.kommun} · {farm.lan} län</p>
+            {/* Farm name + verified badge + status */}
+            <div className="space-y-2">
+              {farm.isClaimed && (
+                <span className="inline-flex items-center gap-1 text-[11px] font-medium text-stone-400 tracking-wide">
+                  <BadgeCheck size={12} className="text-stone-400" />
+                  Verifierad gård
+                </span>
+              )}
+              <h1 className="font-display text-3xl text-stone-900 leading-tight">
+                {farm.name}
+              </h1>
+              <div className="space-y-1.5">
+                {farm.openingHours && <OpenStatusBadge openingHours={farm.openingHours} />}
+                <p className="text-xs text-stone-400">{farm.kommun} · {farm.lan} län</p>
+              </div>
             </div>
 
             {/* Feature badges */}
