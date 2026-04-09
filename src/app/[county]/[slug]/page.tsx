@@ -13,6 +13,8 @@ import BackButton from "../../../components/BackButton";
 import FarmContactSection from "../../../components/FarmContactSection";
 import FarmDetailMapLoader from "../../../components/FarmDetailMapLoader";
 import OpeningHoursTable from "../../../components/OpeningHoursTable";
+import OpenStatusBadge from "../../../components/OpenStatusBadge";
+import FarmStickyBar from "../../../components/FarmStickyBar";
 import ClaimSection from "../../../components/ClaimSection";
 import { SITE_URL } from "../../../lib/site";
 import type { Farm } from "../../../types/farm";
@@ -57,7 +59,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const url = `${SITE_URL}${farmPath(farm)}`;
 
   return {
-    title: farm.name,
+    title: `${farm.name} – Gårdsbutik i ${farm.kommun}`,
     description,
     alternates: { canonical: url },
     openGraph: {
@@ -159,24 +161,47 @@ export default async function FarmDetailPage({ params }: Props) {
       <FarmJsonLd farm={farm} />
       <FarmBreadcrumbJsonLd farm={farm} countySlug={county} />
       <div className="h-full overflow-y-auto" style={{ background: "#FAFAF8" }}>
-        <div className="max-w-lg mx-auto pb-10">
+        <div className="max-w-lg mx-auto pb-24">
 
-          {/* Map — full bleed, no padding */}
+          {/* ── Hero: map + overlaid farm name ──────────────────────────────── */}
           <div className="relative">
             <FarmDetailMapLoader lat={farm.lat} lng={farm.lng} name={farm.name} />
+
+            {/* Gradient overlay */}
+            <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-stone-900/85 via-stone-900/30 to-transparent pointer-events-none" />
+
+            {/* Back button */}
             <div className="absolute top-3 left-3">
               <BackButton />
             </div>
+
+            {/* Farm name + verified badge */}
+            <div className="absolute bottom-0 inset-x-0 px-4 pb-5 space-y-1">
+              {farm.isClaimed && (
+                <span className="inline-flex items-center gap-1 text-[11px] font-medium text-white/70 tracking-wide">
+                  <BadgeCheck size={12} />
+                  Verifierad gård
+                </span>
+              )}
+              <h1
+                className="font-display text-2xl sm:text-3xl text-white leading-tight"
+                style={{ textShadow: "0 2px 8px rgba(0,0,0,0.5)" }}
+              >
+                {farm.name}
+              </h1>
+            </div>
           </div>
 
-          <div className="px-4 pt-5 space-y-5">
+          {/* ── Content ─────────────────────────────────────────────────────── */}
+          <div className="px-4 pt-5 space-y-6">
 
-            {/* Farm name */}
-            <h1 className="font-display text-2xl text-stone-900 leading-tight">
-              {farm.name}
-            </h1>
+            {/* Open/closed status + location */}
+            <div className="space-y-1.5">
+              {farm.openingHours && <OpenStatusBadge openingHours={farm.openingHours} />}
+              <p className="text-xs text-stone-400">{farm.kommun} · {farm.lan} län</p>
+            </div>
 
-            {/* Labels row */}
+            {/* Feature badges */}
             {labels.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {labels.map(({ label, icon: Icon }) => (
@@ -190,6 +215,34 @@ export default async function FarmDetailPage({ params }: Props) {
                 ))}
               </div>
             )}
+
+            {/* About */}
+            {farm.description && (
+              <section className="space-y-1.5">
+                <h2 className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">
+                  Om gården
+                </h2>
+                <p className="text-[15px] text-stone-700 leading-relaxed">
+                  {farm.description}
+                </p>
+              </section>
+            )}
+
+            {/* Opening hours */}
+            <section className="space-y-2">
+              <h2 className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">
+                Öppettider
+              </h2>
+              {farm.openingHours ? (
+                <div className="bg-white rounded-2xl border border-stone-100 shadow-sm px-4 py-1">
+                  <OpeningHoursTable openingHours={farm.openingHours} season={farm.season} />
+                </div>
+              ) : (
+                <p className="text-sm text-stone-500">
+                  Kontakta gården för öppettider.
+                </p>
+              )}
+            </section>
 
             {/* Products */}
             {visibleProducts.length > 0 && (
@@ -210,32 +263,7 @@ export default async function FarmDetailPage({ params }: Props) {
               </section>
             )}
 
-            {/* About */}
-            {farm.description && (
-              <section className="space-y-2">
-                <h2 className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">
-                  Om gården
-                </h2>
-                <p className="text-sm text-stone-700 leading-relaxed">
-                  {farm.description}
-                </p>
-              </section>
-            )}
-
-            {/* Opening hours */}
-            <section className="space-y-2">
-              <h2 className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">
-                Öppettider
-              </h2>
-              {farm.openingHours ? (
-                <OpeningHoursTable openingHours={farm.openingHours} season={farm.season} />
-              ) : (
-                <p className="text-sm text-stone-500">
-                  Kontakta gården för öppettider.
-                </p>
-              )}
-            </section>
-
+            {/* Contact */}
             <FarmContactSection
               farmId={farm.id}
               farmName={farm.name}
@@ -245,7 +273,6 @@ export default async function FarmDetailPage({ params }: Props) {
               website={farm.website}
               facebook={farm.facebook}
               instagram={farm.instagram}
-              mapsUrl={mapsUrl}
             />
 
             <ClaimSection farmId={farm.id} farmName={farm.name} />
@@ -261,6 +288,16 @@ export default async function FarmDetailPage({ params }: Props) {
             </p>
 
           </div>
+
+          {/* ── Sticky action bar ───────────────────────────────────────────── */}
+          <FarmStickyBar
+            farmId={farm.id}
+            farmName={farm.name}
+            farmCounty={farm.lan}
+            phone={farm.phone}
+            mapsUrl={mapsUrl}
+          />
+
         </div>
       </div>
     </>

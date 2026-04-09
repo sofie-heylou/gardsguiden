@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 const FarmDetailMap = dynamic(() => import("./FarmDetailMap"), {
   ssr: false,
   loading: () => (
-    <div className="h-48 w-full rounded-xl bg-stone-200 animate-pulse" />
+    <div className="h-72 w-full bg-stone-200 animate-pulse" />
   ),
 });
 
