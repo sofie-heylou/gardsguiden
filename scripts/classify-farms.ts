@@ -1,98 +1,71 @@
 /**
- * Classifies all unreviewed farm listings using Claude API.
- * Flags non-farms (shops, cafés, bakeries, restaurants) with needs_review = 1.
+ * Flags listings that are likely not farms using keyword matching on the name.
+ * No API key required — runs instantly and for free.
+ *
+ * Flagged listings (needs_review = 1) appear in the admin panel for deletion.
  * Confirmed farms get needs_review = 0.
  *
  * Usage:
- *   ANTHROPIC_API_KEY=sk-... npx tsx scripts/classify-farms.ts
- *   ANTHROPIC_API_KEY=sk-... npx tsx scripts/classify-farms.ts --dry-run
- *   ANTHROPIC_API_KEY=sk-... npx tsx scripts/classify-farms.ts --limit 20
+ *   npx tsx scripts/classify-farms.ts             # run for real
+ *   npx tsx scripts/classify-farms.ts --dry-run   # preview only
  */
 
 import Database from "better-sqlite3";
 import path from "path";
-import axios from "axios";
-import https from "https";
 
-const DB_PATH  = path.join(process.cwd(), "data", "gardsguiden.db");
-const DRY_RUN  = process.argv.includes("--dry-run");
-const LIMIT    = (() => {
-  const i = process.argv.indexOf("--limit");
-  return i !== -1 ? parseInt(process.argv[i + 1] ?? "999999", 10) : 999999;
-})();
-const DELAY_MS = 400;
-const API_KEY  = process.env.ANTHROPIC_API_KEY;
+const DB_PATH = path.join(process.cwd(), "data", "gardsguiden.db");
+const DRY_RUN = process.argv.includes("--dry-run");
 
-interface FarmRow {
-  id: string;
-  name: string;
-  website: string | null;
-  products: string | null;
-  kommun: string | null;
-  lan: string | null;
-}
+// Words in a listing name that strongly suggest it is NOT a farm.
+// Checked as whole words (word boundary match) to avoid false positives
+// e.g. "bageri" matches "Andréns Bageri" but not "gårdsbageri".
+const NON_FARM_KEYWORDS = [
+  "café",
+  "kafé",
+  "restaurang",
+  "restaurant",
+  "krog",
+  "bistro",
+  "pizzeria",
+  "bar",
+  "hotell",
+  "pensionat",
+  "spa",
+  "bageri",     // bare bageri — "gårdsbageri" is fine, checked below
+  "konditori",
+  "butik",      // bare butik — "gårdsbutik" is fine, checked below
+  "delikatess",
+  "livsmedelsgrossist",
+];
 
-function sleep(ms: number) {
-  return new Promise<void>((r) => setTimeout(r, ms));
-}
+// If the name contains these prefixes before a flagged word, it's still a farm.
+const FARM_PREFIXES = ["gårds", "lant", "by"];
 
-function buildPrompt(farm: FarmRow): string {
-  const products = (() => {
-    try {
-      const parsed = JSON.parse(farm.products ?? "[]") as string[];
-      return parsed.filter((p) => p !== "annat");
-    } catch {
-      return [];
-    }
-  })();
+function isLikelyNonFarm(name: string): boolean {
+  const lower = name.toLowerCase();
 
-  const websiteDomain = farm.website
-    ? farm.website.replace(/^https?:\/\//, "").split("/")[0]
-    : null;
+  for (const keyword of NON_FARM_KEYWORDS) {
+    // Find the keyword in the name
+    const idx = lower.indexOf(keyword);
+    if (idx === -1) continue;
 
-  const lines = [
-    `Name: ${farm.name}`,
-    websiteDomain ? `Website: ${websiteDomain}` : null,
-    products.length ? `Products: ${products.join(", ")}` : null,
-  ].filter(Boolean).join("\n");
+    // Check if it's preceded by a farm prefix (e.g. "gårds" + "bageri")
+    const before = lower.slice(0, idx);
+    const hasFarmPrefix = FARM_PREFIXES.some((p) => before.endsWith(p));
+    if (hasFarmPrefix) continue;
 
-  return `Is the following listing an actual farm or agricultural producer that sells directly to consumers? Or is it a shop, bakery, café, restaurant, or other non-farm business?
-
-${lines}
-
-Answer with exactly one word: farm OR not_farm`;
-}
-
-async function classify(farm: FarmRow): Promise<"farm" | "not_farm"> {
-  const res = await axios.post(
-    "https://api.anthropic.com/v1/messages",
-    {
-      model: "claude-haiku-4-5-20251001",
-      max_tokens: 10,
-      messages: [{ role: "user", content: buildPrompt(farm) }],
-    },
-    {
-      headers: {
-        "x-api-key": API_KEY!,
-        "anthropic-version": "2023-06-01",
-        "content-type": "application/json",
-      },
-      httpsAgent: new https.Agent({ rejectUnauthorized: false }),
-    }
-  );
-
-  const text = (res.data as { content: { type: string; text: string }[] })
-    .content.find((b) => b.type === "text")?.text?.trim().toLowerCase() ?? "";
-
-  return text.includes("not_farm") ? "not_farm" : "farm";
-}
-
-async function main() {
-  if (!API_KEY) {
-    console.error("Error: ANTHROPIC_API_KEY environment variable is not set.");
-    process.exit(1);
+    // Check it's a word boundary (not part of a longer word)
+    const charBefore = lower[idx - 1];
+    const charAfter  = lower[idx + keyword.length];
+    const boundaryBefore = !charBefore || /[\s\-–&,.()/]/.test(charBefore);
+    const boundaryAfter  = !charAfter  || /[\s\-–&,.()/]/.test(charAfter);
+    if (boundaryBefore && boundaryAfter) return true;
   }
 
+  return false;
+}
+
+function main() {
   const db = new Database(DB_PATH);
   db.pragma("journal_mode = WAL");
 
@@ -100,69 +73,44 @@ async function main() {
   const cols = db.prepare("PRAGMA table_info(farms)").all() as { name: string }[];
   if (!cols.some((c) => c.name === "needs_review")) {
     db.exec("ALTER TABLE farms ADD COLUMN needs_review INTEGER");
-    console.log("Added needs_review column to farms table.\n");
+    console.log("Added needs_review column.\n");
   }
 
   const farms = db.prepare(`
-    SELECT id, name, website, products, kommun, lan
+    SELECT id, name, kommun, lan
     FROM farms
     WHERE needs_review IS NULL
     ORDER BY lan, name
-    LIMIT ?
-  `).all(LIMIT) as FarmRow[];
+  `).all() as { id: string; name: string; kommun: string | null; lan: string | null }[];
 
-  console.log(`Found ${farms.length} unclassified farms${DRY_RUN ? " (dry run)" : ""}\n`);
-
-  if (farms.length === 0) {
-    console.log("Nothing to classify.");
-    db.close();
-    return;
-  }
+  console.log(`Checking ${farms.length} unclassified listings${DRY_RUN ? " (dry run)" : ""}...\n`);
 
   const update = db.prepare("UPDATE farms SET needs_review = ? WHERE id = ?");
-  let farms_count  = 0;
-  let flagged = 0;
-  let failed  = 0;
+  let confirmed = 0;
+  let flagged   = 0;
 
-  for (let i = 0; i < farms.length; i++) {
-    const farm = farms[i]!;
-    const tag  = `[${String(i + 1).padStart(farms.length.toString().length)}/${farms.length}]`;
-    const label = farm.name + (farm.kommun ? ` (${farm.kommun})` : farm.lan ? ` (${farm.lan})` : "");
+  for (const farm of farms) {
+    const nonFarm = isLikelyNonFarm(farm.name);
+    const location = farm.kommun ?? farm.lan ?? "";
 
-    process.stdout.write(`${tag} ${label}... `);
-
-    try {
-      const result = await classify(farm);
-
-      if (result === "farm") {
-        if (!DRY_RUN) update.run(0, farm.id);
-        console.log("✓ farm");
-        farms_count++;
-      } else {
-        if (!DRY_RUN) update.run(1, farm.id);
-        console.log("⚑ flagged");
-        flagged++;
-      }
-    } catch (err) {
-      console.log(`✗  ${err instanceof Error ? err.message : String(err)}`);
-      failed++;
+    if (nonFarm) {
+      if (!DRY_RUN) update.run(1, farm.id);
+      console.log(`  ⚑  ${farm.name}${location ? ` (${location})` : ""}`);
+      flagged++;
+    } else {
+      if (!DRY_RUN) update.run(0, farm.id);
+      confirmed++;
     }
-
-    if (i < farms.length - 1) await sleep(DELAY_MS);
   }
 
   db.close();
 
-  console.log(`\n── Done ──────────────────────────────────────────`);
-  console.log(`  Confirmed farms: ${farms_count}`);
-  console.log(`  Flagged:         ${flagged}`);
-  if (failed > 0) console.log(`  Failed:          ${failed}`);
+  console.log(`\n── Done ────────────────────────────────────────────`);
+  console.log(`  Confirmed: ${confirmed}`);
+  console.log(`  Flagged:   ${flagged}`);
   if (!DRY_RUN && flagged > 0) {
     console.log(`\n  Review flagged listings at /admin`);
   }
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+main();
