@@ -14,7 +14,7 @@ export default async function RegistreraPage() {
 
   return (
     <div className="h-full overflow-y-auto flex items-center justify-center py-12" style={{ background: "#FAFAF8" }}>
-      <SignUp />
+      <SignUp routing="path" path="/registrera" />
     </div>
   );
 }
