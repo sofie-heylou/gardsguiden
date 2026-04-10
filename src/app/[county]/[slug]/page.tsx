@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import Link from "next/link";
 import {
   ShoppingBag,
   GlassWater,
@@ -170,7 +169,7 @@ export default async function FarmDetailPage({ params }: Props) {
       <FarmJsonLd farm={farm} />
       <FarmBreadcrumbJsonLd farm={farm} countySlug={county} />
       <div className="h-full overflow-y-auto" style={{ background: "#FAFAF8" }}>
-        <div className="max-w-lg mx-auto pb-24">
+        <div className="max-w-lg mx-auto pb-8">
 
           {/* ── Map ─────────────────────────────────────────────────────────── */}
           <div className="relative">
@@ -276,34 +275,24 @@ export default async function FarmDetailPage({ params }: Props) {
               instagram={farm.instagram}
             />
 
-            <ClaimSection farmId={farm.id} farmName={farm.name} />
+            {/* Ring + Vägbeskrivning */}
+            <FarmStickyBar
+              farmId={farm.id}
+              farmName={farm.name}
+              farmCounty={farm.lan}
+              phone={farm.phone}
+              mapsUrl={mapsUrl}
+            />
 
             <FlagFarmButton farmId={farm.id} />
 
-            <p className="text-center text-[11px] text-stone-400 pb-2">
-              Stämmer inte informationen?{" "}
-              <Link
-                href={`/ta-bort/${farm.id}`}
-                className="underline hover:text-stone-600 transition-colors"
-              >
-                Kontakta oss
-              </Link>
-            </p>
+            <ClaimSection farmId={farm.id} farmName={farm.name} />
 
             {isAdmin && (
               <AdminDeleteFarmButton farmId={farm.id} farmName={farm.name} />
             )}
 
           </div>
-
-          {/* ── Sticky action bar ───────────────────────────────────────────── */}
-          <FarmStickyBar
-            farmId={farm.id}
-            farmName={farm.name}
-            farmCounty={farm.lan}
-            phone={farm.phone}
-            mapsUrl={mapsUrl}
-          />
 
         </div>
       </div>

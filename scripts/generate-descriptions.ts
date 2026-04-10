@@ -10,6 +10,8 @@
 
 import Database from "better-sqlite3";
 import path from "path";
+import axios from "axios";
+import https from "https";
 
 const DB_PATH  = path.join(process.cwd(), "data", "gardsguiden.db");
 const DRY_RUN  = process.argv.includes("--dry-run");
@@ -80,26 +82,25 @@ ${lines}`;
 }
 
 async function callClaude(prompt: string): Promise<string> {
-  const res = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "x-api-key": API_KEY!,
-      "anthropic-version": "2023-06-01",
-      "content-type": "application/json",
-    },
-    body: JSON.stringify({
+  const res = await axios.post(
+    "https://api.anthropic.com/v1/messages",
+    {
       model: "claude-haiku-4-5-20251001",
       max_tokens: 300,
       messages: [{ role: "user", content: prompt }],
-    }),
-  });
+    },
+    {
+      headers: {
+        "x-api-key": API_KEY!,
+        "anthropic-version": "2023-06-01",
+        "content-type": "application/json",
+      },
+      httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+    }
+  );
 
-  if (!res.ok) {
-    throw new Error(`API ${res.status}: ${await res.text()}`);
-  }
-
-  const data = await res.json() as { content: { type: string; text: string }[] };
-  const text = data.content.find((b) => b.type === "text")?.text?.trim();
+  const text = (res.data as { content: { type: string; text: string }[] })
+    .content.find((b) => b.type === "text")?.text?.trim();
   if (!text) throw new Error("Empty response from API");
   return text;
 }

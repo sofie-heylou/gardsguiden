@@ -17,7 +17,7 @@ export default function FarmStickyBar({ farmId, farmName, farmCounty, phone, map
   const hasBoth = !!(phone && mapsUrl);
 
   return (
-    <div className="sticky bottom-0 bg-[#FAFAF8]/90 backdrop-blur-md border-t border-stone-200/60 px-4 py-3 flex gap-3">
+    <div className="flex gap-3">
       {phone && (
         <a
           href={`tel:${phone}`}
