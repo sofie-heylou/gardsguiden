@@ -23077,5 +23077,51 @@
     "openingHours": "måndag: 09:00–21:00, tisdag: 09:00–21:00, onsdag: 09:00–21:00, torsdag: 09:00–21:00, fredag: 09:00–21:00, lördag: 09:00–21:00, söndag: 09:00–21:00",
     "season": "",
     "source": "google-places:gårdsbutik"
+  },
+  {
+    "id": "astad-vingard",
+    "name": "Ästad Vingård",
+    "description": "",
+    "address": "Ästad 10, 432 77 Tvååker, Sverige",
+    "kommun": "Varberg",
+    "lan": "Halland",
+    "lat": 57.0648899,
+    "lng": 12.5573484,
+    "website": "https://astadvingard.se",
+    "phone": "0340-460 61",
+    "email": "info@astadvingard.se",
+    "products": [
+      "vin"
+    ],
+    "onSiteSales": true,
+    "tastingRoom": true,
+    "gardsförsäljningLicense": true,
+    "isArchipelago": false,
+    "openingHours": "",
+    "season": "",
+    "source": "manual"
+  },
+  {
+    "id": "juntras-gront",
+    "name": "Juntras Grönt",
+    "description": "",
+    "address": "Sätunavägen 16, 179 97 Färentuna, Sverige",
+    "kommun": "Ekerö",
+    "lan": "Stockholm",
+    "lat": 59.3856142,
+    "lng": 17.6372756,
+    "website": "https://juntrasgront.se",
+    "phone": "076-846 17 58",
+    "email": "",
+    "products": [
+      "grönsaker"
+    ],
+    "onSiteSales": true,
+    "tastingRoom": false,
+    "gardsförsäljningLicense": false,
+    "isArchipelago": false,
+    "openingHours": "måndag: Stängt, tisdag: Stängt, onsdag: Stängt, torsdag: 11:00–18:00, fredag: 11:00–18:00, lördag: 11:00–18:00, söndag: 11:00–18:00",
+    "season": "",
+    "source": "manual"
   }
 ]
