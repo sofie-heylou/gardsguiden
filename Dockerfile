@@ -1,7 +1,8 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # Stage 1: Build
 # Compiles the Next.js app and the better-sqlite3 native addon.
-# /scripts/ and /data/tmp/ are excluded via .dockerignore.
+# /data/tmp/ and most of /scripts/ are excluded via .dockerignore
+# (scripts/baseline-meta.ts is the one exception — needed for Stage 1.2).
 # ─────────────────────────────────────────────────────────────────────────────
 FROM node:22-alpine AS builder
 WORKDIR /app
@@ -48,6 +49,13 @@ ENV HOSTNAME=0.0.0.0
 COPY --from=builder /app/.next/standalone ./
 # Static assets (CSS, JS chunks) — not included in standalone
 COPY --from=builder /app/.next/static ./.next/static
+
+# ── Migration assets (Stage 1.2) ───────────────────────────────────────────
+# `scripts/baseline-meta.ts` is a one-shot run via `npx tsx` to seed
+# `_schema_meta` v1 on the prod DB after deploy. It reads the SQL files in
+# /app/migrations at runtime, so both directories must ship in the image.
+COPY --from=builder /app/migrations ./migrations
+COPY --from=builder /app/scripts/baseline-meta.ts ./scripts/baseline-meta.ts
 
 # ── Seed database ──────────────────────────────────────────────────────────
 # Bake the current database into the image so the app works out-of-the-box

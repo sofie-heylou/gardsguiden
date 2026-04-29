@@ -2,8 +2,10 @@
 .next/
 node_modules/
 
-# Scrapers — local-only tools, never deployed
-scripts/
+# Scrapers — local-only tools, never deployed.
+# Exception: baseline-meta.ts is a one-shot prod migration helper (Stage 1.2).
+scripts/*
+!scripts/baseline-meta.ts
 
 # Scraper intermediate files
 data/tmp/
