@@ -1,0 +1,7 @@
+-- The baseline migration cannot be rolled back without dropping the entire
+-- schema and discarding all data. To "undo" the baseline, restore from a
+-- pre-migrate snapshot — see docs/runbook-db.md.
+--
+-- This file is intentionally empty. It exists to establish the convention
+-- that every forward migration ships with a paired .down.sql file (even if
+-- the down is just a comment explaining why rollback is unsafe).
