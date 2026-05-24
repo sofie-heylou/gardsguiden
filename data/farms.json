@@ -1805,29 +1805,6 @@
     "source": "google-places:gårdsbutik"
   },
   {
-    "id": "granngarden",
-    "name": "Granngården",
-    "description": "",
-    "address": "Färjeleden 5, 621 58 Visby, Sverige",
-    "kommun": "Visby",
-    "lan": "Gotland",
-    "lat": 57.6275699,
-    "lng": 18.277575,
-    "website": "https://www.granngarden.se/butiker/visby",
-    "phone": "",
-    "email": "",
-    "products": [
-      "annat"
-    ],
-    "onSiteSales": false,
-    "tastingRoom": false,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "måndag: 09:00–18:00, tisdag: 09:00–18:00, onsdag: 09:00–18:00, torsdag: 09:00–18:00, fredag: 09:00–18:00, lördag: 09:00–14:00, söndag: 10:00–14:00",
-    "season": "",
-    "source": "google-places:lokal producent mat"
-  },
-  {
     "id": "graute-gard-far-och-lammgard",
     "name": "Graute gård - Får och Lammgård",
     "description": "",
@@ -3168,52 +3145,6 @@
     "openingHours": "",
     "season": "",
     "source": "google-places:bryggeri"
-  },
-  {
-    "id": "granngarden-2",
-    "name": "Granngården",
-    "description": "",
-    "address": "Fläktstigen 1, 432 32 Varberg, Sverige",
-    "kommun": "Varberg",
-    "lan": "Halland",
-    "lat": 57.12167609999999,
-    "lng": 12.2836812,
-    "website": "https://www.granngarden.se/butiker/varberg",
-    "phone": "",
-    "email": "",
-    "products": [
-      "annat"
-    ],
-    "onSiteSales": false,
-    "tastingRoom": false,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "måndag: 09:00–18:00, tisdag: 09:00–18:00, onsdag: 09:00–18:00, torsdag: 09:00–18:00, fredag: 09:00–18:00, lördag: 10:00–14:00, söndag: 10:00–14:00",
-    "season": "",
-    "source": "google-places:lokal producent mat"
-  },
-  {
-    "id": "granngarden-falkenberg",
-    "name": "Granngården Falkenberg",
-    "description": "",
-    "address": "Torsholmsvägen 1, 311 50 Falkenberg, Sverige",
-    "kommun": "Falkenberg",
-    "lan": "Halland",
-    "lat": 56.9338247,
-    "lng": 12.5158359,
-    "website": "https://www.granngarden.se/butiker/falkenberg",
-    "phone": "",
-    "email": "",
-    "products": [
-      "annat"
-    ],
-    "onSiteSales": false,
-    "tastingRoom": false,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "måndag: 09:00–18:00, tisdag: 09:00–18:00, onsdag: 09:00–18:00, torsdag: 09:00–18:00, fredag: 09:00–18:00, lördag: 09:00–14:00, söndag: 10:00–14:00",
-    "season": "",
-    "source": "google-places:lokal producent mat"
   },
   {
     "id": "grasljunga-gardsprodukter-2",
@@ -4716,29 +4647,6 @@
     "source": "google-places:gårdsbutik"
   },
   {
-    "id": "granngarden-jonkoping",
-    "name": "Granngården Jönköping",
-    "description": "",
-    "address": "Solåsvägen 4, 553 03 Jönköping, Sverige",
-    "kommun": "Jönköping",
-    "lan": "Jönköping",
-    "lat": 57.7603632,
-    "lng": 14.1696905,
-    "website": "https://www.granngarden.se/butiker/jonkoping",
-    "phone": "",
-    "email": "",
-    "products": [
-      "annat"
-    ],
-    "onSiteSales": true,
-    "tastingRoom": false,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "måndag: 09:00–19:00, tisdag: 09:00–19:00, onsdag: 09:00–19:00, torsdag: 09:00–19:00, fredag: 09:00–19:00, lördag: 10:00–16:00, söndag: 11:00–16:00",
-    "season": "",
-    "source": "google-places:gårdsbutik"
-  },
-  {
     "id": "gardsbutik-wernerssons-frukt-honung",
     "name": "Gårdsbutik Wernerssons Frukt & Honung",
     "description": "",
@@ -6166,29 +6074,6 @@
     "openingHours": "",
     "season": "",
     "source": "google-places:självplock"
-  },
-  {
-    "id": "granngarden-vaxjo",
-    "name": "Granngården Växjö",
-    "description": "",
-    "address": "Marketenterivägen 25, 352 36 Växjö, Sverige",
-    "kommun": "Växjö",
-    "lan": "Kronoberg",
-    "lat": 56.87798799999999,
-    "lng": 14.766959,
-    "website": "https://www.granngarden.se/butiker/vaxjo",
-    "phone": "",
-    "email": "",
-    "products": [
-      "annat"
-    ],
-    "onSiteSales": false,
-    "tastingRoom": false,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "måndag: 10:00–19:00, tisdag: 10:00–19:00, onsdag: 10:00–19:00, torsdag: 10:00–19:00, fredag: 10:00–19:00, lördag: 10:00–17:00, söndag: 10:00–17:00",
-    "season": "",
-    "source": "google-places:lokal producent mat"
   },
   {
     "id": "grasljunga-gardsprodukter-3",
@@ -16267,29 +16152,6 @@
     "source": "google-places:odlare gård"
   },
   {
-    "id": "granngarden-skovde",
-    "name": "Granngården Skövde",
-    "description": "",
-    "address": "Mariestadsvägen 104, 549 38 Skövde, Sverige",
-    "kommun": "Skövde",
-    "lan": "Västra Götaland",
-    "lat": 58.40600000000001,
-    "lng": 13.867,
-    "website": "https://www.granngarden.se/butiker/skovde",
-    "phone": "",
-    "email": "",
-    "products": [
-      "annat"
-    ],
-    "onSiteSales": false,
-    "tastingRoom": false,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "måndag: 09:00–19:00, tisdag: 09:00–19:00, onsdag: 09:00–19:00, torsdag: 09:00–19:00, fredag: 09:00–19:00, lördag: 10:00–17:00, söndag: 10:00–17:00",
-    "season": "",
-    "source": "google-places:lokal producent mat"
-  },
-  {
     "id": "grebbestad-bryggeri",
     "name": "Grebbestad Bryggeri",
     "description": "",
@@ -21599,29 +21461,6 @@
     "openingHours": "",
     "season": "",
     "source": "google-places:gårdsbutik"
-  },
-  {
-    "id": "granngarden-norrkoping",
-    "name": "Granngården Norrköping",
-    "description": "",
-    "address": "Malmgatan 41, 602 23 Norrköping, Sverige",
-    "kommun": "Norrköping",
-    "lan": "Östergötland",
-    "lat": 58.6160322,
-    "lng": 16.1747963,
-    "website": "https://www.granngarden.se/butiker/norrkoping",
-    "phone": "",
-    "email": "",
-    "products": [
-      "annat"
-    ],
-    "onSiteSales": false,
-    "tastingRoom": false,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "måndag: 09:00–19:00, tisdag: 09:00–19:00, onsdag: 09:00–19:00, torsdag: 09:00–19:00, fredag: 09:00–19:00, lördag: 10:00–16:00, söndag: 11:00–16:00",
-    "season": "",
-    "source": "google-places:lokal producent mat"
   },
   {
     "id": "grepstad-gardsbutik-2",

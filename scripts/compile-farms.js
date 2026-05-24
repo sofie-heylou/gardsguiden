@@ -60,6 +60,7 @@ const EXCLUDE_PATTERNS = [
   /^(passage vinkaféet?$|trosa stadshotell|bomans hotell|hillsta$|på hellmanska)/i,
   /^(kärleken till|sörmlandsturen$|ariu|café twister|vår[t|a] hundvänliga)/i,
   /^(Föregående|Nästa)/i,
+  /^granngård/i, // national retail chain, not a local producer
   /bästa (restauranger|pizzor|kaféer|cafeer|caféer)/i,
   /^\d+ av /i,
   /historiska|heritage|museum(?! -)/i,
