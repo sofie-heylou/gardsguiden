@@ -6,14 +6,18 @@ out/
 node_modules/
 
 # Environment
+.env
+.env*
 .env.local
 .env*.local
+!.env.example
 
 # Database (exclude SQLite files except the seeded production DB)
 *.sqlite
 *.db
 *.db-shm
 *.db-wal
+*.db-journal
 !data/gardsguiden.db
 
 # Scraper intermediate / temp files
@@ -25,3 +29,6 @@ data/tmp/
 # Debug
 npm-debug.log*
 session.md
+
+# Build cache
+tsconfig.tsbuildinfo
