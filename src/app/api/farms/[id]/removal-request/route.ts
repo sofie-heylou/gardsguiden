@@ -41,6 +41,11 @@ export async function POST(
     return NextResponse.json({ error: "Gården hittades inte" }, { status: 404 });
   }
 
+  const existing = db.prepare(
+    "SELECT 1 FROM farm_removal_requests WHERE farm_id = ? AND email = ? AND status = 'pending'"
+  ).get(id, email.trim());
+  if (existing) return NextResponse.json({ ok: true });
+
   db.prepare(`
     INSERT INTO farm_removal_requests (id, farm_id, email, reason)
     VALUES (?, ?, ?, ?)

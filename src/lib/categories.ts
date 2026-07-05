@@ -63,13 +63,6 @@ export const CATEGORIES: Category[] = [
   },
 ];
 
-/** Returns all categories a farm belongs to based on its raw product strings. */
-export function getFarmCategories(products: string[]): Category[] {
-  return CATEGORIES.filter((cat) =>
-    products.some((p) => cat.products.includes(p))
-  );
-}
-
 /** Returns true if a farm's products match the given category slug. */
 export function farmMatchesCategory(
   products: string[],
@@ -78,4 +71,9 @@ export function farmMatchesCategory(
   const cat = CATEGORIES.find((c) => c.slug === categorySlug);
   if (!cat) return false;
   return products.some((p) => cat.products.includes(p));
+}
+
+/** Returns all categories a farm belongs to based on its raw product strings. */
+export function getFarmCategories(products: string[]): Category[] {
+  return CATEGORIES.filter((cat) => farmMatchesCategory(products, cat.slug));
 }

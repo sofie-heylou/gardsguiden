@@ -32,11 +32,22 @@ export async function POST(req: NextRequest) {
   if (!name || typeof name !== "string" || !name.trim()) {
     return NextResponse.json({ error: "Ange gårdens namn" }, { status: 400 });
   }
+  if (name.length > 200) {
+    return NextResponse.json({ error: "Gårdsnamnet är för långt" }, { status: 400 });
+  }
   if (!submittedEmail || typeof submittedEmail !== "string" || !isValidEmail(submittedEmail)) {
     return NextResponse.json({ error: "Ange en giltig e-postadress" }, { status: 400 });
   }
   if (lan && !VALID_LAN.includes(lan as string)) {
     return NextResponse.json({ error: "Ogiltigt län" }, { status: 400 });
+  }
+  if (typeof description === "string" && description.length > 2000) {
+    return NextResponse.json({ error: "Beskrivningen är för lång (max 2000 tecken)" }, { status: 400 });
+  }
+  const tooLong = [address, kommun, phone, website, openingHours, season, facebook, instagram]
+    .some((v) => typeof v === "string" && v.length > 500);
+  if (tooLong) {
+    return NextResponse.json({ error: "Ett av fälten är för långt (max 500 tecken)" }, { status: 400 });
   }
 
   const { userId } = await auth();

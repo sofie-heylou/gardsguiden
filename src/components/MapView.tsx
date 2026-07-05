@@ -12,6 +12,7 @@ import type { Farm } from "../types/farm";
 import { CATEGORIES, farmMatchesCategory } from "../lib/categories";
 import { farmPath, COUNTY_NAMES, COUNTIES, COUNTY_TO_SLUG } from "../lib/counties";
 import { useGeolocation } from "../hooks/useGeolocation";
+import { haversineKm } from "../lib/geo";
 import { track } from "../lib/analytics";
 
 const TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
@@ -45,17 +46,6 @@ function pickFeatured(farms: Farm[], max = 8): Farm[] {
 
 type FarmPoint = Supercluster.PointFeature<{ farm: Farm }>;
 
-function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
-  const R = 6371;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLng = ((lng2 - lng1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLng / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
 
 /** Approximate a radius circle as a GeoJSON polygon (64-point). */
 function geoCircle(lat: number, lng: number, radiusKm: number): Feature<Polygon> {

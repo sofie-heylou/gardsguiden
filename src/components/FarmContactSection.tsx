@@ -3,10 +3,10 @@
 import { Phone, Mail, Globe } from "lucide-react";
 import { track } from "../lib/analytics";
 
-type Props = {
-  farmId: string;
-  farmName: string;
-  farmCounty: string;
+type FarmContact = {
+  id: string;
+  name: string;
+  lan: string;
   phone?: string | null;
   email?: string | null;
   website?: string | null;
@@ -14,30 +14,17 @@ type Props = {
   instagram?: string | null;
 };
 
-function handleContact(
-  contactType: string,
-  farmId: string,
-  farmName: string,
-  farmCounty: string
-) {
+function handleContact(contactType: string, farm: FarmContact) {
   track("farm_contact", {
     contact_type: contactType,
-    farm_id: farmId,
-    farm_name: farmName,
-    farm_county: farmCounty,
+    farm_id: farm.id,
+    farm_name: farm.name,
+    farm_county: farm.lan,
   });
 }
 
-export default function FarmContactSection({
-  farmId,
-  farmName,
-  farmCounty,
-  phone,
-  email,
-  website,
-  facebook,
-  instagram,
-}: Props) {
+export default function FarmContactSection({ farm }: { farm: FarmContact }) {
+  const { phone, email, website, facebook, instagram } = farm;
   return (
     <section className="space-y-2">
       <h2 className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">
@@ -48,7 +35,7 @@ export default function FarmContactSection({
           <li>
             <a
               href={`tel:${phone}`}
-              onClick={() => handleContact("phone", farmId, farmName, farmCounty)}
+              onClick={() => handleContact("phone", farm)}
               className="flex items-center gap-3 text-sm text-stone-700 hover:text-stone-900 transition-colors"
             >
               <Phone size={15} className="shrink-0 text-stone-400" />
@@ -60,7 +47,7 @@ export default function FarmContactSection({
           <li>
             <a
               href={`mailto:${email}`}
-              onClick={() => handleContact("email", farmId, farmName, farmCounty)}
+              onClick={() => handleContact("email", farm)}
               className="flex items-center gap-3 text-sm text-stone-700 hover:text-stone-900 transition-colors break-all"
             >
               <Mail size={15} className="shrink-0 text-stone-400" />
@@ -74,7 +61,7 @@ export default function FarmContactSection({
               href={website}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={() => handleContact("website", farmId, farmName, farmCounty)}
+              onClick={() => handleContact("website", farm)}
               className="flex items-center gap-3 text-sm text-stone-700 hover:text-stone-900 transition-colors break-all"
             >
               <Globe size={15} className="shrink-0 text-stone-400" />
@@ -88,7 +75,7 @@ export default function FarmContactSection({
               href={facebook}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={() => handleContact("facebook", farmId, farmName, farmCounty)}
+              onClick={() => handleContact("facebook", farm)}
               className="flex items-center gap-3 text-sm text-stone-700 hover:text-stone-900 transition-colors"
             >
               <svg
@@ -111,7 +98,7 @@ export default function FarmContactSection({
               href={instagram}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={() => handleContact("instagram", farmId, farmName, farmCounty)}
+              onClick={() => handleContact("instagram", farm)}
               className="flex items-center gap-3 text-sm text-stone-700 hover:text-stone-900 transition-colors"
             >
               <svg

@@ -32,6 +32,9 @@ export async function POST(req: NextRequest) {
   if (!message?.trim()) {
     return NextResponse.json({ error: "Ange ett meddelande" }, { status: 400 });
   }
+  if (message.length > 5000) {
+    return NextResponse.json({ error: "Meddelandet är för långt (max 5000 tecken)" }, { status: 400 });
+  }
 
   let db;
   try {
