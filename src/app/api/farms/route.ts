@@ -8,6 +8,8 @@ const CACHE_HEADER = "no-store";
 // Proximity queries include user coordinates — also no shared cache.
 const PRIVATE_CACHE_HEADER = "no-store";
 
+const MAX_RADIUS_KM = 200;
+
 export function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
 
@@ -20,20 +22,25 @@ export function GET(req: NextRequest) {
 
   const filters = { lan, category, q };
 
-  if (latParam && lngParam && radiusParam) {
-    const lat = parseFloat(latParam);
-    const lng = parseFloat(lngParam);
-    const radius = parseFloat(radiusParam);
-    if (!isNaN(lat) && !isNaN(lng) && !isNaN(radius)) {
-      const data = getFarmsNearLocation(lat, lng, radius, filters);
-      return NextResponse.json(data, {
-        headers: { "Cache-Control": PRIVATE_CACHE_HEADER },
-      });
+  try {
+    if (latParam && lngParam && radiusParam) {
+      const lat = parseFloat(latParam);
+      const lng = parseFloat(lngParam);
+      const radius = Math.min(parseFloat(radiusParam), MAX_RADIUS_KM);
+      if (!isNaN(lat) && !isNaN(lng) && radius > 0) {
+        const data = getFarmsNearLocation(lat, lng, radius, filters);
+        return NextResponse.json(data, {
+          headers: { "Cache-Control": PRIVATE_CACHE_HEADER },
+        });
+      }
     }
-  }
 
-  const data = getFilteredFarms(filters);
-  return NextResponse.json(data, {
-    headers: { "Cache-Control": CACHE_HEADER },
-  });
+    const data = getFilteredFarms(filters);
+    return NextResponse.json(data, {
+      headers: { "Cache-Control": CACHE_HEADER },
+    });
+  } catch (err) {
+    console.error("[api/farms] Failed to load farms:", err);
+    return NextResponse.json({ error: "Kunde inte hämta gårdar" }, { status: 500 });
+  }
 }

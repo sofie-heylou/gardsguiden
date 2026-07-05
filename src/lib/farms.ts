@@ -1,4 +1,5 @@
 import { getDb } from "./db";
+import { haversineKm } from "./geo";
 import type { Farm } from "../types/farm";
 
 interface FarmRow {
@@ -26,11 +27,16 @@ interface FarmRow {
   instagram: string | null;
 }
 
+function parseProducts(raw: string | null): string[] {
+  if (!raw) return [];
+  try { return JSON.parse(raw) as string[]; } catch { return []; }
+}
+
 function rowToFarm(row: FarmRow): Farm {
   return {
     ...row,
     lan: row.lan as Farm["lan"],
-    products: JSON.parse(row.products) as string[],
+    products: parseProducts(row.products),
     onSiteSales: row.onSiteSales === 1,
     tastingRoom: row.tastingRoom === 1,
     gardsförsäljningLicense: row.gardsförsäljningLicense === 1,
@@ -74,8 +80,9 @@ export function getFilteredFarms(filters: FarmFilters = {}): Farm[] {
   }
 
   if (q) {
-    const pattern = `%${q}%`;
-    conditions.push("(f.name LIKE ? OR f.description LIKE ? OR f.products LIKE ?)");
+    const escaped = q.replace(/[%_\\]/g, "\\$&");
+    const pattern = `%${escaped}%`;
+    conditions.push("(f.name LIKE ? ESCAPE '\\' OR f.description LIKE ? ESCAPE '\\' OR f.products LIKE ? ESCAPE '\\')");
     params.push(pattern, pattern, pattern);
   }
 
@@ -129,18 +136,3 @@ export function searchFarms(query: string): Farm[] {
   return getFilteredFarms({ q: query });
 }
 
-// ── Haversine ────────────────────────────────────────────────────────────────
-
-function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
-  const R = 6371;
-  const dLat = toRad(lat2 - lat1);
-  const dLng = toRad(lng2 - lng1);
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-
-function toRad(deg: number): number {
-  return (deg * Math.PI) / 180;
-}

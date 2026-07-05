@@ -19,7 +19,10 @@ export function getDb(): Database.Database {
   return db;
 }
 
+const KNOWN_TABLES = new Set(["farms", "users", "farm_claims", "farm_submissions", "farm_ownership", "farm_edits"]);
+
 function columnExists(db: Database.Database, table: string, column: string): boolean {
+  if (!KNOWN_TABLES.has(table)) throw new Error(`Unknown table: ${table}`);
   const cols = db.prepare(`PRAGMA table_info(${table})`).all() as { name: string }[];
   return cols.some((c) => c.name === column);
 }
@@ -239,11 +242,17 @@ function initSchema(db: Database.Database): void {
       const runtimeCount = (db.prepare("SELECT COUNT(*) as n FROM farms").get() as { n: number }).n;
       console.log(`[db] Runtime DB has ${runtimeCount} farms, build DB has ${farms.length} farms.`);
       if (farms.length > 0) {
-        const cols = Object.keys(farms[0]).join(", ");
-        const placeholders = Object.keys(farms[0]).map(() => "?").join(", ");
-        const insert = db.prepare(`INSERT OR IGNORE INTO farms (${cols}) VALUES (${placeholders})`);
+        const SYNC_COLS = [
+          "id", "name", "description", "address", "kommun", "lan", "lat", "lng",
+          "website", "phone", "email", "products", "onSiteSales", "tastingRoom",
+          "gardsförsäljningLicense", "isArchipelago", "openingHours", "season", "source",
+        ] as const;
+        const placeholders = SYNC_COLS.map(() => "?").join(", ");
+        const insert = db.prepare(
+          `INSERT OR IGNORE INTO farms (${SYNC_COLS.join(", ")}) VALUES (${placeholders})`
+        );
         db.transaction((rows: Record<string, unknown>[]) => {
-          for (const r of rows) insert.run(Object.values(r));
+          for (const r of rows) insert.run(SYNC_COLS.map((c) => r[c] ?? null));
         })(farms);
         const newCount = (db.prepare("SELECT COUNT(*) as n FROM farms").get() as { n: number }).n;
         console.log(`[db] Sync complete. Runtime DB now has ${newCount} farms.`);

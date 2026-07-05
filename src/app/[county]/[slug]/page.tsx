@@ -264,16 +264,7 @@ export default async function FarmDetailPage({ params }: Props) {
             )}
 
             {/* Contact */}
-            <FarmContactSection
-              farmId={farm.id}
-              farmName={farm.name}
-              farmCounty={farm.lan}
-              phone={farm.phone}
-              email={farm.email}
-              website={farm.website}
-              facebook={farm.facebook}
-              instagram={farm.instagram}
-            />
+            <FarmContactSection farm={farm} />
 
             {/* Ring + Vägbeskrivning */}
             <FarmStickyBar

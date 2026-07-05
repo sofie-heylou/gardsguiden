@@ -48,6 +48,11 @@ export function getOpenStatus(rows: ParsedDay[], now: Date): OpenStatus {
     return { status: "open", closesAt: `${closeHStr}:${closeMStr}` };
   }
 
+  // Farm opens later today — don't skip ahead to tomorrow
+  if (nowMinutes < openMinutes) {
+    return { status: "closed", opensDay: todayName, opensAt: `${openHStr}:${openMStr}` };
+  }
+
   // Find next open day (search up to 7 days ahead)
   for (let i = 1; i <= 7; i++) {
     const nextIndex = (todayIndex + i) % 7;
