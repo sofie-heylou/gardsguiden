@@ -6,6 +6,7 @@ import { svSE } from "@clerk/localizations";
 import { clerkAppearance } from "../lib/clerkAppearance";
 import Header from "../components/Header";
 import BottomNav from "../components/BottomNav";
+import CookieConsentBanner from "../components/CookieConsentBanner";
 import { SITE_URL } from "../lib/site";
 import "./globals.css";
 
@@ -125,6 +126,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="sv" className={lora.variable}>
       <body className="h-dvh flex flex-col overflow-hidden" style={{ background: "#FAFAF8", color: "#2c2c2c", "--banner-h": "1.75rem" } as React.CSSProperties}>
+        {/* Google Consent Mode v2 default — must run before GTM loads so GA4
+            sets no cookies until the visitor accepts (see CookieConsentBanner). */}
+        <Script id="consent-default" strategy="beforeInteractive">{`
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied',wait_for_update:500});
+`}</Script>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
@@ -163,6 +171,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           <Header />
           <main className="flex-1 overflow-hidden">{children}</main>
           <BottomNav />
+          <CookieConsentBanner />
         </ClerkProvider>
       </body>
     </html>

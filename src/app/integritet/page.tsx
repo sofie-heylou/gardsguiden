@@ -108,16 +108,13 @@ export default function IntegritetPage() {
             >
               Googles integritetspolicy
             </a>
-            . Du kan avsäga dig spårning genom att installera{" "}
-            <a
-              href="https://tools.google.com/dlpage/gaoptout"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline hover:text-stone-900 transition-colors"
-            >
-              Googles webbläsartillägg för att avsäga dig
-            </a>
             .
+          </p>
+          <p>
+            Analyskakorna sätts först när du godkänner dem i vår cookie-ruta —
+            innan dess samlas ingen analysdata in. Du kan när som helst ändra
+            eller återkalla ditt samtycke via knappen{" "}
+            <strong>&rdquo;Hantera kakor&rdquo;</strong> längst ned på sidan.
           </p>
           <p>
             Inloggning hanteras av Clerk (clerk.com). Clerk sätter kakor för att
