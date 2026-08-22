@@ -32,3 +32,6 @@ session.md
 
 # Build cache
 tsconfig.tsbuildinfo
+
+# clerk configuration (can include secrets)
+/.clerk/
