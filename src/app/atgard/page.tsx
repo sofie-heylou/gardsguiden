@@ -8,6 +8,7 @@
 
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { revalidateFarmPages } from "../../lib/revalidateFarms";
 import type { Metadata } from "next";
 import { verifyActionToken, type AdminAction } from "../../lib/actionTokens";
 import {
@@ -15,6 +16,7 @@ import {
   approveSubmission,
   rejectSubmission,
 } from "../../lib/submissionActions";
+import { getFarmSummary, clearFarmFlags, deleteFarm } from "../../lib/farmActions";
 
 export const dynamic = "force-dynamic";
 
@@ -41,6 +43,10 @@ interface ActionSpec {
   /** Shown when load() returns null. */
   goneText: string;
   run: (targetId: string) => { ok: boolean };
+  /** Whether this action changes what the cached farm pages should show.
+   *  Deliberately required: a new action must state its cache impact rather
+   *  than inherit "no" by omission. */
+  revalidates: boolean;
 }
 
 function loadSubmission(targetId: string): Target | null {
@@ -50,7 +56,18 @@ function loadSubmission(targetId: string): Target | null {
     : null;
 }
 
+function loadFarm(targetId: string): Target | null {
+  const farm = getFarmSummary(targetId);
+  if (!farm) return null;
+  const flags = farm.user_flag_count;
+  return {
+    name: farm.name,
+    subtitle: flags > 0 ? `${flags} flagg${flags === 1 ? "a" : "or"} från besökare` : undefined,
+  };
+}
+
 const SUBMISSION_GONE = "Ansökan är redan godkänd eller avvisad — ingenting har ändrats.";
+const FARM_GONE = "Gården finns inte längre — ingenting har ändrats.";
 
 /** The single registry of what a token may do.  Because it is keyed by
  *  AdminAction, adding an action to that union fails to compile until it is
@@ -63,6 +80,7 @@ const ACTIONS: Record<AdminAction, ActionSpec> = {
     tone: "approve",
     goneText: SUBMISSION_GONE,
     run: approveSubmission,
+    revalidates: true, // publishes a farm onto the cached lists
   },
   "submission:reject": {
     load: loadSubmission,
@@ -71,6 +89,25 @@ const ACTIONS: Record<AdminAction, ActionSpec> = {
     tone: "danger",
     goneText: SUBMISSION_GONE,
     run: rejectSubmission,
+    revalidates: false,
+  },
+  "farm:clear-flags": {
+    load: loadFarm,
+    question: (t) => `Rensa flaggorna för ${t.name} och behålla gården?`,
+    confirmLabel: "Ja, rensa flaggorna",
+    tone: "approve",
+    goneText: FARM_GONE,
+    run: clearFarmFlags,
+    revalidates: false, // flag counts are not rendered on public pages
+  },
+  "farm:delete": {
+    load: loadFarm,
+    question: (t) => `Ta bort ${t.name} permanent?`,
+    confirmLabel: "Ja, ta bort gården",
+    tone: "danger",
+    goneText: FARM_GONE,
+    run: deleteFarm,
+    revalidates: true,
   },
 };
 
@@ -141,7 +178,9 @@ export default async function AtgardPage({
     const checked = verifyActionToken(formData.get("token"));
     if (!checked) redirect("/atgard?status=invalid");
 
-    const result = ACTIONS[checked.action].run(checked.targetId);
+    const spec = ACTIONS[checked.action];
+    const result = spec.run(checked.targetId);
+    if (result.ok && spec.revalidates) revalidateFarmPages();
     redirect(`/atgard?status=${result.ok ? "done" : "gone"}`);
   }
 

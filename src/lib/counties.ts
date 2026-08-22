@@ -40,6 +40,6 @@ export const COUNTY_LAN_NAME: Record<Farm["lan"], string> =
   Object.fromEntries(COUNTIES.map((c) => [c.name, c.displayName])) as Record<CountyName, string>;
 
 /** Canonical URL path for a farm: /stockholm/farm-slug */
-export function farmPath(farm: Farm): string {
+export function farmPath(farm: Pick<Farm, "id" | "lan">): string {
   return `/${COUNTY_TO_SLUG[farm.lan]}/${farm.id}`;
 }

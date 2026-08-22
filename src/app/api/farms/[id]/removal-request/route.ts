@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "../../../../../lib/db";
 import { generateId } from "../../../../../lib/utils";
 import { sendEmail, emailHtml, table, row, btn, ADMIN_EMAIL } from "../../../../../lib/email";
+import { farmModerationButtons } from "../../../../../lib/moderationEmail";
+import { getFarmSummary } from "../../../../../lib/farmActions";
 import { SITE_URL } from "../../../../../lib/site";
-import { COUNTY_TO_SLUG } from "../../../../../lib/counties";
-import type { Farm } from "../../../../../types/farm";
+import { farmPath } from "../../../../../lib/counties";
 
 export const dynamic = "force-dynamic";
 
@@ -33,9 +34,7 @@ export async function POST(
 
   const db = getDb();
 
-  const farm = db.prepare("SELECT id, name, lan FROM farms WHERE id = ?").get(id) as
-    | { id: string; name: string; lan: Farm["lan"] }
-    | undefined;
+  const farm = getFarmSummary(id);
 
   if (!farm) {
     return NextResponse.json({ error: "Gården hittades inte" }, { status: 404 });
@@ -62,7 +61,8 @@ export async function POST(
         row("Begärd av",  email.trim()) +
         row("Anledning",  reason?.trim() ?? null)
       )}
-      ${btn("Visa gårdsidan", `${SITE_URL}/${COUNTY_TO_SLUG[farm.lan]}/${farm.id}`)}
+      ${btn("Visa gårdsidan", `${SITE_URL}${farmPath(farm)}`)}
+      ${farmModerationButtons(farm.id)}
     `),
   });
 

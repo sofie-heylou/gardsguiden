@@ -231,6 +231,25 @@ function initSchema(db: Database.Database): void {
     db.exec(`ALTER TABLE farm_submissions ADD COLUMN instagram TEXT`);
   }
 
+  // ── Anonymous flag dedup ───────────────────────────────────────────────────
+  // One row per (farm, visitor). visitor_hash is a keyed hash of the caller's
+  // IP salted with the farm id, so it cannot be read back as an address and
+  // the same visitor looks different on every farm. See src/lib/visitor.ts.
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS farm_flags (
+      farm_id      TEXT NOT NULL,
+      visitor_hash TEXT NOT NULL,
+      created_at   TEXT NOT NULL DEFAULT (datetime('now')),
+      PRIMARY KEY (farm_id, visitor_hash)
+    );
+    CREATE INDEX IF NOT EXISTS idx_farm_flags_farm ON farm_flags(farm_id);
+  `);
+
+  // A keyed hash of an IP is pseudonymous, not anonymous — we hold the key, so
+  // storage limitation applies. These rows are a double-click guard, and there
+  // is no reason to keep one for longer than a season.
+  db.prepare(`DELETE FROM farm_flags WHERE created_at < datetime('now', '-90 days')`).run();
+
   // Sync farms from build-time DB into runtime DB on every startup.
   // Uses INSERT OR IGNORE so existing rows (with farmer edits) are preserved,
   // but new farms added in the latest build are picked up automatically.

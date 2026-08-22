@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { getDb } from "../../../../lib/db";
 import { generateId } from "../../../../lib/utils";
-import { sendEmail, emailHtml, table, row, btnRow, ADMIN_EMAIL } from "../../../../lib/email";
-import { actionUrl, actionTokensAvailable } from "../../../../lib/actionTokens";
+import { sendEmail, emailHtml, table, row, ADMIN_EMAIL } from "../../../../lib/email";
+import { submissionModerationButtons } from "../../../../lib/moderationEmail";
 
 export const dynamic = "force-dynamic";
 
@@ -96,15 +96,6 @@ export async function POST(req: NextRequest) {
 
   const productList = Array.isArray(products) ? (products as string[]).join(", ") : null;
 
-  // Approve/reject straight from the inbox.  Omitted rather than broken when
-  // ADMIN_ACTION_SECRET is unset — the admin UI is still there as a fallback.
-  const moderationButtons = actionTokensAvailable()
-    ? btnRow([
-        { label: "Godkänn", href: actionUrl("submission:approve", submissionId), tone: "approve" },
-        { label: "Avvisa", href: actionUrl("submission:reject", submissionId), tone: "danger" },
-      ])
-    : "";
-
   sendEmail({
     to: ADMIN_EMAIL,
     subject: `Ny gård inskickad: ${(name as string).trim()}`,
@@ -119,7 +110,7 @@ export async function POST(req: NextRequest) {
         row("Län",        typeof lan     === "string" ? lan.trim()     : null) +
         row("Produkter",  productList)
       )}
-      ${moderationButtons}
+      ${submissionModerationButtons(submissionId)}
     `),
   });
 

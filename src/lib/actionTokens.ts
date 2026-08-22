@@ -16,6 +16,8 @@ import { SITE_URL } from "./site";
 export const ADMIN_ACTIONS = [
   "submission:approve",
   "submission:reject",
+  "farm:clear-flags",
+  "farm:delete",
 ] as const;
 
 export type AdminAction = (typeof ADMIN_ACTIONS)[number];
@@ -118,7 +120,7 @@ export function verifyActionToken(token: unknown): VerifiedAction | null {
 }
 
 /** Absolute URL of the confirmation page for an action — what goes in an email. */
-export function actionUrl(action: AdminAction, targetId: string): string {
-  const token = createActionToken(action, targetId);
+export function actionUrl(action: AdminAction, targetId: string, ttlDays?: number): string {
+  const token = createActionToken(action, targetId, ttlDays);
   return `${SITE_URL}/atgard?token=${encodeURIComponent(token)}`;
 }

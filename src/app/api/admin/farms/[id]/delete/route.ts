@@ -1,40 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
-import { revalidatePath } from "next/cache";
-import { getDb } from "../../../../../../lib/db";
+import { authorizeAdminAction } from "../../../../../../lib/adminAuth";
+import { deleteFarm } from "../../../../../../lib/farmActions";
+import { revalidateFarmPages } from "../../../../../../lib/revalidateFarms";
 
 export const dynamic = "force-dynamic";
 
 export async function DELETE(
-  _req: NextRequest,
+  req: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: "Inte inloggad" }, { status: 401 });
+  const { id } = await context.params;
 
-  const db = getDb();
-  const adminUser = db.prepare("SELECT role FROM users WHERE id = ?").get(userId) as
-    | { role: string }
-    | undefined;
-  if (adminUser?.role !== "admin") {
+  if (!(await authorizeAdminAction(req, "farm:delete", id))) {
     return NextResponse.json({ error: "Åtkomst nekad" }, { status: 403 });
   }
 
-  const { id } = await context.params;
-
-  const farm = db.prepare("SELECT id, name FROM farms WHERE id = ?").get(id) as
-    | { id: string; name: string }
-    | undefined;
-  if (!farm) {
+  const result = deleteFarm(id);
+  if (!result.ok) {
     return NextResponse.json({ error: "Gård hittades inte" }, { status: 404 });
   }
 
-  db.prepare("DELETE FROM farms WHERE id = ?").run(id);
+  revalidateFarmPages();
 
-  // Bust the Next.js full route cache so list/county pages reflect the deletion immediately.
-  revalidatePath("/gardar", "page");
-  revalidatePath("/gardar/[lan]", "page");
-  revalidatePath("/", "page");
-
-  return NextResponse.json({ ok: true, deleted: farm.name });
+  return NextResponse.json({ ok: true, deleted: result.name });
 }

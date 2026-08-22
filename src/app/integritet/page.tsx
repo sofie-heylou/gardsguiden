@@ -53,7 +53,22 @@ export default function IntegritetPage() {
             <li><strong>Namn</strong> — valfritt, visas inte publikt.</li>
           </ul>
           <p>
-            Besökare som enbart söker eller tittar på gårdar lämnar inga
+            Om du rapporterar en gård med knappen &rdquo;Det här verkar inte vara
+            en gård&rdquo; sparar vi dessutom:
+          </p>
+          <ul className="list-disc list-inside space-y-1 text-stone-600">
+            <li>
+              <strong>En pseudonymiserad uppgift om din IP-adress</strong> — adressen
+              lagras aldrig i klartext, utan som en kryptografisk kod som inte kan
+              översättas tillbaka till en adress. Koden är dessutom unik per gård,
+              så den kan inte användas för att följa dig mellan sidor. Den enda
+              funktionen är att förhindra att samma besökare rapporterar samma gård
+              flera gånger. Rättslig grund är berättigat intresse, och uppgiften
+              raderas automatiskt efter 90 dagar.
+            </li>
+          </ul>
+          <p>
+            Besökare som enbart söker eller tittar på gårdar lämnar i övrigt inga
             personuppgifter till oss. Däremot samlas anonymiserad användningsdata
             in via Google Analytics — se avsnittet om kakor nedan för detaljer.
           </p>

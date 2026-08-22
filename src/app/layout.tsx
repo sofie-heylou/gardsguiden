@@ -7,6 +7,7 @@ import { clerkAppearance } from "../lib/clerkAppearance";
 import Header from "../components/Header";
 import BottomNav from "../components/BottomNav";
 import CookieConsentBanner from "../components/CookieConsentBanner";
+import AnalyticsScripts from "../components/AnalyticsScripts";
 import { SITE_URL } from "../lib/site";
 import "./globals.css";
 
@@ -149,22 +150,7 @@ gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personali
           signInFallbackRedirectUrl="/"
           signUpFallbackRedirectUrl="/"
         >
-          <Script
-            id="gtm-script"
-            strategy="afterInteractive"
-          >{`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-53H6ZXN2');`}</Script>
-          <noscript>
-            <iframe
-              src="https://www.googletagmanager.com/ns.html?id=GTM-53H6ZXN2"
-              height="0"
-              width="0"
-              style={{ display: 'none', visibility: 'hidden' }}
-            />
-          </noscript>
+          <AnalyticsScripts />
           <div className="shrink-0 bg-amber-400 text-stone-900 text-xs text-center py-1.5 px-4 leading-snug">
             Vi håller på att bygga klart — tack för tålamodet!
           </div>

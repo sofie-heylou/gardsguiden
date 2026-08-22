@@ -11,6 +11,7 @@ import type { Database } from "better-sqlite3";
 import { getDb } from "./db";
 import { sendEmail, emailHtml, btn, ADMIN_EMAIL } from "./email";
 import { slugify } from "./utils";
+import { notFound, type ActionFailure } from "./actionResult";
 import { SITE_URL } from "./site";
 
 export interface PendingSubmission {
@@ -35,15 +36,8 @@ interface SubmissionRow extends PendingSubmission {
   user_id: string | null;
 }
 
-/** The one way these actions fail: the submission is gone or already handled. */
-export type ActionFailure = { ok: false; reason: "not_found" };
-
 export type ApproveResult = { ok: true; farmId: string } | ActionFailure;
 export type RejectResult = { ok: true } | ActionFailure;
-
-function notFound(): ActionFailure {
-  return { ok: false, reason: "not_found" };
-}
 
 function newFarmId(name: string): string {
   return `${slugify(name)}-${crypto.randomBytes(3).toString("hex")}`;
