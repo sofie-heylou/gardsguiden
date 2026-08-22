@@ -94,6 +94,25 @@ export function table(rows: string): string {
   return `<table cellpadding="0" cellspacing="0" style="width:100%;margin:16px 0;">${rows}</table>`;
 }
 
-export function btn(label: string, href: string): string {
-  return `<a href="${href}" style="display:inline-block;margin-top:20px;padding:10px 22px;background:#1c1917;color:#fff;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;">${label}</a>`;
+export type BtnTone = "primary" | "approve" | "danger";
+
+const BTN_BASE =
+  "display:inline-block;margin-top:20px;padding:10px 22px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;";
+
+const BTN_TONES: Record<BtnTone, string> = {
+  primary: "background:#1c1917;color:#fff;border:1px solid #1c1917;",
+  approve: "background:#059669;color:#fff;border:1px solid #059669;",
+  danger:  "background:#fff;color:#dc2626;border:1px solid #fecaca;",
+};
+
+export function btn(label: string, href: string, tone: BtnTone = "primary"): string {
+  return `<a href="${href}" style="${BTN_BASE}${BTN_TONES[tone]}">${label}</a>`;
 }
+
+/** Several buttons on one row, for the moderation links in admin emails. */
+export function btnRow(buttons: { label: string; href: string; tone?: BtnTone }[]): string {
+  return buttons
+    .map(({ label, href, tone }) => `<span style="margin-right:8px;">${btn(label, href, tone)}</span>`)
+    .join("");
+}
+

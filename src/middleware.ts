@@ -1,6 +1,8 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-const isProtectedRoute = createRouteMatcher(["/konto(.*)", "/admin(.*)", "/min-gard(.*)"]);
+// One pattern per protected tree.  The trailing "(/.*)?" is what keeps this
+// from also matching siblings like /admin-action or /kontostatus.
+const isProtectedRoute = createRouteMatcher(["/(konto|admin|min-gard)(/.*)?"]);
 
 export default clerkMiddleware(async (auth, req) => {
   if (isProtectedRoute(req)) await auth.protect();
