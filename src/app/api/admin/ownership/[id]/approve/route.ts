@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { getDb } from "../../../../../../lib/db";
-import { sendEmail, emailHtml, ADMIN_EMAIL } from "../../../../../../lib/email";
+import { sendEmail, emailHtml, ADMIN_EMAIL , escapeHtml } from "../../../../../../lib/email";
 
 export const dynamic = "force-dynamic";
 
@@ -46,7 +46,7 @@ export async function POST(
       subject: "Din ansökan har godkänts – Gårdsguiden",
       html: emailHtml(`
         <p style="margin:0 0 12px;font-size:15px;color:#1c1917;">
-          Din ansökan för <strong>${ownership.farm_name}</strong> har godkänts.
+          Din ansökan för <strong>${escapeHtml(ownership.farm_name)}</strong> har godkänts.
         </p>
         <p style="margin:0;font-size:14px;color:#57534e;line-height:1.6;">
           Du kan nu hantera din gård i Gårdsguiden.

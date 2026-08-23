@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "../../../../../lib/db";
-import { generateId } from "../../../../../lib/utils";
+import { generateId, isValidEmail } from "../../../../../lib/utils";
+import { MAX_EMAIL, MAX_REASON } from "../../../../../lib/limits";
 import { sendEmail, emailHtml, table, row, btn, ADMIN_EMAIL } from "../../../../../lib/email";
 import { farmModerationButtons } from "../../../../../lib/moderationEmail";
 import { getFarmSummary } from "../../../../../lib/farmActions";
@@ -8,10 +9,6 @@ import { SITE_URL } from "../../../../../lib/site";
 import { farmPath } from "../../../../../lib/counties";
 
 export const dynamic = "force-dynamic";
-
-function isValidEmail(email: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
 
 export async function POST(
   req: NextRequest,
@@ -28,8 +25,11 @@ export async function POST(
 
   const { email, reason } = body as { email?: string; reason?: string };
 
-  if (!email || !isValidEmail(email)) {
+  if (!email || !isValidEmail(email) || email.length > MAX_EMAIL) {
     return NextResponse.json({ error: "Ange en giltig e-postadress" }, { status: 400 });
+  }
+  if (typeof reason === "string" && reason.length > MAX_REASON) {
+    return NextResponse.json({ error: "Motiveringen är för lång" }, { status: 400 });
   }
 
   const db = getDb();

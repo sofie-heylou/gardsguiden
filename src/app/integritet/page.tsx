@@ -68,6 +68,18 @@ export default function IntegritetPage() {
             </li>
           </ul>
           <p>
+            Om du skickar in ett ändringsförslag om en gård, en begäran om
+            borttagning, eller ett meddelande via kontaktformuläret sparar vi:
+          </p>
+          <ul className="list-disc list-inside space-y-1 text-stone-600">
+            <li>
+              <strong>Din e-postadress och din text</strong> — för att kunna
+              hantera ärendet och återkomma om vi behöver fråga något. Rättslig
+              grund är berättigat intresse. Ändringsförslag raderas automatiskt
+              efter 180 dagar.
+            </li>
+          </ul>
+          <p>
             Besökare som enbart söker eller tittar på gårdar lämnar i övrigt inga
             personuppgifter till oss. Däremot samlas anonymiserad användningsdata
             in via Google Analytics — se avsnittet om kakor nedan för detaljer.

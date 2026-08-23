@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "../../../../../lib/db";
 import { getFarmSummary, type FarmSummary } from "../../../../../lib/farmActions";
 import { visitorHash } from "../../../../../lib/visitor";
-import { sendEmail, emailHtml, table, row, ADMIN_EMAIL } from "../../../../../lib/email";
+import { sendEmail, emailHtml, table, row, linkRow, ADMIN_EMAIL } from "../../../../../lib/email";
 import { farmModerationButtons } from "../../../../../lib/moderationEmail";
+import { requestAlertSlot, ALERT_CAP_NOTICE } from "../../../../../lib/alertBudget";
 import { SITE_URL } from "../../../../../lib/site";
 import { farmPath } from "../../../../../lib/counties";
 
@@ -12,42 +13,6 @@ export const dynamic = "force-dynamic";
 /** Alert on the first flag of a farm, then on every fifth, so a farm that
  *  keeps attracting reports resurfaces without one email per click. */
 const ALERT_EVERY = 5;
-
-/** Hard ceiling on alert volume, independent of how many farms are involved.
- *
- * The per-farm cadence above bounds nothing globally: this endpoint is public
- * and there are ~1000 farms, so walking the sitemap would otherwise produce a
- * "first flag" email for every one of them.  That is not just an unpleasant
- * inbox — it would burn the Resend daily quota and silently take down every
- * other transactional email on the site, because sendEmail swallows failures.
- *
- * Deliberately a plain hourly cap rather than a minimum gap between emails:
- * real flags here are rare, and a gap rule would silently swallow a genuine
- * alert for a second farm flagged a few minutes after the first.  Under the
- * cap every alert goes out; the email that hits the cap says so, and nothing
- * further is sent until the window rolls over.
- *
- * Flags are always recorded either way — only the notification is limited. */
-const ALERT_MAX_PER_HOUR = 6;
-const ALERT_WINDOW_MS = 60 * 60 * 1000;
-
-let windowStartedAt = 0;
-let alertsInWindow = 0;
-
-type AlertDecision = "send" | "send-last" | "suppress";
-
-/** Per-process, which is enough: one container, and the worst case after a
- *  restart is one extra window's worth of email. */
-function alertDecision(now: number): AlertDecision {
-  if (now - windowStartedAt > ALERT_WINDOW_MS) {
-    windowStartedAt = now;
-    alertsInWindow = 0;
-  }
-  if (alertsInWindow >= ALERT_MAX_PER_HOUR) return "suppress";
-
-  alertsInWindow++;
-  return alertsInWindow === ALERT_MAX_PER_HOUR ? "send-last" : "send";
-}
 
 function sendFlagAlert(farm: FarmSummary, count: number, isLast: boolean): void {
   const farmUrl = `${SITE_URL}${farmPath(farm)}`;
@@ -64,13 +29,10 @@ function sendFlagAlert(farm: FarmSummary, count: number, isLast: boolean): void 
         row("Gård",         farm.name) +
         row("Gård-ID",      farm.id) +
         row("Rapporter",    String(count)) +
-        row("Sida",         `<a href="${farmUrl}" style="color:#1c1917;">${farmUrl}</a>`)
+        linkRow("Sida",     farmUrl)
       )}
       ${farmModerationButtons(farm.id)}
-      ${isLast ? `<p style="margin:20px 0 0;font-size:12px;color:#a8a29e;">
-        Gränsen för antal aviseringar den här timmen är nådd. Fler rapporter
-        registreras men mejlas inte förrän nästa timme.
-      </p>` : ""}
+      ${isLast ? ALERT_CAP_NOTICE : ""}
     `),
   });
 }
@@ -104,7 +66,7 @@ export async function POST(
   })();
 
   if (count !== null && (count === 1 || count % ALERT_EVERY === 0)) {
-    const decision = alertDecision(Date.now());
+    const decision = requestAlertSlot();
     if (decision !== "suppress") sendFlagAlert(farm, count, decision === "send-last");
   }
 

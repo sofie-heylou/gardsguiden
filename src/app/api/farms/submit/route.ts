@@ -1,15 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { getDb } from "../../../../lib/db";
-import { generateId } from "../../../../lib/utils";
+import { generateId, isValidEmail } from "../../../../lib/utils";
 import { sendEmail, emailHtml, table, row, ADMIN_EMAIL } from "../../../../lib/email";
 import { submissionModerationButtons } from "../../../../lib/moderationEmail";
 
 export const dynamic = "force-dynamic";
-
-function isValidEmail(email: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
 
 import { COUNTY_NAMES } from "../../../../lib/counties";
 const VALID_LAN: readonly string[] = COUNTY_NAMES;

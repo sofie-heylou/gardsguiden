@@ -13,3 +13,9 @@ export function slugify(name: string): string {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 }
+
+/** Loose on purpose — the only real check is the confirmation email that
+ *  follows.  Shared so the public forms cannot disagree about what is valid. */
+export function isValidEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}

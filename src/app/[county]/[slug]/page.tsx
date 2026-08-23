@@ -19,6 +19,7 @@ import FarmStickyBar from "../../../components/FarmStickyBar";
 import ClaimSection from "../../../components/ClaimSection";
 import AdminDeleteFarmButton from "../../../components/AdminDeleteFarmButton";
 import FlagFarmButton from "../../../components/FlagFarmButton";
+import SuggestChangeForm from "../../../components/SuggestChangeForm";
 import { SITE_URL } from "../../../lib/site";
 import type { Farm } from "../../../types/farm";
 
@@ -274,6 +275,8 @@ export default async function FarmDetailPage({ params }: Props) {
               phone={farm.phone}
               mapsUrl={mapsUrl}
             />
+
+            <SuggestChangeForm farmId={farm.id} farmName={farm.name} />
 
             <FlagFarmButton farmId={farm.id} />
 

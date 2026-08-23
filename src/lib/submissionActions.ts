@@ -9,7 +9,7 @@
 import crypto from "crypto";
 import type { Database } from "better-sqlite3";
 import { getDb } from "./db";
-import { sendEmail, emailHtml, btn, ADMIN_EMAIL } from "./email";
+import { sendEmail, emailHtml, btn, escapeHtml, ADMIN_EMAIL } from "./email";
 import { slugify } from "./utils";
 import { notFound, type ActionFailure } from "./actionResult";
 import { SITE_URL } from "./site";
@@ -108,7 +108,7 @@ function notifyApproved(submission: SubmissionRow, farmId: string): void {
     subject: `${submission.name} är nu med i Gårdsguiden!`,
     html: emailHtml(`
       <p style="margin:0 0 12px;font-size:15px;color:#1c1917;">
-        Din gård <strong>${submission.name}</strong> har godkänts och är nu synlig på Gårdsguiden.
+        Din gård <strong>${escapeHtml(submission.name)}</strong> har godkänts och är nu synlig på Gårdsguiden.
       </p>
       <p style="margin:0 0 20px;font-size:14px;color:#57534e;line-height:1.6;">
         Logga in för att hantera din gårds visning, uppdatera öppettider och mer.
@@ -122,7 +122,7 @@ function notifyApproved(submission: SubmissionRow, farmId: string): void {
     subject: `Godkänd: ${submission.name}`,
     html: emailHtml(`
       <p style="margin:0;font-size:14px;color:#57534e;">
-        Gård <strong>${submission.name}</strong> (<code>${farmId}</code>) har godkänts och lagts till.
+        Gård <strong>${escapeHtml(submission.name)}</strong> (<code>${escapeHtml(farmId)}</code>) har godkänts och lagts till.
       </p>
     `),
   });
@@ -162,7 +162,7 @@ export function rejectSubmission(id: string): RejectResult {
     subject: `Angående din ansökan för ${submission.name}`,
     html: emailHtml(`
       <p style="margin:0 0 12px;font-size:15px;color:#1c1917;">
-        Tack för att du skickade in <strong>${submission.name}</strong> till Gårdsguiden.
+        Tack för att du skickade in <strong>${escapeHtml(submission.name)}</strong> till Gårdsguiden.
       </p>
       <p style="margin:0;font-size:14px;color:#57534e;line-height:1.6;">
         Vi har tyvärr inte möjlighet att lägga till gården just nu.

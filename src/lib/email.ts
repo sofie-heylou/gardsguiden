@@ -82,12 +82,51 @@ export function emailHtml(body: string): string {
 
 // ── Row helper ────────────────────────────────────────────────────────────────
 
+/** Escape text that came from a visitor before it goes into email HTML.
+ *
+ * Not cosmetic: these emails now carry one-click moderation buttons, so an
+ * unescaped farm name or message can render a convincing fake button pointing
+ * anywhere, in an inbox that has been trained to trust green buttons. */
+export function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+/** A label/value row.  The value is escaped — pass trusted markup via rowRaw. */
 export function row(label: string, value: string | null | undefined): string {
   if (!value) return "";
+  return rowRaw(label, escapeHtml(value));
+}
+
+/** Same, for values we build ourselves and know to be safe markup (links). */
+export function rowRaw(label: string, value: string | null | undefined): string {
+  if (!value) return "";
   return `<tr>
-    <td style="padding:4px 0;font-size:13px;color:#78716c;width:140px;vertical-align:top;">${label}</td>
+    <td style="padding:4px 0;font-size:13px;color:#78716c;width:140px;vertical-align:top;">${escapeHtml(label)}</td>
     <td style="padding:4px 0;font-size:13px;color:#1c1917;vertical-align:top;">${value}</td>
   </tr>`;
+}
+
+/** A row whose value is a link we built ourselves. */
+export function linkRow(label: string, href: string): string {
+  return rowRaw(label, `<a href="${encodeURI(href)}" style="color:#1c1917;">${escapeHtml(href)}</a>`);
+}
+
+/** A visitor's free text plus a reply-to line, for forwarded-message emails. */
+export function senderMessage(email: string, text: string): string {
+  // encodeURIComponent neutralises a hostile address: the validation regex
+  // permits "?", so victim@x.se?subject=…&body=… would otherwise pre-fill a
+  // reply the attacker wrote. "@" is put back because some mail clients do not
+  // reliably decode %40 in a mailto.
+  const mailto = encodeURIComponent(email).replace(/%40/g, "@");
+  return `<div style="margin-top:16px;padding:16px;background:#f5f5f4;border-radius:8px;font-size:14px;color:#1c1917;line-height:1.6;white-space:pre-wrap;">${escapeHtml(text)}</div>
+      <p style="margin:12px 0 0;font-size:13px;color:#78716c;">
+        Svara direkt till: <a href="mailto:${mailto}" style="color:#1c1917;">${escapeHtml(email)}</a>
+      </p>`;
 }
 
 export function table(rows: string): string {
@@ -106,7 +145,7 @@ const BTN_TONES: Record<BtnTone, string> = {
 };
 
 export function btn(label: string, href: string, tone: BtnTone = "primary"): string {
-  return `<a href="${href}" style="${BTN_BASE}${BTN_TONES[tone]}">${label}</a>`;
+  return `<a href="${encodeURI(href)}" style="${BTN_BASE}${BTN_TONES[tone]}">${escapeHtml(label)}</a>`;
 }
 
 /** Several buttons on one row, for the moderation links in admin emails. */

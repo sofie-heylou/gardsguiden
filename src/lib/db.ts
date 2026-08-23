@@ -151,6 +151,20 @@ function initSchema(db: Database.Database): void {
     CREATE INDEX IF NOT EXISTS idx_removals_farm   ON farm_removal_requests(farm_id);
     CREATE INDEX IF NOT EXISTS idx_removals_status ON farm_removal_requests(status);
 
+    -- ── Suggested corrections from visitors and owners (no login) ─────────────
+    CREATE TABLE IF NOT EXISTS farm_suggestions (
+      id           TEXT PRIMARY KEY,
+      farm_id      TEXT NOT NULL REFERENCES farms(id) ON DELETE CASCADE,
+      email        TEXT NOT NULL,
+      message      TEXT NOT NULL,
+      visitor_hash TEXT,                              -- dedup key, see visitor.ts
+      status       TEXT NOT NULL DEFAULT 'pending',   -- pending | handled
+      created_at   TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_suggestions_farm    ON farm_suggestions(farm_id);
+    CREATE INDEX IF NOT EXISTS idx_suggestions_visitor ON farm_suggestions(farm_id, visitor_hash);
+
     -- ── Farm ownership (new subscription model) ───────────────────────────────
     CREATE TABLE IF NOT EXISTS farm_ownership (
       id         INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -249,6 +263,11 @@ function initSchema(db: Database.Database): void {
   // storage limitation applies. These rows are a double-click guard, and there
   // is no reason to keep one for longer than a season.
   db.prepare(`DELETE FROM farm_flags WHERE created_at < datetime('now', '-90 days')`).run();
+
+  // Suggestions carry a visitor's email and free text. Kept longer than the
+  // flag hashes because they are the record of a correction request, but not
+  // indefinitely.
+  db.prepare(`DELETE FROM farm_suggestions WHERE created_at < datetime('now', '-180 days')`).run();
 
   // Sync farms from build-time DB into runtime DB on every startup.
   // Uses INSERT OR IGNORE so existing rows (with farmer edits) are preserved,
