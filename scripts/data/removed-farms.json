@@ -1,0 +1,654 @@
+[
+  {
+    "name": "3 Små Rum",
+    "reason": "stadssmuts: urban-centre:Göteborg:1.1km,no-farm-word"
+  },
+  {
+    "name": "Alliaria Bryggeri",
+    "reason": "stadssmuts: urban-centre:Västerås:0.3km,no-farm-word"
+  },
+  {
+    "name": "Arla Foods",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Arla Kalmar Mejeri - Ostlager",
+    "reason": "gränsfall: urban-centre:Kalmar:1.1km"
+  },
+  {
+    "name": "Aschebergsgatans Ost & Delikatesser",
+    "reason": "stadssmuts: urban-centre:Göteborg:1.5km,no-farm-word"
+  },
+  {
+    "name": "Babettes Kafferi & Bageri",
+    "reason": "stadssmuts: urban-centre:Linköping:0.2km,no-farm-word"
+  },
+  {
+    "name": "Backagården Café, Vin & Bistro på Österlen",
+    "reason": "stadssmuts: keyword:bistro"
+  },
+  {
+    "name": "Bageri Säf",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Bageriet Mat & Bar",
+    "reason": "stadssmuts: keyword:bar"
+  },
+  {
+    "name": "Bar La Lune",
+    "reason": "stadssmuts: keyword:bar,urban-centre:Göteborg:1.4km,no-farm-word"
+  },
+  {
+    "name": "BaraBraMat - Ekologisk Livsmedelsbutik",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "BarlindBeer Bryggeri och Taproom",
+    "reason": "stadssmuts: keyword:taproom"
+  },
+  {
+    "name": "Barlingbo Bryggeri AB",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Bearded Rabbit Brewery AB",
+    "reason": "stadssmuts: urban-centre:Göteborg:1.2km,no-farm-word"
+  },
+  {
+    "name": "Beerbliotek Brewery",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Billdale & Co AB",
+    "reason": "stadssmuts: urban-centre:Göteborg:1.5km,no-farm-word"
+  },
+  {
+    "name": "Bistro Bakgården",
+    "reason": "stadssmuts: keyword:bistro"
+  },
+  {
+    "name": "Blomlöfs på Saltö",
+    "reason": "stadssmuts: urban-centre:Karlskrona:1.1km,no-farm-word"
+  },
+  {
+    "name": "Bondens Marknad",
+    "reason": "namnflagga:marknad"
+  },
+  {
+    "name": "Brewers Beer Bar Magasinsgatan",
+    "reason": "stadssmuts: keyword:bar,urban-centre:Göteborg:0.9km,no-farm-word"
+  },
+  {
+    "name": "Brewski",
+    "reason": "stadssmuts: urban-centre:Helsingborg:1.6km,no-farm-word"
+  },
+  {
+    "name": "Brooktorpsgården",
+    "reason": "gränsfall: urban-centre:Halmstad:0.1km"
+  },
+  {
+    "name": "Brukskällan Bryggeri",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Bryggan Café & Bistro",
+    "reason": "stadssmuts: keyword:bistro,urban-centre:Jönköping:0.5km,no-farm-word"
+  },
+  {
+    "name": "Bryggan Ringön",
+    "reason": "stadssmuts: urban-centre:Göteborg:1.3km,no-farm-word"
+  },
+  {
+    "name": "Bryggeri Portvakten",
+    "reason": "stadssmuts: urban-centre:Västerås:0.3km,no-farm-word"
+  },
+  {
+    "name": "Bryggeriet Bar & bistro",
+    "reason": "stadssmuts: keyword:bar"
+  },
+  {
+    "name": "Bryggeriet Mat & Malt",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Bryggeriet Piren Jönköping",
+    "reason": "stadssmuts: urban-centre:Jönköping:0.5km,no-farm-word"
+  },
+  {
+    "name": "Bryggeriet Sportbar",
+    "reason": "namnflagga:sportbar"
+  },
+  {
+    "name": "Bryggeriet Ångkvarn",
+    "reason": "gränsfall: urban-centre:Uppsala:0.4km"
+  },
+  {
+    "name": "Bryggpub",
+    "reason": "stadssmuts: urban-centre:Göteborg:1.5km,no-farm-word"
+  },
+  {
+    "name": "Bröd & Sovel",
+    "reason": "stadssmuts: urban-centre:Växjö:0.3km,no-farm-word"
+  },
+  {
+    "name": "Bättre kött och delikatess Sverige AB",
+    "reason": "stadssmuts: urban-centre:Jönköping:1.4km,no-farm-word"
+  },
+  {
+    "name": "Café Tingsgården",
+    "reason": "gränsfall: urban-centre:Eskilstuna:0.6km"
+  },
+  {
+    "name": "Carnex Kött & Chark AB",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "CENTRALBRYGGERIET",
+    "reason": "stadssmuts: urban-centre:Linköping:1.3km,no-farm-word"
+  },
+  {
+    "name": "Chapter House",
+    "reason": "stadssmuts: urban-centre:Växjö:0.2km,no-farm-word"
+  },
+  {
+    "name": "Dammhagen gård och bistro",
+    "reason": "stadssmuts: keyword:bistro"
+  },
+  {
+    "name": "Danska Wienerbageriet - Bageri i Kalmar",
+    "reason": "stadssmuts: urban-centre:Kalmar:0.3km,no-farm-word"
+  },
+  {
+    "name": "EM Vilt Butik",
+    "reason": "stadssmuts: urban-centre:Jönköping:0km,no-farm-word"
+  },
+  {
+    "name": "Fermenterarna Bryggeri AB",
+    "reason": "stadssmuts: urban-centre:Göteborg:1.3km,no-farm-word"
+  },
+  {
+    "name": "Fram Ekolivs, kooperativ handel",
+    "reason": "stadssmuts: urban-centre:Göteborg:1.5km,no-farm-word"
+  },
+  {
+    "name": "Färgargården",
+    "reason": "gränsfall: urban-centre:Norrköping:1.4km"
+  },
+  {
+    "name": "Gamla Bryggeriet",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Gamla Enskede Bryggeri",
+    "reason": "stadssmuts: urban-centre:Stockholm:3.8km,no-farm-word"
+  },
+  {
+    "name": "GLHF Brewery Company AB",
+    "reason": "stadssmuts: urban-centre:Stockholm:1.8km,no-farm-word"
+  },
+  {
+    "name": "Gotlands Bryggeri",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Grästorps Lilla Edet Bryggeri AB",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Gröna gårdar AB",
+    "reason": "gränsfall: urban-centre:Göteborg:2.5km"
+  },
+  {
+    "name": "Gudagott",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Hallandsgården",
+    "reason": "gränsfall: urban-centre:Halmstad:0.8km"
+  },
+  {
+    "name": "Hantverksbageriet Christin",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Hantverksbryggeriet",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Hebe",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Helenes Smörrebröd AB",
+    "reason": "stadssmuts: urban-centre:Göteborg:1.2km,no-farm-word"
+  },
+  {
+    "name": "Helsingborgs Bryggeri Aktiebolag",
+    "reason": "stadssmuts: urban-centre:Helsingborg:1.5km,no-farm-word"
+  },
+  {
+    "name": "Herbarium_ Rosendals Trädgård restaurang & trädgårdsbar",
+    "reason": "gränsfall: urban-centre:Stockholm:2.6km"
+  },
+  {
+    "name": "Hjo Bryggeri",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Hop Shed Brew Pub",
+    "reason": "stadssmuts: keyword:pub"
+  },
+  {
+    "name": "Hossmo gård – Bröllop och Festlokal vid Kalmar",
+    "reason": "stadssmuts: keyword:festlokal"
+  },
+  {
+    "name": "Hufvudsta Gård Boutique House | Konferens Stockholm | Matlagningskurs | Restaurang",
+    "reason": "namnflagga:konferens"
+  },
+  {
+    "name": "Husaren Bryggeri AB",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Hyllie Bryggeri",
+    "reason": "stadssmuts: urban-centre:Malmö:0.8km,no-farm-word"
+  },
+  {
+    "name": "Höganäs Bryggeri",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Idlewild Beer Café",
+    "reason": "stadssmuts: urban-centre:Jönköping:0.3km,no-farm-word"
+  },
+  {
+    "name": "Imperial Brygghus",
+    "reason": "stadssmuts: urban-centre:Karlskrona:0.1km,no-farm-word"
+  },
+  {
+    "name": "Kalmar Kött & Bar",
+    "reason": "stadssmuts: keyword:bar,urban-centre:Kalmar:0.3km,no-farm-word"
+  },
+  {
+    "name": "Kesuddens Hantverksbryggeri",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Kopparsträdets Hembageri",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Korvpojkarna AB",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Krönleins Bryggeri AB",
+    "reason": "stadssmuts: urban-centre:Halmstad:0.2km,no-farm-word"
+  },
+  {
+    "name": "Kungstorgets Brygghus",
+    "reason": "stadssmuts: urban-centre:Göteborg:0.7km,no-farm-word"
+  },
+  {
+    "name": "Kustbageriet AB",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Kvarngärdets Odlarförening",
+    "reason": "gränsfall: urban-centre:Uppsala:0.9km"
+  },
+  {
+    "name": "Kvarnholmsbryggeriet",
+    "reason": "gränsfall: urban-centre:Kalmar:0.5km"
+  },
+  {
+    "name": "Kålgårdens svampodling och gårdsbutik.",
+    "reason": "gränsfall: urban-centre:Jönköping:1.5km"
+  },
+  {
+    "name": "Kävlinge Bryggeri AB",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Ladan i Backa",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Ladugård 206 I Saluhall I Ost I Delikatesser I Bistro I Inredning",
+    "reason": "stadssmuts: keyword:bistro"
+  },
+  {
+    "name": "Landets Goda Specerihandel -Restaurang Hotell & Konferens",
+    "reason": "namnflagga:konferens"
+  },
+  {
+    "name": "Lanemo Konditori & Bageri AB",
+    "reason": "stadssmuts: urban-centre:Linköping:1km,no-farm-word"
+  },
+  {
+    "name": "Laxbutiken Restaurang & Konferens",
+    "reason": "namnflagga:konferens"
+  },
+  {
+    "name": "Lokala Gårdar",
+    "reason": "gränsfall: urban-centre:Göteborg:0.7km"
+  },
+  {
+    "name": "Lundabryggeriets Ölkällare",
+    "reason": "stadssmuts: urban-centre:Lund:0.5km,no-farm-word"
+  },
+  {
+    "name": "Majas Cottage Gårdsbutik & Bistro",
+    "reason": "stadssmuts: keyword:bistro"
+  },
+  {
+    "name": "Majornas Bryggeri",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Malmborgs konditori och Bageri",
+    "reason": "stadssmuts: urban-centre:Jönköping:0.9km,no-farm-word"
+  },
+  {
+    "name": "Malmö Brewing Co & Taproom",
+    "reason": "stadssmuts: keyword:taproom,urban-centre:Malmö:1.3km,no-farm-word"
+  },
+  {
+    "name": "Malte Gustavsson Frukt & bär",
+    "reason": "stadssmuts: urban-centre:Göteborg:2.1km,no-farm-word"
+  },
+  {
+    "name": "Mellansvenska Odlare ek för",
+    "reason": "gränsfall: urban-centre:Linköping:1.9km"
+  },
+  {
+    "name": "Miklagård",
+    "reason": "gränsfall: urban-centre:Uppsala:1.7km"
+  },
+  {
+    "name": "Molinvin",
+    "reason": "stadssmuts: urban-centre:Göteborg:1.3km,no-farm-word"
+  },
+  {
+    "name": "Mormors Brödbod i Kalmar",
+    "reason": "stadssmuts: urban-centre:Kalmar:0.3km,no-farm-word"
+  },
+  {
+    "name": "Möllers bryggeri",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Möllys Bryggeri",
+    "reason": "stadssmuts: urban-centre:Eskilstuna:1.2km,no-farm-word"
+  },
+  {
+    "name": "Nellys Café och hembageri",
+    "reason": "stadssmuts: urban-centre:Karlskrona:1km,no-farm-word"
+  },
+  {
+    "name": "Nordic Sea Winery | Showroom | Restaurant | Winebar",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Norins Ost Butiks AB Linköping",
+    "reason": "stadssmuts: urban-centre:Linköping:0.2km,no-farm-word"
+  },
+  {
+    "name": "Nornir Brewery AB",
+    "reason": "stadssmuts: urban-centre:Eskilstuna:0.1km,no-farm-word"
+  },
+  {
+    "name": "Norra Vångas Bryggeri AB",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Nya Carnegiebryggeriet",
+    "reason": "stadssmuts: urban-centre:Stockholm:3.2km,no-farm-word"
+  },
+  {
+    "name": "O/O Bar",
+    "reason": "stadssmuts: keyword:bar,urban-centre:Göteborg:2.7km,no-farm-word"
+  },
+  {
+    "name": "O/O Brewing",
+    "reason": "stadssmuts: urban-centre:Göteborg:3km,no-farm-word"
+  },
+  {
+    "name": "Orchis - Gårdsbutiken i Stan",
+    "reason": "gränsfall: urban-centre:Stockholm:2km"
+  },
+  {
+    "name": "Ostbutiken",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Oxhallen",
+    "reason": "stadssmuts: urban-centre:Helsingborg:1.5km,no-farm-word"
+  },
+  {
+    "name": "Pine Brewing Company",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "PKLK Bryggeri",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Poppels Citybryggeri",
+    "reason": "stadssmuts: urban-centre:Göteborg:0.6km,no-farm-word"
+  },
+  {
+    "name": "Proviant Humlegården",
+    "reason": "gränsfall: urban-centre:Stockholm:1km"
+  },
+  {
+    "name": "Restaurang Bryggeriet Avenyn",
+    "reason": "stadssmuts: urban-centre:Göteborg:1.3km,no-farm-word"
+  },
+  {
+    "name": "Restaurang Falkenbergska Kvarnen",
+    "reason": "gränsfall: urban-centre:Västerås:0.9km"
+  },
+  {
+    "name": "Ringu",
+    "reason": "stadssmuts: urban-centre:Göteborg:1.3km,no-farm-word"
+  },
+  {
+    "name": "Rocket Brewing Company AB",
+    "reason": "stadssmuts: urban-centre:Malmö:2.2km,no-farm-word"
+  },
+  {
+    "name": "Rosegarden",
+    "reason": "stadssmuts: urban-centre:Jönköping:0.9km,no-farm-word"
+  },
+  {
+    "name": "Rosendals Trädgård",
+    "reason": "gränsfall: urban-centre:Stockholm:2.6km"
+  },
+  {
+    "name": "Rosendals Trädgårdskafé",
+    "reason": "gränsfall: urban-centre:Stockholm:2.7km"
+  },
+  {
+    "name": "Sad Robot Brewing",
+    "reason": "stadssmuts: urban-centre:Göteborg:3.3km,no-farm-word"
+  },
+  {
+    "name": "Saluhallen Majorna Deli & Vilt AB & ConservCompaniet",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Sinnenas Spa",
+    "reason": "namnflagga:spa"
+  },
+  {
+    "name": "Skönfärgaregården Butik & Våffelstuga",
+    "reason": "gränsfall: urban-centre:Linköping:2km"
+  },
+  {
+    "name": "Slakthusets köttbod",
+    "reason": "stadssmuts: urban-centre:Göteborg:1.6km,no-farm-word"
+  },
+  {
+    "name": "Slottsträdgårdens Kafé",
+    "reason": "gränsfall: urban-centre:Malmö:0.9km"
+  },
+  {
+    "name": "Smakverkstan Bryggeri",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Solhaga Stenugnsbageri",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "South Plains Brewing Company",
+    "reason": "stadssmuts: urban-centre:Malmö:2.6km,no-farm-word"
+  },
+  {
+    "name": "Spendrups Bryggeri AB",
+    "reason": "stadssmuts: urban-centre:Göteborg:1.1km,no-farm-word"
+  },
+  {
+    "name": "Spike Brewery & Taproom",
+    "reason": "stadssmuts: keyword:taproom,urban-centre:Göteborg:2.7km,no-farm-word"
+  },
+  {
+    "name": "Stensö Hembageri",
+    "reason": "stadssmuts: urban-centre:Kalmar:0.9km,no-farm-word"
+  },
+  {
+    "name": "Stiftelsen Rosendals Trädgård",
+    "reason": "gränsfall: urban-centre:Stockholm:2.7km"
+  },
+  {
+    "name": "Stigbergets Bryggeri",
+    "reason": "stadssmuts: urban-centre:Göteborg:2.3km,no-farm-word"
+  },
+  {
+    "name": "Stigbergets Shangri-La",
+    "reason": "stadssmuts: urban-centre:Göteborg:2.8km,no-farm-word"
+  },
+  {
+    "name": "STUK",
+    "reason": "stadssmuts: urban-centre:Jönköping:0.7km,no-farm-word"
+  },
+  {
+    "name": "SV Gårdskök",
+    "reason": "gränsfall: urban-centre:Stockholm:1.6km"
+  },
+  {
+    "name": "Systrarna Lindqvist Cafe & Surdegsbageri",
+    "reason": "stadssmuts: urban-centre:Karlskrona:0.2km,no-farm-word"
+  },
+  {
+    "name": "Systrarna På Gaggeska Gården",
+    "reason": "gränsfall: urban-centre:Västerås:2km"
+  },
+  {
+    "name": "Sörgårdens Gästgiveri",
+    "reason": "gränsfall: borderline-keyword:gästgiveri"
+  },
+  {
+    "name": "Tap Town",
+    "reason": "stadssmuts: urban-centre:Jönköping:0.1km,no-farm-word"
+  },
+  {
+    "name": "The Bishops Arms, Kungsgatan (Växjö)",
+    "reason": "stadssmuts: urban-centre:Växjö:0km,no-farm-word"
+  },
+  {
+    "name": "The Piraya Brewery",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "The Uncharted Brewing Company AB",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Trädgård på spåret",
+    "reason": "gränsfall: urban-centre:Stockholm:2.6km"
+  },
+  {
+    "name": "Två Feta Grisar",
+    "reason": "stadssmuts: urban-centre:Göteborg:1.5km,no-farm-word"
+  },
+  {
+    "name": "Törst Ölpub - Craft Beer & Food",
+    "reason": "stadssmuts: urban-centre:Jönköping:0.6km,no-farm-word"
+  },
+  {
+    "name": "Vega Bryggeri",
+    "reason": "stadssmuts: urban-centre:Göteborg:1.1km,no-farm-word"
+  },
+  {
+    "name": "Vellinge Bryggeri",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Vera och Ruth Smakfulla delikatesser",
+    "reason": "stadssmuts: urban-centre:Göteborg:2km,no-farm-word"
+  },
+  {
+    "name": "Viltverket @ Resta Gårdsbutik",
+    "reason": "gränsfall: urban-centre:Stockholm:0.6km"
+  },
+  {
+    "name": "Vinbaren",
+    "reason": "stadssmuts: urban-centre:Göteborg:1km,no-farm-word"
+  },
+  {
+    "name": "Visby Centrum",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Volare Vinbar - Vin med mera",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Vreta kloster bryggeri",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Västanå Bryggeri",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Västkustägg i Halmstad AB",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Wild@Eating Krog, gårdsbutik och Catering",
+    "reason": "stadssmuts: keyword:krog"
+  },
+  {
+    "name": "Wine Mechanics | Gamlestan",
+    "reason": "stadssmuts: urban-centre:Göteborg:2.7km,no-farm-word"
+  },
+  {
+    "name": "Wolraths Bryggeri",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Åhus Bryggeri & Restaurang Åhus",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Ängsgläntans Gårdsbutik",
+    "reason": "gränsfall: urban-centre:Stockholm:3.6km"
+  },
+  {
+    "name": "Ängöl AB",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
+    "name": "Ölkemi Bryggeri",
+    "reason": "stadssmuts: urban-centre:Stockholm:2.5km,no-farm-word"
+  },
+  {
+    "name": "Ölkompaniet",
+    "reason": "stadssmuts: urban-centre:Göteborg:2.3km,no-farm-word"
+  }
+]

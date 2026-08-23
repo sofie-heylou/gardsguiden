@@ -24,18 +24,28 @@ const { actions } = JSON.parse(fs.readFileSync(actionsPath, "utf8"));
 const db = new Database(DB_PATH);
 db.pragma("busy_timeout = 10000"); // the app may hold the same WAL
 
+// Child tables reference farms(id); clear them first or the FK blocks the
+// delete. Probed per-DB — the set differs between prod and the local seed.
+const childDel = ["farm_categories", "farm_flags", "farm_removal_requests", "farm_suggestions"]
+  .filter((t) => db.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?").get(t))
+  .map((t) => db.prepare(`DELETE FROM ${t} WHERE farm_id = ?`));
+
 const del = db.prepare("DELETE FROM farms WHERE id = ?");
 const move = db.prepare("UPDATE farms SET lan = ?, kommun = ? WHERE id = ?");
+const moveKommun = db.prepare("UPDATE farms SET kommun = ? WHERE id = ?");
 const flag = db.prepare("UPDATE farms SET needs_review = 1 WHERE id = ?");
 
 const counts = {};
 db.transaction(() => {
   for (const a of actions) {
     let changes = 0;
-    if (a.action === "delete-duplicate" || a.action === "delete-out-of-coverage") {
+    if (a.action.startsWith("delete-")) {
+      for (const cd of childDel) cd.run(a.id);
       changes = del.run(a.id).changes;
     } else if (a.action === "move-county") {
       changes = move.run(a.toLan, a.toKommun, a.id).changes;
+    } else if (a.action === "move-kommun") {
+      changes = moveKommun.run(a.toKommun, a.id).changes;
     } else if (a.action === "flag-for-review") {
       changes = flag.run(a.id).changes;
     } else {

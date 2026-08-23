@@ -41,6 +41,14 @@ const SKIP_GOOGLE_TYPES = new Set([
 // Café/restaurant words that alone don't make a farm
 const FOOD_VENUE_NAME = /\b(restaurang|restaurant|café|bistro|kök|matsal|bar\b|pizzeria|sushi|thai|kinarestaurang)\b/i;
 
+// Entries a human reviewed and removed from the catalog — see
+// scripts/data/removed-farms.json and the same guard in compile-farms.js.
+const REMOVED_NAMES = new Set(
+  (JSON.parse(
+    fs.readFileSync(path.join(__dirname, "data", "removed-farms.json"), "utf8"),
+  ) as { name: string }[]).map((r) => r.name.toLowerCase().trim()),
+);
+
 // ── Classification ────────────────────────────────────────────────────────────
 
 type Verdict = "keep" | "maybe" | "remove";
@@ -52,6 +60,10 @@ function classify(r: PlaceResult): { verdict: Verdict; reason: string } {
   const src   = r.source || "";
 
   // ── Hard removes ────────────────────────────────────────────────────────────
+
+  if (REMOVED_NAMES.has(name.toLowerCase().trim())) {
+    return { verdict: "remove", reason: "previously reviewed and removed" };
+  }
 
   if (CHAIN_NAMES.test(name)) {
     return { verdict: "remove", reason: "chain/supermarket name" };

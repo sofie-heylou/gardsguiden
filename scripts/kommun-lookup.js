@@ -82,6 +82,18 @@ function loadFeatures() {
   return JSON.parse(fs.readFileSync(geojsonPath, "utf8")).features;
 }
 
+// Great-circle distance in km (haversine). Plain-JS twin of
+// src/lib/geo.ts haversineKm, which these scripts cannot require.
+function kmBetween(lat1, lng1, lat2, lng2) {
+  const rad = Math.PI / 180;
+  const dLat = (lat2 - lat1) * rad;
+  const dLng = (lng2 - lng1) * rad;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1 * rad) * Math.cos(lat2 * rad) * Math.sin(dLng / 2) ** 2;
+  return 6371 * 2 * Math.asin(Math.sqrt(a));
+}
+
 /**
  * Returns { kommun, lan, lanCode, km } for a coordinate, where `lan` is one of
  * the site's 13 county names or undefined when the point lies outside them.
@@ -100,4 +112,4 @@ function locate(features, lng, lat) {
   };
 }
 
-module.exports = { LAN_CODE_TO_NAME, loadFeatures, locate };
+module.exports = { LAN_CODE_TO_NAME, loadFeatures, locate, kmBetween };

@@ -16,6 +16,13 @@
  *                         301s the old address, so nothing breaks.
  *   delete-out-of-coverage  coordinates fall outside the 13 covered counties;
  *                         the row can only ever render under a wrong county.
+ *   move-kommun           right county, but the stored kommun disagrees with
+ *                         the coordinates (wrong kommun, a town name like
+ *                         Mariefred, or a genitive spelling like "Flens" that
+ *                         splits the county page's kommun grouping). Kommun is
+ *                         not part of the URL, so nothing moves. Stored "Visby"
+ *                         on Gotland is left alone — deliberate label, the
+ *                         whole island is one kommun.
  *   flag-for-review       name suggests it is not a farm (sportbar, spa,
  *                         konferens…). Sets needs_review = 1 so the existing
  *                         scripts/review-flagged-farms.ts triage handles it —
@@ -30,60 +37,20 @@
  */
 
 const fs = require("fs");
-const path = require("path");
 const { loadFeatures, locate } = require("./kommun-lookup");
-
-const COUNTY_TO_SLUG = {
-  Stockholm: "stockholm", Uppsala: "uppsala", Västmanland: "vastmanland",
-  Södermanland: "sodermanland", Skåne: "skane", Kalmar: "kalmar",
-  Gotland: "gotland", "Västra Götaland": "vastra-gotaland", Halland: "halland",
-  Blekinge: "blekinge", Kronoberg: "kronoberg", Jönköping: "jonkoping",
-  Östergötland: "ostergotland",
-};
+const { farmPath, arg, loadFarms, loadClicks, compareKommun, wordMatcher } = require("./review-lib");
 
 const SUSPECT_KEYWORDS = [
   "sportbar", "spa", "konferens", "hotell", "grossist", "systembolag",
   "marknad", "salong", "kiosk", "bensinstation", "food truck", "festvåning",
 ];
 
-function arg(name) {
-  const i = process.argv.indexOf(name);
-  return i > -1 ? process.argv[i + 1] : undefined;
-}
-
-// ── Load farms ───────────────────────────────────────────────────────────────
-
-function loadFarms() {
-  const farmsPath = arg("--farms");
-  if (farmsPath) return JSON.parse(fs.readFileSync(farmsPath, "utf8"));
-  const Database = require("better-sqlite3");
-  const dbPath = process.env.DB_PATH || path.join(process.cwd(), "data", "gardsguiden.db");
-  return new Database(dbPath, { readonly: true })
-    .prepare("SELECT id, name, kommun, lan, lat, lng, address, website, phone, openingHours, products, onSiteSales, source FROM farms")
-    .all();
-}
-
-// ── GSC clicks per URL path ──────────────────────────────────────────────────
-
-function loadClicks() {
-  const csvPath = arg("--gsc");
-  if (!csvPath) return {};
-  const clicks = {};
-  const lines = fs.readFileSync(csvPath, "utf8").split("\n").slice(1);
-  for (const line of lines) {
-    const m = line.match(/^(https:\/\/www\.gardsguiden\.se[^,]*),(\d+),/);
-    if (m) clicks[new URL(m[1]).pathname] = Number(m[2]);
-  }
-  return clicks;
-}
-
 // ── Analysis ─────────────────────────────────────────────────────────────────
 
 const features = loadFeatures();
-const farms = loadFarms();
+const farms = loadFarms(["id", "name", "kommun", "lan", "lat", "lng", "address", "website", "phone", "openingHours", "products", "onSiteSales", "source"]);
 const clicksByPath = loadClicks();
 
-const farmPath = (f) => `/${COUNTY_TO_SLUG[f.lan]}/${f.id}`;
 const clicksOf = (f) => clicksByPath[farmPath(f)] || 0;
 const completeness = (f) =>
   ["kommun", "address", "phone", "openingHours", "website"].filter((k) => f[k]).length;
@@ -97,7 +64,7 @@ for (const f of farms) {
 }
 
 const actions = [];
-const report = { duplicates: [], moves: [], outOfCoverage: [], suspects: [], unverifiable: [], farCoords: [] };
+const report = { duplicates: [], moves: [], kommunMoves: [], outOfCoverage: [], suspects: [], unverifiable: [], farCoords: [] };
 
 // Duplicate groups by normalized name.
 const byName = new Map();
@@ -150,18 +117,23 @@ for (const f of survivors) {
   } else if (d.lan !== f.lan) {
     actions.push({ action: "move-county", id: f.id, fromLan: f.lan, toLan: d.lan, toKommun: d.kommun, clicks: f._clicks });
     report.moves.push({ id: f.id, name: f.name, from: f.lan, to: `${d.lan} / ${d.kommun}`, clicks: f._clicks });
+  } else {
+    const cmp = compareKommun(f.kommun, d.kommun);
+    if (cmp === "different" || cmp === "genitive") {
+      actions.push({ action: "move-kommun", id: f.id, fromKommun: f.kommun, toKommun: d.kommun, clicks: f._clicks });
+      report.kommunMoves.push({ id: f.id, name: f.name, lan: f.lan, from: f.kommun, to: d.kommun, kind: cmp, clicks: f._clicks });
+    }
+    // "alias" (Visby on Gotland) is a deliberate label; "empty" belongs to
+    // scripts/backfill-kommun.js, which fills from the same lookup.
   }
 }
 
 // Relevance suspects among survivors (report + flag, never delete).
 const deleted = new Set(actions.filter((a) => a.action.startsWith("delete")).map((a) => a.id));
+const suspectHit = wordMatcher(SUSPECT_KEYWORDS);
 for (const f of survivors) {
   if (deleted.has(f.id)) continue;
-  // Whole-word match so "spa" doesn't fire inside "Vingårdspark".
-  const name = f.name.toLowerCase();
-  const hit = SUSPECT_KEYWORDS.find((k) =>
-    new RegExp(`(^|[^a-zåäö])${k}($|[^a-zåäö])`).test(name),
-  );
+  const hit = suspectHit(f.name.toLowerCase());
   if (hit) {
     actions.push({ action: "flag-for-review", id: f.id, keyword: hit });
     report.suspects.push({ id: f.id, name: f.name, lan: f.lan, keyword: hit, clicks: f._clicks });
@@ -188,6 +160,8 @@ for (const m of movesWithClicks.slice(0, 15)) console.log(` `, JSON.stringify(m)
 
 console.log(`\nDuplicate groups: ${report.duplicates.length}`);
 console.log(`County moves: ${report.moves.length}`);
+console.log(`Kommun moves (same county): ${report.kommunMoves.length}`);
+report.kommunMoves.forEach((m) => console.log(`  ${m.id}: ${m.from} -> ${m.to} (${m.lan})`));
 console.log(`Out of coverage (delete): ${report.outOfCoverage.length}`);
 report.outOfCoverage.forEach((f) => console.log(`  ${f.id} (${f.name}): actually in ${f.actualKommun}, clicks ${f.clicks}`));
 console.log(`Relevance suspects (flag only): ${report.suspects.length}`);

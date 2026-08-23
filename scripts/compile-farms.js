@@ -69,7 +69,17 @@ const EXCLUDE_PATTERNS = [
 // Farm inclusion keywords — if name/desc contains these, it's likely a farm
 const FARM_KEYWORDS = /gård|gard|lantbruk|bonde|mejeri|bryggeri|vingård|vingard|cideri|mjöderi|mjoderi|honung|kött|odling|trädgård|tradgard|kvarn|chark|fisk(?:rök|e)|mathantverk|gardsbutik|naturbruk|ekogård|ekogard|lammköt|nötkött|viltkött|destille|bränneri/i;
 
+// Entries a human reviewed and removed from the catalog (city bars, urban
+// breweries, conference venues…). Matched on the exact name so a re-scrape
+// cannot reintroduce them. Duplicates deleted during that review are NOT
+// listed — those farms are still in the catalog under another id.
+const REMOVED_NAMES = new Set(
+  require('./data/removed-farms.json').map((r) => r.name.toLowerCase().trim()),
+);
+
 function isFarmEntry(farm) {
+  if (REMOVED_NAMES.has(farm.name.toLowerCase().trim())) return false;
+
   // Check exclusion patterns
   for (const pat of EXCLUDE_PATTERNS) {
     if (pat.test(farm.name)) return false;
