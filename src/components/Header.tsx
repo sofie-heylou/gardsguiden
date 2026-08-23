@@ -99,7 +99,7 @@ export default function Header() {
             ? "translate-y-0 opacity-100"
             : "-translate-y-full opacity-0 pointer-events-none"
         }`}
-        style={{ top: "calc(var(--banner-h, 1.75rem) + 3.5rem)" }}
+        style={{ top: "3.5rem" }}
       >
         <nav className="flex flex-col py-4 px-5 gap-5">
 

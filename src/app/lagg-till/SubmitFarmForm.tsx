@@ -165,7 +165,7 @@ export default function SubmitFarmForm() {
           mejl när den är live.
         </p>
         <Link
-          href="/lista"
+          href="/gardar"
           className="inline-block text-xs text-stone-500 hover:text-stone-800 underline transition-colors"
         >
           Tillbaka till gårdslistan

@@ -101,7 +101,7 @@ const websiteJsonLd = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="sv" className={lora.variable}>
-      <body className="h-dvh flex flex-col overflow-hidden" style={{ background: "#FAFAF8", color: "#2c2c2c", "--banner-h": "1.75rem" } as React.CSSProperties}>
+      <body className="h-dvh flex flex-col overflow-hidden" style={{ background: "#FAFAF8", color: "#2c2c2c" }}>
         {/* Google Consent Mode v2 default — must run before GTM loads so GA4
             sets no cookies until the visitor accepts (see CookieConsentBanner). */}
         <Script id="consent-default" strategy="beforeInteractive">{`
@@ -118,9 +118,6 @@ gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personali
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
         />
           <AnalyticsScripts />
-          <div className="shrink-0 bg-amber-400 text-stone-900 text-xs text-center py-1.5 px-4 leading-snug">
-            Vi håller på att bygga klart — tack för tålamodet!
-          </div>
           <Header />
           <main className="flex-1 overflow-hidden">{children}</main>
           <BottomNav />

@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const lan = SLUG_TO_COUNTY[county];
   if (!lan) return { title: "Sidan hittades inte" };
 
-  const farms = getFarmsByCounty(lan);
+  const farms = getFarmsByCounty(lan).filter((farm) => !isBrewery(farm));
   const url = `${SITE_URL}/${county}`;
   const title = `Gårdsbutiker i ${lan}`;
   const description = `Hitta ${farms.length} gårdsbutiker i ${lan} och köp lokala råvaror direkt från bonden.`;
@@ -90,6 +90,57 @@ function CountyJsonLd({ lan, slug, farms }: { lan: string; slug: string; farms: 
   );
 }
 
+// Beer-only places without gårdsförsäljning are city breweries and taprooms,
+// not farm shops — someone searching "gårdsbutik" shouldn't meet them first.
+function isBrewery(farm: Farm): boolean {
+  return farm.products.length === 1 && farm.products[0] === "öl" && !farm.onSiteSales;
+}
+
+function FarmCard({ farm }: { farm: Farm }) {
+  const visibleProducts = farm.products.filter((p) => p !== "annat");
+  return (
+    <Link
+      href={farmPath(farm)}
+      className="block bg-white rounded-xl border border-stone-100 shadow-sm hover:shadow-md active:shadow-none transition-shadow px-4 py-4"
+    >
+      <h2 className="font-display text-[15px] text-stone-900 leading-snug mb-0.5">
+        {farm.name}
+      </h2>
+      <p className="text-[11px] text-stone-400 mb-2.5">{farm.kommun || `${farm.lan} län`}</p>
+
+      {visibleProducts.length > 0 && (
+        <div className="flex flex-wrap gap-1 mb-2.5">
+          {visibleProducts.map((p) => (
+            <span
+              key={p}
+              className="px-1.5 py-0.5 rounded text-[10px] bg-stone-100 text-stone-500 capitalize"
+            >
+              {p}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {(farm.onSiteSales || farm.tastingRoom) && (
+        <div className="flex items-center gap-3 text-[11px] text-stone-400">
+          {farm.onSiteSales && (
+            <span className="flex items-center gap-1">
+              <ShoppingBag size={11} />
+              Gårdsförsäljning
+            </span>
+          )}
+          {farm.tastingRoom && (
+            <span className="flex items-center gap-1">
+              <GlassWater size={11} />
+              Provsmakning
+            </span>
+          )}
+        </div>
+      )}
+    </Link>
+  );
+}
+
 export default async function CountyPage({ params }: Props) {
   const { county } = await params;
   const lan = SLUG_TO_COUNTY[county];
@@ -97,16 +148,18 @@ export default async function CountyPage({ params }: Props) {
 
   const farms = getFarmsByCounty(lan);
   const sorted = [...farms].sort((a, b) => a.name.localeCompare(b.name, "sv"));
+  const gardar = sorted.filter((farm) => !isBrewery(farm));
+  const bryggerier = sorted.filter(isBrewery);
 
   return (
     <>
-      <CountyJsonLd lan={lan} slug={county} farms={sorted} />
+      <CountyJsonLd lan={lan} slug={county} farms={[...gardar, ...bryggerier]} />
       <CountyBreadcrumbJsonLd lan={lan} slug={county} />
       <div className="h-full overflow-y-auto" style={{ background: "#FAFAF8" }}>
         <div className="max-w-lg mx-auto px-4 py-4 pb-8">
 
           <Link
-            href="/lista"
+            href="/gardar"
             className="flex items-center gap-1 text-sm text-stone-600 hover:text-stone-900 transition-colors py-1 -ml-1 mb-5"
           >
             <ChevronLeft size={18} strokeWidth={2} />
@@ -115,60 +168,40 @@ export default async function CountyPage({ params }: Props) {
 
           <div className="mb-6">
             <h1 className="font-display text-2xl text-stone-900">{lan}</h1>
-            <p className="mt-1 text-sm text-stone-500">{sorted.length} gårdar</p>
+            <p className="mt-1 text-sm text-stone-500">
+              {gardar.length} gårdar
+              {bryggerier.length > 0 && ` · ${bryggerier.length} bryggerier`}
+            </p>
             {COUNTY_DESCRIPTIONS[lan] && (
               <p className="mt-2 text-sm text-stone-600 leading-relaxed">{COUNTY_DESCRIPTIONS[lan]}</p>
             )}
           </div>
 
           <ul className="space-y-2">
-            {sorted.map((farm) => {
-              const visibleProducts = farm.products.filter((p) => p !== "annat");
-              return (
-                <li key={farm.id}>
-                  <Link
-                    href={farmPath(farm)}
-                    className="block bg-white rounded-xl border border-stone-100 shadow-sm hover:shadow-md active:shadow-none transition-shadow px-4 py-4"
-                  >
-                    <h2 className="font-display text-[15px] text-stone-900 leading-snug mb-0.5">
-                      {farm.name}
-                    </h2>
-                    <p className="text-[11px] text-stone-400 mb-2.5">{farm.kommun}</p>
-
-                    {visibleProducts.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mb-2.5">
-                        {visibleProducts.map((p) => (
-                          <span
-                            key={p}
-                            className="px-1.5 py-0.5 rounded text-[10px] bg-stone-100 text-stone-500 capitalize"
-                          >
-                            {p}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-
-                    {(farm.onSiteSales || farm.tastingRoom) && (
-                      <div className="flex items-center gap-3 text-[11px] text-stone-400">
-                        {farm.onSiteSales && (
-                          <span className="flex items-center gap-1">
-                            <ShoppingBag size={11} />
-                            Gårdsförsäljning
-                          </span>
-                        )}
-                        {farm.tastingRoom && (
-                          <span className="flex items-center gap-1">
-                            <GlassWater size={11} />
-                            Provsmakning
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </Link>
-                </li>
-              );
-            })}
+            {gardar.map((farm) => (
+              <li key={farm.id}>
+                <FarmCard farm={farm} />
+              </li>
+            ))}
           </ul>
+
+          {bryggerier.length > 0 && (
+            <>
+              <div className="mt-10 mb-4">
+                <h2 className="font-display text-lg text-stone-900">Bryggerier & taprooms</h2>
+                <p className="mt-1 text-sm text-stone-500">
+                  Hantverksbryggerier i {lan} — utan gårdsbutik, men väl värda ett besök för den ölintresserade.
+                </p>
+              </div>
+              <ul className="space-y-2">
+                {bryggerier.map((farm) => (
+                  <li key={farm.id}>
+                    <FarmCard farm={farm} />
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
         </div>
       </div>
     </>

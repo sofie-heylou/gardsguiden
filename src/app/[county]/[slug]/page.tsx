@@ -41,7 +41,11 @@ function buildDescription(farm: Farm): string {
   if (farm.description) parts.push(farm.description);
   if (farm.products.length)
     parts.push(`Produkter: ${farm.products.join(", ")}.`);
-  parts.push(`Belägen i ${farm.kommun}, ${farm.lan} län.`);
+  parts.push(
+    farm.kommun
+      ? `Belägen i ${farm.kommun}, ${farm.lan} län.`
+      : `Belägen i ${farm.lan} län.`,
+  );
   return parts.join(" ");
 }
 
@@ -64,7 +68,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const url = `${SITE_URL}${farmPath(farm)}`;
 
   return {
-    title: `${farm.name} – Gårdsbutik i ${farm.kommun}`,
+    title: `${farm.name} – Gårdsbutik i ${farm.kommun || `${farm.lan} län`}`,
     description,
     alternates: { canonical: url },
     openGraph: {
@@ -114,17 +118,20 @@ function FarmJsonLd({ farm }: { farm: Farm }) {
     address: {
       "@type": "PostalAddress",
       streetAddress: farm.address || undefined,
-      addressLocality: farm.kommun,
+      addressLocality: farm.kommun || undefined,
       addressRegion: farm.lan,
       addressCountry: "SE",
     },
-    geo: {
+  };
+
+  if (farm.lat != null && farm.lng != null) {
+    jsonLd.geo = {
       "@type": "GeoCoordinates",
       latitude: farm.lat,
       longitude: farm.lng,
-    },
-    hasMap: `https://www.google.com/maps/search/?api=1&query=${farm.lat},${farm.lng}`,
-  };
+    };
+    jsonLd.hasMap = `https://www.google.com/maps/search/?api=1&query=${farm.lat},${farm.lng}`;
+  }
 
   if (farm.phone) jsonLd.telephone = farm.phone;
   if (farm.email) jsonLd.email = farm.email;
@@ -150,7 +157,11 @@ export default async function FarmDetailPage({ params }: Props) {
   const farm = getFarmById(slug);
   if (!farm || COUNTY_TO_SLUG[farm.lan] !== county) notFound();
 
-  const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${farm.lat},${farm.lng}`;
+  // 49 farms have no coordinates yet — no map hero and no directions link for them.
+  const hasCoords = farm.lat != null && farm.lng != null;
+  const mapsUrl = hasCoords
+    ? `https://www.google.com/maps/dir/?api=1&destination=${farm.lat},${farm.lng}`
+    : undefined;
 
   const labels = [
     farm.tastingRoom            && { label: "Provsmakning",             icon: GlassWater  },
@@ -169,12 +180,18 @@ export default async function FarmDetailPage({ params }: Props) {
         <div className="max-w-lg mx-auto pb-8">
 
           {/* ── Map ─────────────────────────────────────────────────────────── */}
-          <div className="relative">
-            <FarmDetailMapLoader lat={farm.lat} lng={farm.lng} name={farm.name} />
-            <div className="absolute top-3 left-3">
+          {hasCoords ? (
+            <div className="relative">
+              <FarmDetailMapLoader lat={farm.lat} lng={farm.lng} name={farm.name} />
+              <div className="absolute top-3 left-3">
+                <BackButton />
+              </div>
+            </div>
+          ) : (
+            <div className="px-4 pt-4">
               <BackButton />
             </div>
-          </div>
+          )}
 
           {/* ── Content ─────────────────────────────────────────────────────── */}
           <div className="px-4 pt-5 space-y-6">
