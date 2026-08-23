@@ -46,7 +46,15 @@ function normalizeCounty(lan) {
 
 function normalizeProducts(products) {
   if (!Array.isArray(products)) return ['annat'];
-  const valid = ['vin', 'cider', 'öl', 'mjöd', 'sprit', 'mejeri', 'kött', 'honung', 'grönsaker', 'bakat', 'fisk', 'annat'];
+  // The raw product vocabulary of src/lib/categories.ts — every string the
+  // site can file under a category. The old shorter list silently stripped
+  // frukt/bär/ägg/must, so scraped farms never appeared under "Ägg" or
+  // "Frukt & bär" (SCRAPER-PLAN stage 2).
+  const valid = [
+    'kött', 'fisk', 'mejeri', 'ost', 'mjölk', 'ägg', 'grönsaker', 'frukt', 'bär',
+    'honung', 'bakat', 'bröd', 'mjöl', 'öl', 'vin', 'sprit', 'cider', 'mjöd', 'must',
+    'annat',
+  ];
   const filtered = products.filter(p => valid.includes(p));
   return filtered.length > 0 ? filtered : ['annat'];
 }

@@ -37,7 +37,7 @@ This stage deliberately fixes nothing else — it gives every later change one p
 
 Three small, independent commits. Each gets a `validate-relevance-gate.js` replay.
 
-- [ ] **Term leak:** compute product tags and `onSiteSales`/`tastingRoom` from the place's own name and types only — never from the search term. Fix the musteri→vin regex while there.
+- [x] **Term leak:** product tags and `onSiteSales`/`tastingRoom` now derive from the place's own name and Google types only — the search term asserts nothing. musteri maps to `must` (a real category the app files under Drycker), not `vin`. Bonus finds fixed with it: the flag regexes were case-sensitive so they mostly matched the lowercase *term*, never the capitalized name (now lowercased); and `compile-farms.js` silently stripped `frukt`/`bär`/`ägg`/`must` even though src/lib/categories.ts displays them — scraped farms could never appear under "Ägg" or "Frukt & bär". Verified with unit checks: same place → same tags across three different search terms.
 - [ ] **Prune mismatched terms and patterns:** drop "bondens marknad" as a search term (or capture markets as a separate content type later), drop "lanthandel" from any farm-word pattern, and review "destilleri" (keep the term, but no auto-accept — let `assess()` judge each result).
 - [ ] **No-website rows:** write them to a review file instead of silently dropping them. Many real small farms only have a Facebook page; if website-required stays policy, we should at least see what it costs.
 

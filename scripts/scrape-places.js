@@ -84,15 +84,18 @@ async function apiGet(base, params) {
 }
 
 // ── Product categorisation ────────────────────────────────────────────────────
-// NOTE (stage 2 will fix): the text passed in includes the SEARCH TERM, so
-// every hit from e.g. the "bryggeri" query gets tagged öl regardless of what
-// the place actually is. Carried over as-is for now — this file's job in
-// stage 1 is consolidation, not new behavior.
+// Fed the place's own name and Google types — never the search term, which
+// used to leak in and tag every hit from a "bryggeri" query as öl (SCRAPER-PLAN
+// stage 2). The emitted strings are the raw product vocabulary of
+// src/lib/categories.ts; compile-farms.js normalizeProducts accepts the same
+// set. These are still name-based guesses — stage 3 replaces them with what
+// the farm's own website says.
 
 function categorizeProducts(text) {
   const t = (text || '').toLowerCase();
   const products = [];
-  if (/vin\b|vingård|vingard|vineri|musteri/.test(t)) products.push('vin');
+  if (/vin\b|vingård|vingard|vineri/.test(t)) products.push('vin');
+  if (/musteri|äppelmust|\bmust\b/.test(t)) products.push('must');
   if (/cider|cideri/.test(t)) products.push('cider');
   if (/\böl\b|bryggeri/.test(t)) products.push('öl');
   if (/mjöd/.test(t)) products.push('mjöd');
@@ -182,13 +185,16 @@ function placeDetails(placeId) {
 }
 
 // ── Row shape ─────────────────────────────────────────────────────────────────
-// Identical to the retired scrapers' output (union of their regex variants),
-// term-leak flaws included — see the categorizeProducts note above.
+// products/onSiteSales/tastingRoom are derived from the place's own name and
+// Google types. The search term is recorded in `source` but asserts nothing
+// about the place — the retired scrapers let it set these fields, which is how
+// a random café found via the "gårdsbutik" query got onSiteSales: true.
 
 function buildRow(r, detail, term, fallbackCounty) {
   const address = detail.formatted_address || r.formatted_address || r.vicinity || '';
   const name    = detail.name || r.name;
-  const text    = [name, term, (r.types || []).join(' ')].join(' ');
+  const types   = r.types || [];
+  const text    = [name, types.join(' ')].join(' ').toLowerCase();
 
   return {
     // identification
@@ -206,8 +212,9 @@ function buildRow(r, detail, term, fallbackCounty) {
     email:   '',
     // products & flags
     products:    categorizeProducts(text),
-    onSiteSales: /gårdsbutik|gårdsförsäljning|självplock|café|restaurang|butik|lanthandel|direktförsäljning|REKO|bondens marknad/.test(term + name),
-    tastingRoom: /gårdscafé|restaurang|musteri|vingård|bryggeri|destilleri/.test(term + name),
+    onSiteSales: /gårdsbutik|gårdsförsäljning|gårdsbod|självplock|butik/.test(text) || types.includes('store'),
+    tastingRoom: /café|kafé|restaurang|musteri|vingård|bryggeri|destilleri/.test(text)
+                 || types.includes('cafe') || types.includes('restaurant'),
     gardsförsäljningLicense: false,
     isArchipelago: /skärgård|vaxholm|ljusterö|möja|sandhamn|\butö\b|ornö|dalarö|grinda|finnhamn|svartsö|runmarö|nämdö|ingmarsö/.test(address.toLowerCase()),
     openingHours: (detail.opening_hours?.weekday_text || []).join(', '),
@@ -344,6 +351,7 @@ if (require.main === module) {
   main().catch(err => { console.error(err); process.exit(1); });
 }
 
-// preFilter is exported for the replay/validation tooling that scores the
-// pre-filter against saved scrapes (see SCRAPER-PLAN stage 1).
-module.exports = { preFilter };
+// preFilter and buildRow are exported for the replay/validation tooling that
+// scores the pre-filter and row derivation against saved scrapes (SCRAPER-PLAN
+// stages 1–2).
+module.exports = { preFilter, buildRow };
