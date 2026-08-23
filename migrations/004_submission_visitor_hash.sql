@@ -1,10 +1,16 @@
 -- Rate-limit key for anonymous farm submissions (Stage 5 of the login removal).
 --
--- Adding a farm no longer requires an account, and the login was the only
--- thing bounding how many submissions one person could send. This column lets
--- the endpoint hold a visitor to a few pending submissions per hour; see
--- src/lib/visitor.ts for why it is a keyed hash rather than an address.
+-- INTENTIONALLY A NO-OP. src/lib/db.ts initSchema() adds
+-- farm_submissions.visitor_hash at boot, guarded by columnExists(), and SQLite
+-- has no "ALTER TABLE ... ADD COLUMN IF NOT EXISTS". A plain ALTER here aborts
+-- the runner with "duplicate column name" against any database the app has
+-- booted -- which is every real one, production included.
 --
--- Mirrors the ALTER that src/lib/db.ts initSchema() performs at boot.
+-- initSchema owns the schema; this file exists so migrations/ stays an accurate
+-- record of when the column appeared. Destructive changes that initSchema
+-- cannot express (see 006) are what the runner is actually for.
+--
+-- Rewritten 2026-08-23, before ever being applied anywhere: production had only
+-- version 1 recorded in _schema_meta, so no stored checksum was invalidated.
 
-ALTER TABLE farm_submissions ADD COLUMN visitor_hash TEXT;
+SELECT 1;

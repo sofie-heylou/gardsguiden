@@ -1,0 +1,15 @@
+-- Down migration for 006_drop_auth_tables.
+--
+-- THERE IS NO ROLLBACK. The forward migration destroys the users, sessions,
+-- auth_codes, farm_claims, farm_ownership, subscriptions and farm_edits
+-- tables, along with farms.claimed_by and farm_submissions.user_id.
+-- Recreating the empty tables would not bring back the 4 users, 1 ownership
+-- row or 16 edit-log rows that were in them.
+--
+-- Recovery is by restoring the snapshot taken before the migration ran:
+--   /data/gardsguiden.db.pre-stage7
+-- alongside the docker-entrypoint pre-migrate snapshots in the same directory.
+--
+-- Restoring the file is not sufficient on its own: the code change that
+-- removed these tables from initSchema() must be reverted too, or the next
+-- boot simply will not have them.

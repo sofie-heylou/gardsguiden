@@ -1,11 +1,7 @@
 -- Coordinates on farm submissions (fixes approved farms having no map).
 --
--- The submit form's Mapbox address autofill already returns exact coordinates;
--- they were being discarded. Approving a submission then produced a farm with
--- NULL lat/lng: a blank map, a "Vägbeskrivning" link pointing at null,null and
--- null coordinates in the page's structured data.
---
--- Mirrors the ALTERs that src/lib/db.ts initSchema() performs at boot.
+-- INTENTIONALLY A NO-OP, for the same reason as 004: initSchema() adds
+-- farm_submissions.lat and .lng at boot, so a plain ALTER here would abort the
+-- runner with "duplicate column name" against any booted database.
 
-ALTER TABLE farm_submissions ADD COLUMN lat REAL;
-ALTER TABLE farm_submissions ADD COLUMN lng REAL;
+SELECT 1;
