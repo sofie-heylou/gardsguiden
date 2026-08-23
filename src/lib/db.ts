@@ -247,6 +247,15 @@ function initSchema(db: Database.Database): void {
   if (!columnExists(db, "farm_submissions", "visitor_hash")) {
     db.exec(`ALTER TABLE farm_submissions ADD COLUMN visitor_hash TEXT`);
   }
+  // Coordinates captured by the address autofill at submission time. Without
+  // these an approved farm has no map, a dead directions link and null
+  // coordinates in its structured data.
+  if (!columnExists(db, "farm_submissions", "lat")) {
+    db.exec(`ALTER TABLE farm_submissions ADD COLUMN lat REAL`);
+  }
+  if (!columnExists(db, "farm_submissions", "lng")) {
+    db.exec(`ALTER TABLE farm_submissions ADD COLUMN lng REAL`);
+  }
 
   // ── Anonymous flag dedup ───────────────────────────────────────────────────
   // One row per (farm, visitor). visitor_hash is a keyed hash of the caller's

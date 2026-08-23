@@ -14,6 +14,7 @@ import { slugify } from "./utils";
 import { COUNTY_TO_SLUG, farmPath } from "./counties";
 import type { Farm } from "../types/farm";
 import { notFound, type ActionFailure } from "./actionResult";
+import { geocodeAddress } from "./geocode";
 import { SITE_URL } from "./site";
 
 export interface PendingSubmission {
@@ -35,6 +36,10 @@ interface SubmissionRow extends PendingSubmission {
   season: string | null;
   on_site_sales: number;
   tasting_room: number;
+  facebook: string | null;
+  instagram: string | null;
+  lat: number | null;
+  lng: number | null;
 }
 
 export type ApproveResult = { ok: true; farmId: string } | ActionFailure;
@@ -56,19 +61,24 @@ export function getPendingSubmission(id: string): PendingSubmission | null {
 
 /** Publish the farm and close the submission.  All-or-nothing: a half-approved
  *  submission (farm row but still 'pending') would be live yet re-approvable. */
-function insertApprovedFarm(db: Database, submission: SubmissionRow, farmId: string): void {
+function insertApprovedFarm(
+  db: Database,
+  submission: SubmissionRow,
+  farmId: string,
+  coords: { lat: number; lng: number } | null
+): void {
   db.transaction(() => {
     db.prepare(`
       INSERT INTO farms
         (id, name, description, address, kommun, lan,
          website, phone, email, products, openingHours, season,
          onSiteSales, tastingRoom, gardsförsäljningLicense, isArchipelago,
-         source, is_boosted, tier)
+         source, is_boosted, tier, lat, lng, facebook, instagram)
       VALUES
         (?, ?, ?, ?, ?, ?,
          ?, ?, ?, ?, ?, ?,
          ?, ?, 0, 0,
-         'submission', 0, 'free')
+         'submission', 0, 'free', ?, ?, ?, ?)
     `).run(
       farmId,
       submission.name,
@@ -84,6 +94,10 @@ function insertApprovedFarm(db: Database, submission: SubmissionRow, farmId: str
       submission.season,
       submission.on_site_sales,
       submission.tasting_room,
+      coords?.lat ?? null,
+      coords?.lng ?? null,
+      submission.facebook,
+      submission.instagram,
     );
 
     db.prepare(`
@@ -134,20 +148,28 @@ function notifyApproved(submission: SubmissionRow, farmId: string): void {
   });
 }
 
-export function approveSubmission(id: string): ApproveResult {
+export async function approveSubmission(id: string): Promise<ApproveResult> {
   const db = getDb();
 
   const submission = db.prepare(`
     SELECT id, name, description, address, kommun, lan,
            website, phone, email, products, opening_hours, season,
-           on_site_sales, tasting_room, submitted_email
+           on_site_sales, tasting_room, submitted_email,
+           facebook, instagram, lat, lng
     FROM farm_submissions WHERE id = ? AND status = 'pending'
   `).get(id) as SubmissionRow | undefined;
 
   if (!submission) return notFound();
 
+  // Prefer what the address autofill captured; fall back to geocoding so a
+  // hand-typed address still yields a farm with a working map.
+  const coords =
+    submission.lat != null && submission.lng != null
+      ? { lat: submission.lat, lng: submission.lng }
+      : await geocodeAddress(submission.address ?? "");
+
   const farmId = newFarmId(submission.name);
-  insertApprovedFarm(db, submission, farmId);
+  insertApprovedFarm(db, submission, farmId, coords);
   notifyApproved(submission, farmId);
 
   return { ok: true, farmId };

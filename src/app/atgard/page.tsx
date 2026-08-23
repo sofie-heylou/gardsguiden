@@ -42,7 +42,9 @@ interface ActionSpec {
   tone: "approve" | "danger";
   /** Shown when load() returns null. */
   goneText: string;
-  run: (targetId: string) => { ok: boolean };
+  /** May be async: approving geocodes the address when the submission
+   *  arrived without coordinates. */
+  run: (targetId: string) => { ok: boolean } | Promise<{ ok: boolean }>;
   /** Whether this action changes what the cached farm pages should show.
    *  Deliberately required: a new action must state its cache impact rather
    *  than inherit "no" by omission. */
@@ -179,7 +181,7 @@ export default async function AtgardPage({
     if (!checked) redirect("/atgard?status=invalid");
 
     const spec = ACTIONS[checked.action];
-    const result = spec.run(checked.targetId);
+    const result = await spec.run(checked.targetId);
     if (result.ok && spec.revalidates) revalidateFarmPages();
     redirect(`/atgard?status=${result.ok ? "done" : "gone"}`);
   }

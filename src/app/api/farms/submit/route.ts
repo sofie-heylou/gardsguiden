@@ -9,6 +9,12 @@ import { submissionModerationButtons } from "../../../../lib/moderationEmail";
 
 export const dynamic = "force-dynamic";
 
+/** Coordinates arrive from the client, so they are validated as numbers in
+ *  range rather than trusted. */
+function isFiniteCoord(v: unknown, max: number): boolean {
+  return typeof v === "number" && Number.isFinite(v) && Math.abs(v) <= max;
+}
+
 import { COUNTY_NAMES } from "../../../../lib/counties";
 const VALID_LAN: readonly string[] = COUNTY_NAMES;
 
@@ -26,6 +32,7 @@ export async function POST(req: NextRequest) {
     openingHours, season, onSiteSales, tastingRoom,
     facebook, instagram,
     submittedEmail,
+    lat, lng,
   } = body as Record<string, unknown>;
 
   if (!name || typeof name !== "string" || !name.trim()) {
@@ -77,11 +84,11 @@ export async function POST(req: NextRequest) {
     INSERT INTO farm_submissions
       (id, name, description, address, kommun, lan, website, phone, email,
        products, opening_hours, season, on_site_sales, tasting_room,
-       facebook, instagram, submitted_email, visitor_hash)
+       facebook, instagram, submitted_email, visitor_hash, lat, lng)
     VALUES
       (?, ?, ?, ?, ?, ?, ?, ?, ?,
        ?, ?, ?, ?, ?,
-       ?, ?, ?, ?)
+       ?, ?, ?, ?, ?, ?)
   `).run(
     submissionId,
     (name as string).trim(),
@@ -101,6 +108,8 @@ export async function POST(req: NextRequest) {
     typeof instagram   === "string" && instagram.trim()  ? instagram.trim()   : null,
     (submittedEmail as string).trim(),
     visitor,
+    isFiniteCoord(lat, 90) ? (lat as number) : null,
+    isFiniteCoord(lng, 180) ? (lng as number) : null,
   );
 
   const productList = Array.isArray(products) ? (products as string[]).join(", ") : null;

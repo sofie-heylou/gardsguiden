@@ -14,7 +14,7 @@ export async function POST(
     return NextResponse.json({ error: "Åtkomst nekad" }, { status: 403 });
   }
 
-  const result = approveSubmission(id);
+  const result = await approveSubmission(id);
   if (!result.ok) {
     return NextResponse.json(
       { error: "Ansökan hittades inte eller är redan hanterad" },

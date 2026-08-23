@@ -61,6 +61,8 @@ function Field({ label, required, children }: {
 
 export default function SubmitFarmForm() {
   const [submittedEmail, setSubmittedEmail] = useState("");
+  const [lat,           setLat]           = useState<number | null>(null);
+  const [lng,           setLng]           = useState<number | null>(null);
   const [name,          setName]          = useState("");
   const [description,   setDescription]   = useState("");
   const [address,       setAddress]       = useState("");
@@ -88,6 +90,13 @@ export default function SubmitFarmForm() {
     const feature = res.features[0];
     if (!feature) return;
     const props = feature.properties;
+    // GeoJSON order is [lng, lat]. Keeping these is what gives the approved
+    // farm a working map and directions link.
+    const coords = feature.geometry?.coordinates;
+    if (Array.isArray(coords) && coords.length === 2) {
+      setLng(coords[0]);
+      setLat(coords[1]);
+    }
     setAddress(props.full_address ?? props.place_name ?? "");
     const ctx = props.context ?? [];
     const placeText  = ctx.find((c) => c.id.startsWith("place"))?.text  ?? "";
@@ -130,6 +139,8 @@ export default function SubmitFarmForm() {
             .map(({ key, sv }) => `${sv}: ${hours[key as keyof typeof hours].trim()}`)
             .join(", ") : "",
           submittedEmail,
+          lat,
+          lng,
         }),
       });
       const data = await res.json() as { ok?: boolean; error?: string };
@@ -204,7 +215,7 @@ export default function SubmitFarmForm() {
               required
               autoComplete="shipping address-line1"
               value={address}
-              onChange={(e) => setAddress(e.target.value)}
+              onChange={(e) => { setAddress(e.target.value); setLat(null); setLng(null); }}
               placeholder="Gårdsvägen 1, 123 45 Orten"
               className={inputCls}
             />
