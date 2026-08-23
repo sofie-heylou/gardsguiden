@@ -28,7 +28,7 @@ These are small fixes, but every organic visitor hits at least one of them.
 - [x] Fix the county page back link (`/lista` → `/gardar`). *(941afc3)*
 - [x] Breweries: beer-only places without gårdsförsäljning (156 nationally) now sit in their own "Bryggerier & taprooms" section under the county list. *(941afc3)*
 - [ ] **New, found by the backfill dry run:** 102 farms are filed under the wrong county and 55 names are duplicated (the same farm stored once per scraped county, up to 3 copies). Needs a review pass: keep the copy whose county matches the coordinates, delete the rest, move the genuine one-offs. Note: moving a farm's county changes its URL. 11 farms are physically outside the 13 covered counties (Värmland, Örebro, Jämtland).
-- [ ] Run the kommun backfill against the production database (`railway ssh`, `DB_PATH=/data/gardsguiden.db` — prod has ~134 more rows than the seed).
+- [x] Run the kommun backfill against the production database — 384 written 2026-08-23, missing kommun down from 514 to 130. Backup at `/data/gardsguiden.pre-kommun-backfill-20260823.db`. *(Found in passing: seed and prod can disagree on a farm's coordinates — e.g. blacksta-vingard — so prerendered pages may show seed values until ISR revalidates against the runtime DB.)*
 
 **Done when:** a visitor landing on /stockholm sees no construction banner, no blank locations, and a list that actually matches "gårdsbutik".
 
