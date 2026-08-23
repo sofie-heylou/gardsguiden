@@ -4,8 +4,12 @@
  * judging results live in farm-relevance.js.
  *
  * Union of the five retired scrape-google-places*.js scripts (SCRAPER-PLAN
- * stage 1), carried over unchanged. The term list is still pre-stage-2:
- * "bondens marknad" and friends get pruned there, not here.
+ * stage 1), pruned in stage 2: "bondens marknad" is gone — a farmers' market
+ * is where farms sell *away* from the farm, and the catalog's criterion is
+ * buying where things are made. (Markets as their own content type is a
+ * backlog idea, not a scrape term.) "destilleri" stays: city distilleries are
+ * a real risk, but assess() judges every result on location and name now that
+ * the old auto-accept term lists are gone.
  */
 
 'use strict';
@@ -62,8 +66,6 @@ const SEARCH_TERMS = [
   'charkuteri gård',
   'gårdsbageri',
   'destilleri',
-  // Markets (new-terms; slated for removal in stage 2)
-  'bondens marknad',
 ];
 
 // One or two 80 km-radius search centres per county. Stockholm and Västra
