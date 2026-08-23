@@ -207,7 +207,7 @@ function buildRow(r, detail, term, fallbackCounty) {
     lat: detail.geometry?.location?.lat ?? r.geometry?.location?.lat,
     lng: detail.geometry?.location?.lng ?? r.geometry?.location?.lng,
     // contact
-    website: detail.website,
+    website: detail.website || '',
     phone:   detail.formatted_phone_number || '',
     email:   '',
     // products & flags
@@ -254,11 +254,16 @@ async function main() {
   fs.mkdirSync(path.dirname(args.out), { recursive: true });
 
   // Resume from existing output if present
-  const seen = new Map();    // place_id → row
-  const dropped = new Set(); // place_ids already rejected or website-less this
-                             // run, so a place recurring under another term or
-                             // centre never costs a second Details call
-  const doneFile = args.out.replace(/\.json$/, '-done-counties.json');
+  const seen = new Map();      // place_id → row (kept results)
+  const noWebsite = new Map(); // place_id → row for places that passed the
+                               // relevance gate but have no website — written
+                               // to their own review file so the cost of the
+                               // website-required rule stays visible
+  const dropped = new Set();   // place_ids already rejected or website-less,
+                               // so a place recurring under another term or
+                               // centre never costs a second Details call
+  const doneFile      = args.out.replace(/\.json$/, '-done-counties.json');
+  const noWebsiteFile = args.out.replace(/\.json$/, '-no-website.json');
   const doneCounties = new Set(
     fs.existsSync(doneFile) ? JSON.parse(fs.readFileSync(doneFile, 'utf8')) : []
   );
@@ -266,9 +271,14 @@ async function main() {
     for (const f of JSON.parse(fs.readFileSync(args.out, 'utf8'))) seen.set(f.place_id, f);
     console.log(`[Resume] ${seen.size} existing results, ${doneCounties.size} county centres already done`);
   }
+  if (fs.existsSync(noWebsiteFile)) {
+    for (const f of JSON.parse(fs.readFileSync(noWebsiteFile, 'utf8'))) {
+      noWebsite.set(f.place_id, f);
+      dropped.add(f.place_id);
+    }
+  }
 
   let prefilterDrops = 0;
-  let noWebsiteDrops = 0;
 
   for (const point of points) {
     const pointKey = `${point.name}:${point.lat}:${point.lng}`;
@@ -307,9 +317,15 @@ async function main() {
           const det = await placeDetails(r.place_id);
           const detail = det?.result || {};
 
-          // No-website rows are dropped for now; stage 2 routes them to a
-          // review file instead so the cost of the rule becomes visible.
-          if (!detail.website) { dropped.add(r.place_id); noWebsiteDrops++; continue; }
+          // No website → the review file, not the catalog feed. Many real
+          // small farms only have a Facebook page; keeping these visible is
+          // what lets us judge the website-required rule (and stage 3 can
+          // mine the file once verification exists).
+          if (!detail.website) {
+            noWebsite.set(r.place_id, buildRow(r, detail, term, point.name));
+            dropped.add(r.place_id);
+            continue;
+          }
 
           seen.set(r.place_id, buildRow(r, detail, term, point.name));
           termHits++;
@@ -326,7 +342,8 @@ async function main() {
     doneCounties.add(pointKey);
     fs.writeFileSync(doneFile, JSON.stringify([...doneCounties], null, 2));
     saveProgress(args.out, seen);
-    console.log(`  ✓ Saved ${seen.size} total so far`);
+    saveProgress(noWebsiteFile, noWebsite);
+    console.log(`  ✓ Saved ${seen.size} total so far (+${noWebsite.size} without website)`);
   }
 
   // The file is already current — the last county centre's iteration wrote it
@@ -338,7 +355,7 @@ async function main() {
   console.log('\n── Summary ──────────────────────────────────────────────────');
   console.log(`Unique results with website: ${farms.length}`);
   console.log(`Rejected by pre-filter (no details call spent): ${prefilterDrops}`);
-  console.log(`Dropped for missing website: ${noWebsiteDrops}`);
+  console.log(`Relevant but no website (kept for review in ${path.basename(noWebsiteFile)}): ${noWebsite.size}`);
   const byCounty = {};
   farms.forEach(f => { byCounty[f.lan] = (byCounty[f.lan] || 0) + 1; });
   for (const [county, n] of Object.entries(byCounty).sort()) {

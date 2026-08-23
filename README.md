@@ -62,6 +62,7 @@ producerar en ny SQLite-databas som du sedan driftsätter.
 #    (kräver GOOGLE_PLACES_API_KEY i .env.local eller som miljövariabel)
 #    Alla län och söktermer som standard; begränsa med --counties/--terms.
 #    Relevansreglerna körs redan här, innan detaljanropet betalas.
+#    Relevanta platser utan webbplats hamnar i *-no-website.json för granskning.
 GOOGLE_PLACES_API_KEY=din_nyckel node scripts/scrape-places.js
 
 # 2. Filtrera resultaten i tre hinkar: keep / maybe / removed
