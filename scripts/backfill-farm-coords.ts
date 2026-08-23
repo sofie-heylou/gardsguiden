@@ -13,14 +13,18 @@
  *   npx tsx scripts/backfill-farm-coords.ts --apply         # write them
  *   npx tsx scripts/backfill-farm-coords.ts --limit 10      # try a few first
  *
- * IMPORTANT — run this against the *runtime* database, not the bundled seed:
+ * Against production: the runner image has no tsx and does not ship this
+ * script, so it cannot be run with `railway ssh` directly.
+ * See docs/running-scripts-in-production.md for the pattern that works —
+ * geocode locally, then send the finished UPDATEs to the container.
  *
- *   railway ssh
- *   DB_PATH=/data/gardsguiden.db npx tsx scripts/backfill-farm-coords.ts --apply
+ * Whichever route you take, target the *runtime* database, not the bundled
+ * seed: the boot sync uses INSERT OR IGNORE and never updates existing rows,
+ * so backfilling the seed changes nothing in production.
  *
- * The boot sync copies the seed into the runtime DB with INSERT OR IGNORE, so
- * it never updates rows that already exist. Backfilling the local seed would
- * therefore change nothing in production.
+ * Status: the 30 street-accurate matches were applied to production on
+ * 2026-08-23. 35 farms remain, resolvable only to postcode level, plus 2 with
+ * no address at all.
  */
 
 import Database from "better-sqlite3";

@@ -20,9 +20,9 @@
  *   npx tsx scripts/review-flagged-farms.ts --delete <id>...   # remove farms
  *   npx tsx scripts/review-flagged-farms.ts --clear <id>...    # reset flags
  *
- * Against production:
- *   railway ssh
- *   DB_PATH=/data/gardsguiden.db npx tsx scripts/review-flagged-farms.ts
+ * Against production: the runner image has no tsx and does not ship this
+ * script, so it cannot be run with `railway ssh` directly.
+ * See docs/running-scripts-in-production.md for the pattern that works.
  */
 
 import Database from "better-sqlite3";

@@ -12,9 +12,9 @@
  * The reason is stored in farm_submissions.notes for your own reference. It is
  * NOT included in the email to the submitter.
  *
- * Against production:
- *   railway ssh
- *   DB_PATH=/data/gardsguiden.db npx tsx scripts/reject-submission.ts <id> "duplicate"
+ * Against production: the runner image has no tsx and does not ship this
+ * script, so it cannot be run with `railway ssh` directly.
+ * See docs/running-scripts-in-production.md for the pattern that works.
  */
 
 import { getDb } from "../src/lib/db";

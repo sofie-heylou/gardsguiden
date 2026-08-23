@@ -10,9 +10,9 @@
  * Usage:
  *   npx tsx scripts/approve-submission.ts <submission-id>
  *
- * Against production:
- *   railway ssh
- *   DB_PATH=/data/gardsguiden.db npx tsx scripts/approve-submission.ts <id>
+ * Against production: the runner image has no tsx and does not ship this
+ * script, so it cannot be run with `railway ssh` directly.
+ * See docs/running-scripts-in-production.md for the pattern that works.
  *
  * Normally you would just press the button in the email. Reach for this when
  * the email is lost or its token has expired (30 days).
