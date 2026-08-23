@@ -3,9 +3,12 @@
 node_modules/
 
 # Scrapers — local-only tools, never deployed.
-# Exception: baseline-meta.ts is a one-shot prod migration helper (Stage 1.2).
+# Exceptions: baseline-meta.ts is a one-shot prod migration helper (Stage 1.2);
+# backfill-kommun.js + its boundaries data run on prod via railway ssh.
 scripts/*
 !scripts/baseline-meta.ts
+!scripts/backfill-kommun.js
+!scripts/data
 
 # Scraper intermediate files
 data/tmp/
