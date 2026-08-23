@@ -1,28 +1,5 @@
 [
   {
-    "id": "abbes-mejeri",
-    "name": "Abbes Mejeri",
-    "description": "",
-    "address": "Kungsgatan 8E, 372 30 Ronneby, Sverige",
-    "kommun": "Ronneby",
-    "lan": "Blekinge",
-    "lat": 56.21154989999999,
-    "lng": 15.2751249,
-    "website": "https://www.facebook.com/abbesmejerii",
-    "phone": "076-935 39 36",
-    "email": "",
-    "products": [
-      "mejeri"
-    ],
-    "onSiteSales": false,
-    "tastingRoom": false,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "måndag: 10:00–18:00, tisdag: 10:00–18:00, onsdag: 10:00–18:00, torsdag: 10:00–18:00, fredag: 10:00–18:00, lördag: 10:00–16:00, söndag: Stängt",
-    "season": "",
-    "source": "google-places:gårdsmejeri"
-  },
-  {
     "id": "andr-ns-bageri-sturko",
     "name": "Andréns Bageri Sturkö",
     "description": "",
@@ -12542,29 +12519,6 @@
     "openingHours": "måndag: Öppet dygnet runt, tisdag: Öppet dygnet runt, onsdag: Öppet dygnet runt, torsdag: Öppet dygnet runt, fredag: Öppet dygnet runt, lördag: Öppet dygnet runt, söndag: Öppet dygnet runt",
     "season": "",
     "source": "google-places:gårdsbutik"
-  },
-  {
-    "id": "falkopings-mejeri-ek-for",
-    "name": "Falköpings Mejeri ek för",
-    "description": "",
-    "address": "Odengatan 6, 521 43 Falköping, Sverige",
-    "kommun": "Falköping",
-    "lan": "Västra Götaland",
-    "lat": 58.1655681,
-    "lng": 13.5480001,
-    "website": "https://www.falkopingsmejeri.se/",
-    "phone": "0515-72 32 50",
-    "email": "",
-    "products": [
-      "mejeri"
-    ],
-    "onSiteSales": false,
-    "tastingRoom": false,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "",
-    "season": "",
-    "source": "google-places:gårdsmejeri"
   },
   {
     "id": "flato-bryggeri-ab",

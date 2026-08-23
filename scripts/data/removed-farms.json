@@ -4,6 +4,10 @@
     "reason": "stadssmuts: urban-centre:Göteborg:1.1km,no-farm-word"
   },
   {
+    "name": "Abbes Mejeri",
+    "reason": "stadssmuts: no-farm-word,town-street"
+  },
+  {
     "name": "Alliaria Bryggeri",
     "reason": "stadssmuts: urban-centre:Västerås:0.3km,no-farm-word"
   },
@@ -162,6 +166,10 @@
   {
     "name": "EM Vilt Butik",
     "reason": "stadssmuts: urban-centre:Jönköping:0km,no-farm-word"
+  },
+  {
+    "name": "Falköpings Mejeri ek för",
+    "reason": "stadssmuts: no-farm-word,town-street"
   },
   {
     "name": "Fermenterarna Bryggeri AB",
