@@ -2194,8 +2194,8 @@
     "tastingRoom": false,
     "gardsförsäljningLicense": false,
     "isArchipelago": false,
-    "openingHours": "måndag: Stängt, tisdag: Stängt, onsdag: Stängt, torsdag: Stängt, fredag: Stängt, lördag: 11:00–16:00, söndag: 11:00–16:00",
-    "season": "",
+    "openingHours": "måndag: 11:00–16:00, tisdag: 11:00–16:00, onsdag: 11:00–16:00, torsdag: 11:00–16:00, fredag: 11:00–16:00, lördag: 11:00–16:00, söndag: 11:00–16:00",
+    "season": "Öppet fram till 30/9",
     "source": "google-places:gårdsbutik"
   },
   {
