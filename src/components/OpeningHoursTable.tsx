@@ -1,6 +1,18 @@
 "use client";
 
+import { CalendarClock } from "lucide-react";
 import { DAYS_SV, parseHours } from "../lib/openingHours";
+
+/* Full-width amber banner anchored to the card's bottom edge — the negative
+   margins assume the parent card's px-4 py-1 padding. */
+function SeasonNote({ season }: { season: string }) {
+  return (
+    <div className="flex items-center gap-2 -mx-4 -mb-1 px-4 py-2 rounded-b-2xl bg-amber-100 text-amber-800 text-[13px]">
+      <CalendarClock size={15} className="shrink-0" aria-hidden="true" />
+      <span>{season}</span>
+    </div>
+  );
+}
 
 export default function OpeningHoursTable({ openingHours, season }: { openingHours: string; season?: string }) {
   const todayName = DAYS_SV[new Date().getDay()];
@@ -10,8 +22,8 @@ export default function OpeningHoursTable({ openingHours, season }: { openingHou
   if (!rows) {
     return (
       <div className="text-sm text-stone-600 space-y-0.5">
-        <p>{openingHours}</p>
-        {season && <p className="text-stone-400">{season}</p>}
+        <p className="py-1.5">{openingHours}</p>
+        {season && <SeasonNote season={season} />}
       </div>
     );
   }
@@ -39,7 +51,7 @@ export default function OpeningHoursTable({ openingHours, season }: { openingHou
           );
         })}
       </div>
-      {season && <p className="text-xs text-stone-400 pt-1">{season}</p>}
+      {season && <SeasonNote season={season} />}
     </div>
   );
 }
