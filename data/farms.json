@@ -12913,30 +12913,6 @@
     "source": "google-places:gårdsrestaurang"
   },
   {
-    "id": "goteborgs-bryggerimuseum",
-    "place_id": "ChIJByxEq-3yT0YREWMeyxUIRRY",
-    "name": "Göteborgs Bryggerimuseum",
-    "description": "",
-    "address": "J A Pripps Gata 2, 421 32 Västra Frölunda, Sverige",
-    "kommun": "",
-    "lan": "Västra Götaland",
-    "lat": null,
-    "lng": null,
-    "website": "http://www.bryggerikultur.se/",
-    "phone": "070-821 55 00",
-    "email": "",
-    "products": [
-      "öl"
-    ],
-    "onSiteSales": false,
-    "tastingRoom": true,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "måndag: Öppet dygnet runt, tisdag: Öppet dygnet runt, onsdag: Öppet dygnet runt, torsdag: Öppet dygnet runt, fredag: Öppet dygnet runt, lördag: Öppet dygnet runt, söndag: Öppet dygnet runt",
-    "season": "",
-    "source": "google-places:bryggeri"
-  },
-  {
     "id": "goteborgs-nya-bryggeri",
     "name": "Göteborgs Nya Bryggeri",
     "description": "",
@@ -17093,29 +17069,6 @@
     "openingHours": "",
     "season": "",
     "source": "google-places:odlare gård"
-  },
-  {
-    "id": "rinkeby-kott-vilt",
-    "name": "Rinkeby Kött&Vilt",
-    "description": "",
-    "address": "Fågelbovägen 32, 611 36 Nyköping, Sverige",
-    "kommun": "",
-    "lan": "Östergötland",
-    "lat": 58.75340629999999,
-    "lng": 17.0320019,
-    "website": "http://www.rinkebykottochvilt.se/",
-    "phone": "0155-21 04 03",
-    "email": "",
-    "products": [
-      "kött"
-    ],
-    "onSiteSales": false,
-    "tastingRoom": false,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "måndag: Stängt, tisdag: 10:00–18:00, onsdag: 10:00–18:00, torsdag: 10:00–18:00, fredag: 10:00–18:00, lördag: 10:00–15:00, söndag: Stängt",
-    "season": "",
-    "source": "google-places:lokal producent mat"
   },
   {
     "id": "rydsnas-lanthandel",

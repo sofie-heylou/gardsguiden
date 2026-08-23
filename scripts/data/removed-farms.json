@@ -212,6 +212,10 @@
     "reason": "stadssmuts: no-farm-word,town-street"
   },
   {
+    "name": "Göteborgs Bryggerimuseum",
+    "reason": "stadssmuts: bryggerimuseum, inte en gård"
+  },
+  {
     "name": "Hallandsgården",
     "reason": "gränsfall: urban-centre:Halmstad:0.8km"
   },
@@ -462,6 +466,14 @@
   {
     "name": "Ringu",
     "reason": "stadssmuts: urban-centre:Göteborg:1.3km,no-farm-word"
+  },
+  {
+    "name": "Rinkeby Kött & Vilt",
+    "reason": "stadssmuts: urban-centre:Nyköping,no-farm-word"
+  },
+  {
+    "name": "Rinkeby Kött&Vilt",
+    "reason": "stadssmuts: urban-centre:Nyköping,no-farm-word"
   },
   {
     "name": "Rocket Brewing Company AB",
