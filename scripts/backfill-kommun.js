@@ -16,94 +16,16 @@
  *   DB_PATH=/data/gardsguiden.db node scripts/backfill-kommun.js  # prod path
  */
 
-const fs = require("fs");
 const path = require("path");
 const Database = require("better-sqlite3");
+const { loadFeatures, locate } = require("./kommun-lookup");
 
 const DB_PATH = process.env.DB_PATH || path.join(process.cwd(), "data", "gardsguiden.db");
-const GEOJSON_PATH = path.join(__dirname, "data", "kommuner.geojson");
 const APPLY = process.argv.includes("--apply");
-
-// SCB län codes → the site's county names (the 13 counties we cover).
-const LAN_CODE_TO_NAME = {
-  "01": "Stockholm",
-  "03": "Uppsala",
-  "04": "Södermanland",
-  "05": "Östergötland",
-  "06": "Jönköping",
-  "07": "Kronoberg",
-  "08": "Kalmar",
-  "09": "Gotland",
-  "10": "Blekinge",
-  "12": "Skåne",
-  "13": "Halland",
-  "14": "Västra Götaland",
-  "19": "Västmanland",
-};
-
-// ── Point-in-polygon (ray casting) ───────────────────────────────────────────
-
-function inRing(lng, lat, ring) {
-  let inside = false;
-  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
-    const [xi, yi] = ring[i];
-    const [xj, yj] = ring[j];
-    if (yi > lat !== yj > lat && lng < ((xj - xi) * (lat - yi)) / (yj - yi) + xi) {
-      inside = !inside;
-    }
-  }
-  return inside;
-}
-
-function inPolygon(lng, lat, coords) {
-  // First ring is the outer boundary, the rest are holes.
-  if (!inRing(lng, lat, coords[0])) return false;
-  for (let i = 1; i < coords.length; i++) {
-    if (inRing(lng, lat, coords[i])) return false;
-  }
-  return true;
-}
-
-function containsPoint(geometry, lng, lat) {
-  if (geometry.type === "Polygon") return inPolygon(lng, lat, geometry.coordinates);
-  if (geometry.type === "MultiPolygon") {
-    return geometry.coordinates.some((poly) => inPolygon(lng, lat, poly));
-  }
-  return false;
-}
-
-// The boundaries are simplified, so coastal and skärgård farms can fall just
-// outside every polygon. For those, take the kommun with the nearest boundary
-// vertex and report the distance so the dry run shows how confident that is.
-function nearestFeature(features, lng, lat) {
-  let best = null;
-  let bestD2 = Infinity;
-  for (const f of features) {
-    const polys = f.geometry.type === "Polygon" ? [f.geometry.coordinates] : f.geometry.coordinates;
-    for (const poly of polys) {
-      for (const [x, y] of poly[0]) {
-        const dx = (x - lng) * Math.cos((lat * Math.PI) / 180);
-        const dy = y - lat;
-        const d2 = dx * dx + dy * dy;
-        if (d2 < bestD2) {
-          bestD2 = d2;
-          best = f;
-        }
-      }
-    }
-  }
-  return { feature: best, km: Math.sqrt(bestD2) * 111 };
-}
-
-function locate(features, lng, lat) {
-  const hit = features.find((f) => containsPoint(f.geometry, lng, lat));
-  if (hit) return { feature: hit, km: 0 };
-  return nearestFeature(features, lng, lat);
-}
 
 // ── Main ─────────────────────────────────────────────────────────────────────
 
-const { features } = JSON.parse(fs.readFileSync(GEOJSON_PATH, "utf8"));
+const features = loadFeatures();
 const db = new Database(DB_PATH);
 db.pragma("journal_mode = WAL");
 
@@ -118,11 +40,10 @@ const outsideCoverage = [];
 const farAway = [];
 
 for (const farm of farms) {
-  const { feature, km } = locate(features, farm.lng, farm.lat);
-  if (!feature) continue;
-  const derivedKommun = feature.properties.kom_namn;
-  const derivedLan = LAN_CODE_TO_NAME[feature.properties.lan_code];
-  const entry = { ...farm, derivedKommun, derivedLan, km: Math.round(km * 10) / 10 };
+  const loc = locate(features, farm.lng, farm.lat);
+  if (!loc) continue;
+  const { kommun: derivedKommun, lan: derivedLan, km } = loc;
+  const entry = { ...farm, derivedKommun, derivedLan, km };
 
   if (km > 5) {
     // Too far from any boundary to trust — bad coordinates, most likely.
@@ -130,7 +51,7 @@ for (const farm of farms) {
     continue;
   }
   if (!derivedLan) {
-    outsideCoverage.push({ ...entry, lanCode: feature.properties.lan_code });
+    outsideCoverage.push({ ...entry, lanCode: loc.lanCode });
     continue;
   }
   if (derivedLan !== farm.lan) {

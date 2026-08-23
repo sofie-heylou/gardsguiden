@@ -8,6 +8,8 @@ node_modules/
 scripts/*
 !scripts/baseline-meta.ts
 !scripts/backfill-kommun.js
+!scripts/kommun-lookup.js
+!scripts/apply-trust-actions.js
 !scripts/data
 
 # Scraper intermediate files

@@ -58,10 +58,12 @@ COPY --from=builder /app/migrations ./migrations
 COPY --from=builder /app/scripts/baseline-meta.ts ./scripts/baseline-meta.ts
 
 # ── Data-maintenance scripts ───────────────────────────────────────────────
-# `scripts/backfill-kommun.js` is plain JS (the image has no tsx) run over
-# `railway ssh` against /data/gardsguiden.db. It reads the municipality
-# boundaries GeoJSON next to it, so both files must ship in the image.
+# Plain-JS admin scripts (the image has no tsx) run over `railway ssh`
+# against /data/gardsguiden.db. kommun-lookup.js + the boundaries GeoJSON
+# are shared dependencies of the others.
+COPY --from=builder /app/scripts/kommun-lookup.js ./scripts/kommun-lookup.js
 COPY --from=builder /app/scripts/backfill-kommun.js ./scripts/backfill-kommun.js
+COPY --from=builder /app/scripts/apply-trust-actions.js ./scripts/apply-trust-actions.js
 COPY --from=builder /app/scripts/data/kommuner.geojson ./scripts/data/kommuner.geojson
 
 # ── Seed database ──────────────────────────────────────────────────────────

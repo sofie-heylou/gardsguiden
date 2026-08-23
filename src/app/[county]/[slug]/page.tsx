@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import {
   ShoppingBag,
@@ -62,7 +62,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!lan) return { title: "Gård hittades inte" };
 
   const farm = getFarmById(slug);
-  if (!farm || COUNTY_TO_SLUG[farm.lan] !== county) return { title: "Gård hittades inte" };
+  if (!farm) return { title: "Gård hittades inte" };
+  if (COUNTY_TO_SLUG[farm.lan] !== county) return {}; // page redirects to the real URL
 
   const description = buildDescription(farm);
   const url = `${SITE_URL}${farmPath(farm)}`;
@@ -155,7 +156,10 @@ export default async function FarmDetailPage({ params }: Props) {
   if (!lan) notFound();
 
   const farm = getFarmById(slug);
-  if (!farm || COUNTY_TO_SLUG[farm.lan] !== county) notFound();
+  if (!farm) notFound();
+  // A farm reached under the wrong county (moved after curation, stale Google
+  // result) keeps working via its real URL instead of 404ing.
+  if (COUNTY_TO_SLUG[farm.lan] !== county) permanentRedirect(farmPath(farm));
 
   // 49 farms have no coordinates yet — no map hero and no directions link for them.
   const hasCoords = farm.lat != null && farm.lng != null;
