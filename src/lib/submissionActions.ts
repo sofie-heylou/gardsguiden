@@ -1,7 +1,7 @@
 /** Approve / reject logic for submitted farms.
  *
- * Extracted from the admin API routes so that the token-protected email links
- * (/atgard) and the logged-in admin UI run exactly the same code.  Deliberately
+ * Shared by the token-protected email links (/atgard) — and the intended home
+ * for the CLI approve/reject scripts.  Deliberately
  * framework-free — no NextRequest, no HTTP status codes — so each caller maps
  * the result onto its own transport.
  */

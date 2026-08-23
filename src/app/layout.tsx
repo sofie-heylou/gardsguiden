@@ -1,9 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Lora } from "next/font/google";
 import Script from "next/script";
-import { ClerkProvider } from "@clerk/nextjs";
-import { svSE } from "@clerk/localizations";
-import { clerkAppearance } from "../lib/clerkAppearance";
 import Header from "../components/Header";
 import BottomNav from "../components/BottomNav";
 import CookieConsentBanner from "../components/CookieConsentBanner";
@@ -84,12 +81,6 @@ export const viewport: Viewport = {
   themeColor: "#ffffff",
 };
 
-const clerkLocalization = {
-  ...svSE,
-  // No sign-in/sign-up copy overrides: they promised farm management, which
-  // no longer exists. Plain svSE until Clerk itself goes in Stage 6.
-};
-
 const organizationJsonLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
@@ -126,14 +117,6 @@ gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personali
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
         />
-        <ClerkProvider
-          localization={clerkLocalization}
-          appearance={clerkAppearance}
-          signInUrl="/logga-in"
-          signUpUrl="/registrera"
-          signInFallbackRedirectUrl="/"
-          signUpFallbackRedirectUrl="/"
-        >
           <AnalyticsScripts />
           <div className="shrink-0 bg-amber-400 text-stone-900 text-xs text-center py-1.5 px-4 leading-snug">
             Vi håller på att bygga klart — tack för tålamodet!
@@ -142,7 +125,6 @@ gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personali
           <main className="flex-1 overflow-hidden">{children}</main>
           <BottomNav />
           <CookieConsentBanner />
-        </ClerkProvider>
       </body>
     </html>
   );

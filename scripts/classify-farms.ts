@@ -2,7 +2,7 @@
  * Flags listings that are likely not farms using keyword matching on the name.
  * No API key required — runs instantly and for free.
  *
- * Flagged listings (needs_review = 1) appear in the admin panel for deletion.
+ * Flagged listings (needs_review = 1) are triaged with scripts/review-flagged-farms.ts.
  * Confirmed farms get needs_review = 0.
  *
  * Usage:
@@ -109,7 +109,7 @@ function main() {
   console.log(`  Confirmed: ${confirmed}`);
   console.log(`  Flagged:   ${flagged}`);
   if (!DRY_RUN && flagged > 0) {
-    console.log(`\n  Review flagged listings at /admin`);
+    console.log(`\n  Review flagged listings with: npx tsx scripts/review-flagged-farms.ts --needs-review`);
   }
 }
 

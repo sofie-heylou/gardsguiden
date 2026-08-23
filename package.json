@@ -17,8 +17,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@clerk/localizations": "^4.3.0",
-    "@clerk/nextjs": "^7.0.8",
     "@mapbox/search-js-react": "^1.5.1",
     "@next/bundle-analyzer": "^16.2.2",
     "@tailwindcss/postcss": "^4.2.2",
@@ -39,7 +37,6 @@
     "react-dom": "^19.2.4",
     "react-map-gl": "^8.1.0",
     "supercluster": "^8.0.1",
-    "svix": "^1.90.0",
     "tailwindcss": "^4.2.2",
     "typescript": "^6.0.2",
     "vanilla-cookieconsent": "^3.1.0"

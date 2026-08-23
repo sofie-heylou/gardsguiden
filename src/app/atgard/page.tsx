@@ -124,7 +124,7 @@ const STATUS_TEXT: Record<Status, { title: string; body: string }> = {
   },
   invalid: {
     title: "Länken fungerar inte",
-    body: "Länken är ogiltig eller har gått ut. Öppna det senaste mejlet, eller hantera ärendet i adminvyn.",
+    body: "Länken är ogiltig eller har gått ut. Öppna det senaste mejlet — eller hantera ärendet från kommandoraden om mejlet är borta.",
   },
 };
 

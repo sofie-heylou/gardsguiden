@@ -51,7 +51,7 @@ const CC_CONFIG: CookieConsent.CookieConsentConfig = {
             {
               title: "Nödvändiga kakor",
               description:
-                "Krävs för att webbplatsen ska fungera, till exempel för inloggning. Kan inte stängas av.",
+                "Krävs för att webbplatsen ska fungera — i praktiken bara den kaka som sparar ditt val här. Kan inte stängas av.",
               linkedCategory: "necessary",
             },
             {

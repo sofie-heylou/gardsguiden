@@ -1,8 +1,8 @@
 /** Moderation actions on published farms: clear the flags, or delete outright.
  *
- * Same shape as submissionActions.ts — framework-free, so the admin API routes
- * and the token-protected /atgard page run identical code.  Cache
- * revalidation after a delete is the caller's job, since it is a Next concern.
+ * Same shape as submissionActions.ts — framework-free, so /atgard and the CLI
+ * scripts can share one implementation.  Cache revalidation after a delete is
+ * the caller's job, since it is a Next concern.
  */
 
 import { getDb } from "./db";

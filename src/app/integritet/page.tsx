@@ -25,7 +25,7 @@ export default function IntegritetPage() {
         {/* ── Header ────────────────────────────────────────────────────────── */}
         <div className="space-y-2">
           <h1 className="font-display text-3xl text-stone-900">Integritetspolicy</h1>
-          <p className="text-xs text-stone-400">Senast uppdaterad: april 2026</p>
+          <p className="text-xs text-stone-400">Senast uppdaterad: augusti 2026</p>
         </div>
 
         <hr className="border-stone-100" />
@@ -45,12 +45,10 @@ export default function IntegritetPage() {
 
         <Section title="Vilka uppgifter samlas in">
           <p>
-            Vi samlar in uppgifter från gårdsägare som skapar ett konto, och
-            från den som lägger till en ny gård:
+            Gårdsguiden har inga konton och ingen inloggning. Vi samlar bara in
+            uppgifter från den som självmant skickar något till oss:
           </p>
           <ul className="list-disc list-inside space-y-1 text-stone-600">
-            <li><strong>E-postadress</strong> — används för att skapa konto och logga in via Clerk.</li>
-            <li><strong>Namn</strong> — valfritt, visas inte publikt.</li>
             <li>
               <strong>E-postadress vid inskickad gård</strong> — sparas med
               ansökan för att vi ska kunna meddela dig när gården har granskats.
@@ -93,30 +91,12 @@ export default function IntegritetPage() {
 
         <Section title="Varför behandlas uppgifterna">
           <p>
-            Uppgifterna används för att låta gårdsägare skapa konto, logga in
-            och hålla sin gårds information aktuell.
+            Uppgifterna används för att hantera det du skickar in — granska en
+            ny gård, rätta en uppgift eller svara på en rapport — och för att
+            kunna återkomma till dig om ärendet.
             Anonymiserad analysdata används för att förbättra webbplatsen och
             förstå hur den används — den delas inte med tredje part för
             marknadsföringsändamål.
-          </p>
-        </Section>
-
-        <Section title="Konto och inloggning">
-          <p>
-            Konton för gårdsägare skapas och hanteras via{" "}
-            <a
-              href="https://clerk.com/legal/privacy"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline hover:text-stone-900 transition-colors"
-            >
-              Clerk
-            </a>
-            {" "}(clerk.com), en tredjepartstjänst för autentisering. När du skapar
-            ett konto lagrar Clerk din e-postadress och kontoinformation på sina
-            servrar. Vi lagrar även ditt användar-ID och din e-postadress i vår
-            egen databas för att koppla ditt konto till din gård. Clerk är
-            GDPR-kompatibelt och behandlar data inom EU/EES.
           </p>
         </Section>
 
@@ -148,18 +128,23 @@ export default function IntegritetPage() {
             eller återkalla ditt samtycke via knappen{" "}
             <strong>&rdquo;Hantera kakor&rdquo;</strong> längst ned på sidan.
           </p>
+        </Section>
+
+        <Section title="E-post — Resend">
           <p>
-            Inloggning hanteras av Clerk (clerk.com). Clerk sätter kakor för att
-            hantera din session — dessa tas bort när du loggar ut. Läs mer i{" "}
+            När du skickar in en gård, rapporterar en gård, föreslår en ändring
+            eller kontaktar oss skickas ett mejl till oss via{" "}
             <a
-              href="https://clerk.com/legal/privacy"
+              href="https://resend.com/legal/privacy-policy"
               target="_blank"
               rel="noopener noreferrer"
               className="underline hover:text-stone-900 transition-colors"
             >
-              Clerks integritetspolicy
+              Resend
             </a>
-            .
+            {" "}(resend.com), en tjänst för e-postutskick. Mejlet innehåller det
+            du skrev och din e-postadress, och passerar Resends servrar för att
+            kunna levereras.
           </p>
         </Section>
 
@@ -182,9 +167,11 @@ export default function IntegritetPage() {
 
         <Section title="Var lagras uppgifterna">
           <p>
-            Uppgifterna lagras i en databas på servrar inom EU.
-            Vi använder ingen molntjänst utanför EU för lagring av
-            personuppgifter.
+            Uppgifterna lagras i en databas på servrar inom EU. Själva
+            utskicket av e-post sker via Resend, vars servrar kan ligga utanför
+            EU/EES — det som passerar dit är innehållet i ditt meddelande och
+            din e-postadress, inte databasen. Även analysdata behandlas av
+            Google enligt avsnittet om kakor ovan.
           </p>
         </Section>
 
@@ -193,7 +180,7 @@ export default function IntegritetPage() {
           <ul className="list-disc list-inside space-y-1 text-stone-600">
             <li><strong>Begära ett utdrag</strong> av de uppgifter vi har om dig.</li>
             <li><strong>Rätta</strong> felaktiga uppgifter.</li>
-            <li><strong>Radera</strong> ditt konto och alla tillhörande uppgifter.</li>
+            <li><strong>Radera</strong> de uppgifter vi har om dig.</li>
             <li><strong>Invända</strong> mot behandling du inte samtycker till.</li>
           </ul>
           <p>

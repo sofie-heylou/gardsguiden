@@ -107,12 +107,24 @@ För att ersätta databasen på en **körd** Railway-driftsättning utan driftst
 
 2. **Sätt miljövariabler** under Railway → Variables:
 
-   | Variabel | Värde |
-   |---|---|
-   | `NEXT_PUBLIC_MAPBOX_TOKEN` | `pk.ditt_mapbox_token` |
-   | `DB_PATH` | `/data/gardsguiden.db` |
-   | `NODE_ENV` | `production` |
-   | `NEXT_PUBLIC_SITE_URL` | `https://din-app.railway.app` |
+   | Variabel | Värde | Krävs |
+   |---|---|---|
+   | `NEXT_PUBLIC_MAPBOX_TOKEN` | `pk.ditt_mapbox_token` | ja |
+   | `DB_PATH` | `/data/gardsguiden.db` | ja |
+   | `NODE_ENV` | `production` | ja |
+   | `NEXT_PUBLIC_SITE_URL` | `https://din-app.railway.app` | ja |
+   | `ADMIN_ACTION_SECRET` | minst 16 tecken, t.ex. `openssl rand -base64 32` | ja |
+   | `RESEND_API_KEY` | `re_...` från resend.com | ja |
+
+   `ADMIN_ACTION_SECRET` signerar åtgärdslänkarna i notismejlen och används
+   som nyckel för besökarhashen i flaggnings-dedupen. Saknas den skickas
+   mejlen **utan åtgärdsknappar** och alla befintliga länkar slutar gälla —
+   och eftersom det inte finns någon adminvy längre är enda vägen in då
+   `railway ssh` och skripten i `scripts/`. Byter du värdet blir alla länkar
+   som redan ligger i inkorgen ogiltiga.
+
+   Utan `RESEND_API_KEY` loggas mejlen till konsolen i stället för att
+   skickas — inget kraschar, men du får inga notiser.
 
 3. **Skapa en Volume** under Railway → Volumes och montera den på `/data`.
    Detta bevarar SQLite-databasen mellan driftsättningar.

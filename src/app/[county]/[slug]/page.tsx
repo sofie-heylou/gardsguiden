@@ -6,9 +6,7 @@ import {
   BadgeCheck,
   Sailboat,
 } from "lucide-react";
-import { auth } from "@clerk/nextjs/server";
 import { getFarmById, getAllFarms } from "../../../lib/farms";
-import { getDb } from "../../../lib/db";
 import { SLUG_TO_COUNTY, COUNTY_TO_SLUG, farmPath } from "../../../lib/counties";
 import BackButton from "../../../components/BackButton";
 import FarmContactSection from "../../../components/FarmContactSection";
@@ -16,7 +14,6 @@ import FarmDetailMapLoader from "../../../components/FarmDetailMapLoader";
 import OpeningHoursTable from "../../../components/OpeningHoursTable";
 import OpenStatusBadge from "../../../components/OpenStatusBadge";
 import FarmStickyBar from "../../../components/FarmStickyBar";
-import AdminDeleteFarmButton from "../../../components/AdminDeleteFarmButton";
 import FlagFarmButton from "../../../components/FlagFarmButton";
 import SuggestChangeForm from "../../../components/SuggestChangeForm";
 import { SITE_URL } from "../../../lib/site";
@@ -49,6 +46,11 @@ function buildDescription(farm: Farm): string {
 }
 
 // ── Metadata ─────────────────────────────────────────────────────────────────
+
+// Farm data can be changed outside the app (CLI moderation, direct SQL on the
+// runtime volume). Without a revalidate window those edits would never reach
+// these prerendered pages until a redeploy.
+export const revalidate = 3600;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { county, slug } = await params;
@@ -147,11 +149,6 @@ export default async function FarmDetailPage({ params }: Props) {
 
   const farm = getFarmById(slug);
   if (!farm || COUNTY_TO_SLUG[farm.lan] !== county) notFound();
-
-  const { userId } = await auth();
-  const isAdmin = userId
-    ? (getDb().prepare("SELECT role FROM users WHERE id = ?").get(userId) as { role: string } | undefined)?.role === "admin"
-    : false;
 
   const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${farm.lat},${farm.lng}`;
 
@@ -272,10 +269,6 @@ export default async function FarmDetailPage({ params }: Props) {
             <SuggestChangeForm farmId={farm.id} farmName={farm.name} />
 
             <FlagFarmButton farmId={farm.id} />
-
-            {isAdmin && (
-              <AdminDeleteFarmButton farmId={farm.id} farmName={farm.name} />
-            )}
 
           </div>
 

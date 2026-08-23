@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X, ChevronRight } from "lucide-react";
-import HeaderAuth from "./HeaderAuth";
 import { COUNTIES } from "../lib/counties";
 import { track } from "../lib/analytics";
 
@@ -40,19 +39,11 @@ const primaryLinks = [
 
 export default function Header() {
   const [open, setOpen] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
   const pathname = usePathname();
 
   function closeMenu() {
     setOpen(false);
   }
-
-  useEffect(() => {
-    fetch("/api/me/role")
-      .then((r) => r.json())
-      .then((data) => setIsAdmin(data.role === "admin"))
-      .catch(() => {});
-  }, []);
 
   // Close menu on route change
   useEffect(() => {
@@ -128,15 +119,6 @@ export default function Header() {
                 {label}
               </Link>
             ))}
-            {isAdmin && (
-              <Link
-                href="/admin"
-                onClick={closeMenu}
-                className="py-2 text-[15px] text-stone-400 hover:text-stone-700 transition-colors"
-              >
-                Admin
-              </Link>
-            )}
           </div>
 
           {/* County chips */}
@@ -171,10 +153,6 @@ export default function Header() {
                 <ChevronRight size={13} />
               </Link>
             </div>
-            {/* Signing in does nothing for a normal visitor now that farms are
-                neither claimed nor managed — showing the button would funnel
-                farmers into a dead end. Admins reach sign-in via /admin. */}
-            {isAdmin && <HeaderAuth />}
           </div>
 
           {/* Legal — low visual weight */}
