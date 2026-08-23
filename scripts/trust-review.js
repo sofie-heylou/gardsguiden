@@ -38,7 +38,8 @@
 
 const fs = require("fs");
 const { loadFeatures, locate } = require("./kommun-lookup");
-const { farmPath, arg, loadFarms, loadClicks, compareKommun, wordMatcher } = require("./review-lib");
+const { farmPath, arg, loadFarms, loadClicks, compareKommun } = require("./review-lib");
+const { wordMatcher } = require("./farm-relevance");
 
 const SUSPECT_KEYWORDS = [
   "sportbar", "spa", "konferens", "hotell", "grossist", "systembolag",

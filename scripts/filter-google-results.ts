@@ -1,5 +1,9 @@
 import fs from "fs";
 import path from "path";
+// The shared "is this actually a farm?" rules, also used by the post-hoc
+// audit in scripts/relevance-review.js. Everything the 2026-08-23 cleanup
+// learned about city breweries and town bars is enforced here, at intake.
+import { assess } from "./farm-relevance";
 
 const IN_FILE      = path.join(process.cwd(), "data/tmp/google-places-farms.json");
 const OUT_KEEP     = path.join(process.cwd(), "data/tmp/filtered-keep.json");
@@ -16,6 +20,12 @@ interface PlaceResult {
   reviewCount: number | null;
   googleTypes: string[];
   source: string;
+  // Read by assess() for the urban-centre check. Declared rather than left to
+  // the index signature so the field names are at least documented here; the
+  // actual enforcement is the runtime assertion below, since parsed JSON
+  // carries no types.
+  lat: number | null;
+  lng: number | null;
   [key: string]: unknown;
 }
 
@@ -41,29 +51,37 @@ const SKIP_GOOGLE_TYPES = new Set([
 // Café/restaurant words that alone don't make a farm
 const FOOD_VENUE_NAME = /\b(restaurang|restaurant|café|bistro|kök|matsal|bar\b|pizzeria|sushi|thai|kinarestaurang)\b/i;
 
-// Entries a human reviewed and removed from the catalog — see
-// scripts/data/removed-farms.json and the same guard in compile-farms.js.
-const REMOVED_NAMES = new Set(
-  (JSON.parse(
-    fs.readFileSync(path.join(__dirname, "data", "removed-farms.json"), "utf8"),
-  ) as { name: string }[]).map((r) => r.name.toLowerCase().trim()),
-);
-
 // ── Classification ────────────────────────────────────────────────────────────
 
 type Verdict = "keep" | "maybe" | "remove";
 
+/**
+ * The shared relevance rules decide first and can only ever be stricter than
+ * the Google-signal heuristics below: a reject is final, and a "review" caps
+ * the result at `maybe` so a human sees it. Order matters — a strong-sounding
+ * name must not buy its way in. "Nya Carnegiebryggeriet" matches STRONG_NAME
+ * on `bryggeri`, and only the relevance check (city coordinates, no rural farm
+ * word) keeps it out.
+ */
 function classify(r: PlaceResult): { verdict: Verdict; reason: string } {
+  const relevance = assess(r);
+  if (relevance.verdict === "reject") {
+    return { verdict: "remove", reason: `relevance: ${relevance.reasons.join(", ")}` };
+  }
+
+  const signals = classifyGoogleSignals(r);
+  if (relevance.verdict === "review" && signals.verdict === "keep") {
+    return { verdict: "maybe", reason: `needs a look — ${relevance.reasons.join(", ")}` };
+  }
+  return signals;
+}
+
+function classifyGoogleSignals(r: PlaceResult): { verdict: Verdict; reason: string } {
   const name  = r.name  || "";
   const types = r.googleTypes || [];
-  const typeSet = new Set(types);
   const src   = r.source || "";
 
   // ── Hard removes ────────────────────────────────────────────────────────────
-
-  if (REMOVED_NAMES.has(name.toLowerCase().trim())) {
-    return { verdict: "remove", reason: "previously reviewed and removed" };
-  }
 
   if (CHAIN_NAMES.test(name)) {
     return { verdict: "remove", reason: "chain/supermarket name" };
@@ -104,17 +122,12 @@ function classify(r: PlaceResult): { verdict: Verdict; reason: string } {
     return { verdict: "keep", reason: `farm google type: ${types.find(t => FARM_GOOGLE_TYPES.has(t))}` };
   }
 
-  // "from specific term" only counts as a keep signal when combined with
-  // something else — a farm-like name, low review count, or farm google type.
-  // Alone it's not enough (gårdscafé search returns generic city cafés).
-  const isSmallLocal = (r.reviewCount ?? 0) > 0 && (r.reviewCount ?? 0) < 150;
-  // Require the name to have a farm signal even for specific-term results —
-  // city cafés/shops show up in gårdscafé/gårdsbutik searches due to radius.
-  if (fromSpecificTerm && STRONG_NAME.test(name)) {
-    return { verdict: "keep", reason: `specific farm term + farm name signal: ${src}` };
-  }
-
   // ── Maybe ─────────────────────────────────────────────────────────────────────
+
+  // "from specific term" is never a keep signal on its own — a gårdscafé search
+  // returns plenty of generic city cafés — so it only ever lands here. (Pairing
+  // it with STRONG_NAME would be redundant: that already returned keep above.)
+  const isSmallLocal = (r.reviewCount ?? 0) > 0 && (r.reviewCount ?? 0) < 150;
 
   // Café/restaurant name but from a specific farm search and very small — could be a gårdscafé
   if (fromSpecificTerm && FOOD_VENUE_NAME.test(name) && isSmallLocal) {
@@ -134,6 +147,21 @@ function classify(r: PlaceResult): { verdict: Verdict; reason: string } {
 const all: PlaceResult[] = JSON.parse(fs.readFileSync(IN_FILE, "utf-8"));
 console.log(`Read ${all.length} results from ${IN_FILE}\n`);
 
+// The relevance gate leans on coordinates to spot city venues, and a scraper
+// that stopped emitting lat/lng would not fail — it would quietly wave more
+// results through. Every row in the 2026-08-23 scrapes had them, so anything
+// below a clear majority means the input shape changed. Stop rather than
+// filter on half the evidence.
+const withCoords = all.filter((r) => r.lat != null && r.lng != null).length;
+if (all.length && withCoords / all.length < 0.9) {
+  console.error(
+    `Only ${withCoords}/${all.length} results carry lat/lng. The relevance gate ` +
+    `cannot see city locations without them — check the scraper's output shape ` +
+    `before trusting this run.`,
+  );
+  process.exit(1);
+}
+
 const keep:    (PlaceResult & { _reason: string })[] = [];
 const maybe:   (PlaceResult & { _reason: string })[] = [];
 const removed: (PlaceResult & { _reason: string })[] = [];
@@ -152,8 +180,6 @@ fs.writeFileSync(OUT_REMOVED, JSON.stringify(removed, null, 2));
 
 // ── Report ────────────────────────────────────────────────────────────────────
 
-const COUNTIES = ["Stockholm", "Uppsala", "Västmanland", "Södermanland"] as const;
-
 function countByCounty(list: PlaceResult[]) {
   const c: Record<string, number> = {};
   list.forEach(r => { c[r.lan] = (c[r.lan] ?? 0) + 1; });
@@ -167,8 +193,8 @@ console.log(`  REMOVED ${removed.length}`);
 
 console.log("\n── Keep — by county ─────────────────────────────────────────────");
 const keepByCounty = countByCounty(keep);
-for (const c of COUNTIES) {
-  console.log(`  ${c.padEnd(16)} ${keepByCounty[c] ?? 0}`);
+for (const [county, n] of Object.entries(keepByCounty).sort((a, b) => b[1] - a[1])) {
+  console.log(`  ${(county || "(no county)").padEnd(16)} ${n}`);
 }
 
 console.log("\n── Keep — sample names ──────────────────────────────────────────");

@@ -6,6 +6,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { assess } = require('./farm-relevance');
 
 const TMP_DIR = path.join(__dirname, '../data/tmp');
 const PRE_GEOCODE = path.join(TMP_DIR, 'compiled-pre-geocode.json');
@@ -69,16 +70,12 @@ const EXCLUDE_PATTERNS = [
 // Farm inclusion keywords — if name/desc contains these, it's likely a farm
 const FARM_KEYWORDS = /gård|gard|lantbruk|bonde|mejeri|bryggeri|vingård|vingard|cideri|mjöderi|mjoderi|honung|kött|odling|trädgård|tradgard|kvarn|chark|fisk(?:rök|e)|mathantverk|gardsbutik|naturbruk|ekogård|ekogard|lammköt|nötkött|viltkött|destille|bränneri/i;
 
-// Entries a human reviewed and removed from the catalog (city bars, urban
-// breweries, conference venues…). Matched on the exact name so a re-scrape
-// cannot reintroduce them. Duplicates deleted during that review are NOT
-// listed — those farms are still in the catalog under another id.
-const REMOVED_NAMES = new Set(
-  require('./data/removed-farms.json').map((r) => r.name.toLowerCase().trim()),
-);
-
 function isFarmEntry(farm) {
-  if (REMOVED_NAMES.has(farm.name.toLowerCase().trim())) return false;
+  // The shared relevance rules: previously-removed names, non-farm keywords,
+  // and city-centre locations without a rural farm word. Same gate as the
+  // scrape filter (scripts/filter-google-results.ts) and the catalog audit
+  // (scripts/relevance-review.js), so a rule learned once holds everywhere.
+  if (assess(farm).verdict === 'reject') return false;
 
   // Check exclusion patterns
   for (const pat of EXCLUDE_PATTERNS) {

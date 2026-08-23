@@ -63,6 +63,9 @@ producerar en ny SQLite-databas som du sedan driftsätter.
 GOOGLE_PLACES_API_KEY=din_nyckel node scripts/scrape-google-places.js
 
 # 2. Filtrera resultaten i tre hinkar: keep / maybe / removed
+#    Relevansreglerna i scripts/farm-relevance.js kör först och kan bara vara
+#    strängare än Google-signalerna: stadsadresser, barord och tidigare
+#    borttagna namn stoppas här. Gå alltid igenom "maybe"-hinken för hand.
 npx tsx scripts/filter-google-results.ts
 
 # 3. Slå ihop filtrerade resultat med befintlig data/farms.json
@@ -194,6 +197,12 @@ data/
 
 scripts/                  # ENBART LOKALT — driftsätts aldrig
   scrape-google-places.js    # Google Places Text Search + Details API
+  farm-relevance.js          # "Är det här en gård?" — delade regler för både
+                             #   intag (filter/compile) och granskning
+  validate-relevance-gate.js # Poängsätt reglerna mot 2026-08-23 års granskning
+  relevance-review.js        # Granska befintlig katalog mot samma regler
+  trust-review.js            # Dubbletter, fel län/kommun → åtgärds-JSON
+  apply-trust-actions.js     # Kör en granskad åtgärdsfil i en transaktion
   filter-google-results.ts   # Filtrera skrapresultat i keep/maybe/removed
   merge-google-results.ts    # Slå ihop filtrerade resultat med farms.json
   fix-empty-kommun.ts        # Fyll i tomma kommunfält via adress + Nominatim

@@ -63,12 +63,5 @@ function compareKommun(stored, derived) {
   return "different";
 }
 
-// Whole-word Swedish keyword matcher — "spa" must not fire inside
-// "Vingårdspark". Compiles the list once; the returned function takes a
-// lowercased name and returns the first matching keyword, or undefined.
-function wordMatcher(keywords) {
-  const compiled = keywords.map((k) => [k, new RegExp(`(^|[^a-zåäö])${k}($|[^a-zåäö])`)]);
-  return (name) => (compiled.find(([, re]) => re.test(name)) || [])[0];
-}
 
-module.exports = { COUNTY_TO_SLUG, farmPath, arg, loadFarms, loadClicks, compareKommun, wordMatcher };
+module.exports = { COUNTY_TO_SLUG, farmPath, arg, loadFarms, loadClicks, compareKommun };
