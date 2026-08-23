@@ -171,7 +171,10 @@ export default function Header() {
                 <ChevronRight size={13} />
               </Link>
             </div>
-            <HeaderAuth />
+            {/* Signing in does nothing for a normal visitor now that farms are
+                neither claimed nor managed — showing the button would funnel
+                farmers into a dead end. Admins reach sign-in via /admin. */}
+            {isAdmin && <HeaderAuth />}
           </div>
 
           {/* Legal — low visual weight */}

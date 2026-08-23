@@ -16,7 +16,6 @@ import FarmDetailMapLoader from "../../../components/FarmDetailMapLoader";
 import OpeningHoursTable from "../../../components/OpeningHoursTable";
 import OpenStatusBadge from "../../../components/OpenStatusBadge";
 import FarmStickyBar from "../../../components/FarmStickyBar";
-import ClaimSection from "../../../components/ClaimSection";
 import AdminDeleteFarmButton from "../../../components/AdminDeleteFarmButton";
 import FlagFarmButton from "../../../components/FlagFarmButton";
 import SuggestChangeForm from "../../../components/SuggestChangeForm";
@@ -183,14 +182,8 @@ export default async function FarmDetailPage({ params }: Props) {
           {/* ── Content ─────────────────────────────────────────────────────── */}
           <div className="px-4 pt-5 space-y-6">
 
-            {/* Farm name + verified badge + status */}
+            {/* Farm name + status */}
             <div className="space-y-3">
-              {farm.isClaimed && (
-                <span className="inline-flex items-center gap-1 text-[11px] font-medium text-stone-400 tracking-wide">
-                  <BadgeCheck size={12} className="text-stone-400" />
-                  Verifierad gård
-                </span>
-              )}
               <h1 className="font-display text-3xl text-stone-900 leading-tight">
                 {farm.name}
               </h1>
@@ -279,8 +272,6 @@ export default async function FarmDetailPage({ params }: Props) {
             <SuggestChangeForm farmId={farm.id} farmName={farm.name} />
 
             <FlagFarmButton farmId={farm.id} />
-
-            <ClaimSection farmId={farm.id} farmName={farm.name} />
 
             {isAdmin && (
               <AdminDeleteFarmButton farmId={farm.id} farmName={farm.name} />

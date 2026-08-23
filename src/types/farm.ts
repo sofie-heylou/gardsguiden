@@ -18,7 +18,6 @@ export interface Farm {
   openingHours: string;
   season: string;
   source: string;
-  isClaimed: boolean;
   facebook: string | null;
   instagram: string | null;
 }

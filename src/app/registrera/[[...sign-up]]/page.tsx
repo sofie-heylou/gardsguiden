@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default async function RegistreraPage() {
   const user = await currentUser();
-  if (user) redirect("/min-gard");
+  if (user) redirect("/");
 
   return (
     <div className="h-full overflow-y-auto flex items-center justify-center py-12" style={{ background: "#FAFAF8" }}>

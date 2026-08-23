@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { MapPin, PlusCircle, BadgeCheck } from "lucide-react";
+import { MapPin, PlusCircle } from "lucide-react";
 import ContactForm from "./ContactForm";
 import { getAllFarms } from "../../lib/farms";
 import { COUNTIES } from "../../lib/counties";
@@ -53,9 +53,9 @@ export default function OmPage() {
           <h2 className="font-display text-xl text-stone-900">Hur gårdar listas</h2>
           <p className="text-sm text-stone-600 leading-relaxed">
             Gårdarna har samlats in från öppna källor och kompletteras
-            löpande. En gårdsägare kan göra anspråk på sin sida för att
-            hålla information, öppettider och kontaktuppgifter uppdaterade —
-            det syns med ett verifierat-märke på gårdens sida.
+            löpande. Ser du något som inte stämmer — öppettider,
+            kontaktuppgifter eller annat — kan du använda &rdquo;Föreslå en
+            ändring&rdquo; på gårdens sida, så rättar vi det.
           </p>
           <p className="text-sm text-stone-600 leading-relaxed">
             Saknar du din gård? Du kan lägga till den själv så granskar vi
@@ -91,24 +91,17 @@ export default function OmPage() {
         <div className="bg-stone-50 rounded-2xl border border-stone-100 p-6 space-y-4">
           <h2 className="font-display text-xl text-stone-900">Är du gårdsägare?</h2>
           <p className="text-sm text-stone-600 leading-relaxed">
-            Gör anspråk på din gård för att redigera beskrivning, öppettider
-            och kontaktuppgifter. Du syns med ett verifierat-märke och dina
-            uppgifter hålls alltid aktuella.
+            Du behöver inget konto. Saknas din gård lägger du till den här, och
+            behöver något rättas använder du &rdquo;Föreslå en ändring&rdquo;
+            på gårdens sida — vi uppdaterar den åt dig.
           </p>
           <div className="flex flex-col gap-2">
             <Link
-              href="/lista"
+              href="/lagg-till"
               className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-stone-800 text-white text-sm font-semibold hover:bg-stone-700 transition-colors"
             >
-              <BadgeCheck size={15} />
-              Hitta och gör anspråk på din gård
-            </Link>
-            <Link
-              href="/lagg-till"
-              className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-stone-200 text-stone-700 text-sm font-medium hover:border-stone-400 transition-colors"
-            >
               <PlusCircle size={15} />
-              Lägg till en ny gård
+              Lägg till din gård
             </Link>
           </div>
         </div>

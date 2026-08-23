@@ -27,6 +27,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.5,
     },
     {
+      // The public entry point for farmers now that adding a farm needs no account.
+      url: `${SITE_URL}/lagg-till`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
+    {
       url: `${SITE_URL}/reportage`,
       lastModified: now,
       changeFrequency: "monthly",

@@ -3,10 +3,20 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Loader2, Check } from "lucide-react";
-import { AddressAutofill } from "@mapbox/search-js-react";
+import nextDynamic from "next/dynamic";
+
+// @mapbox/search-js-react touches `document` at module scope, so it cannot be
+// evaluated during server rendering. Loading it client-side only lets this
+// page render for logged-out visitors, which it must now that adding a farm
+// no longer requires an account.
+const AddressAutofill = nextDynamic(
+  () => import("@mapbox/search-js-react").then((m) => m.AddressAutofill),
+  { ssr: false }
+);
 import type { AddressAutofillRetrieveResponse } from "@mapbox/search-js-core";
 import { COUNTY_NAMES } from "../../lib/counties";
 import { inputCls } from "../../lib/ui";
+import { MAX_EMAIL } from "../../lib/limits";
 
 
 const ALL_PRODUCTS = [
@@ -49,7 +59,8 @@ function Field({ label, required, children }: {
   );
 }
 
-export default function SubmitFarmForm({ userEmail }: { userEmail: string }) {
+export default function SubmitFarmForm() {
+  const [submittedEmail, setSubmittedEmail] = useState("");
   const [name,          setName]          = useState("");
   const [description,   setDescription]   = useState("");
   const [address,       setAddress]       = useState("");
@@ -118,7 +129,7 @@ export default function SubmitFarmForm({ userEmail }: { userEmail: string }) {
             .filter(({ key }) => hours[key as keyof typeof hours].trim())
             .map(({ key, sv }) => `${sv}: ${hours[key as keyof typeof hours].trim()}`)
             .join(", ") : "",
-          submittedEmail: userEmail,
+          submittedEmail,
         }),
       });
       const data = await res.json() as { ok?: boolean; error?: string };
@@ -397,11 +408,34 @@ export default function SubmitFarmForm({ userEmail }: { userEmail: string }) {
         ))}
       </section>
 
+      <section className="bg-white rounded-xl border border-stone-100 shadow-sm p-5 space-y-4">
+        <h2 className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+          Din kontaktuppgift
+        </h2>
+
+        <Field label="Din e-postadress" required>
+          <input
+            type="email"
+            required
+            maxLength={MAX_EMAIL}
+            value={submittedEmail}
+            onChange={(e) => setSubmittedEmail(e.target.value)}
+            placeholder="din@epost.se"
+            className={inputCls}
+          />
+        </Field>
+
+        <p className="text-[11px] text-stone-400 leading-relaxed">
+          Hit skickar vi besked när gården har granskats. Adressen visas inte
+          publikt.
+        </p>
+      </section>
+
       {error && <p className="text-sm text-red-500">{error}</p>}
 
       <button
         type="submit"
-        disabled={saving || !name || !address || !lan}
+        disabled={saving || !name || !address || !lan || !submittedEmail}
         className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-stone-800 text-white text-sm font-semibold hover:bg-stone-700 active:bg-stone-900 transition-colors disabled:opacity-50"
       >
         {saving ? <Loader2 size={15} className="animate-spin" /> : "Skicka in gård"}

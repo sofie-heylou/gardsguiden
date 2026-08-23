@@ -37,7 +37,6 @@ interface Submission {
   facebook: string | null;
   instagram: string | null;
   submitted_email: string;
-  user_id: string | null;
   status: string;
   notes: string | null;
 }
@@ -201,7 +200,6 @@ const farmRecord = {
   openingHours:          sub.opening_hours ?? "",
   season:                sub.season ?? "",
   source:                "submission",
-  claimed_by:            sub.user_id ?? null,
   facebook:              sub.facebook ?? null,
   instagram:             sub.instagram ?? null,
 };
@@ -213,22 +211,14 @@ const approveTx = db.transaction(() => {
       id, name, description, address, kommun, lan, lat, lng,
       website, phone, email, products, onSiteSales, tastingRoom,
       "gardsförsäljningLicense", isArchipelago, openingHours, season,
-      source, claimed_by, facebook, instagram
+      source, facebook, instagram
     ) VALUES (
       @id, @name, @description, @address, @kommun, @lan, @lat, @lng,
       @website, @phone, @email, @products, @onSiteSales, @tastingRoom,
       @gardsförsäljningLicense, @isArchipelago, @openingHours, @season,
-      @source, @claimed_by, @facebook, @instagram
+      @source, @facebook, @instagram
     )
   `).run(farmRecord);
-
-  // If the submitter is a known user, also create a confirmed farm_claim
-  if (sub.user_id) {
-    db.prepare(`
-      INSERT INTO farm_claims (id, farm_id, user_id, verification_code, status, payment_status, verified_at)
-      VALUES (?, ?, ?, '', 'email_verified', 'confirmed', datetime('now'))
-    `).run(generateId(), farmId, sub.user_id);
-  }
 
   db.prepare(`
     UPDATE farm_submissions
@@ -274,11 +264,7 @@ console.log(`  ID      : ${farmId}`);
 console.log(`  Name    : ${sub.name}`);
 console.log(`  County  : ${sub.lan ?? "(none)"}`);
 console.log(`  Coords  : ${lat != null ? `${lat}, ${lng}` : "none"}`);
-if (sub.user_id) {
-  const owner = db.prepare("SELECT email FROM users WHERE id = ?").get(sub.user_id) as
-    | { email: string } | undefined;
-  console.log(`  Owner   : ${owner?.email ?? sub.user_id}`);
-}
+console.log(`  Sent by : ${sub.submitted_email}`);
 if (farmUrl) {
   console.log(`  URL     : ${farmUrl}`);
 }

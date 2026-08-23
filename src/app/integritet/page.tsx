@@ -45,12 +45,17 @@ export default function IntegritetPage() {
 
         <Section title="Vilka uppgifter samlas in">
           <p>
-            Vi samlar bara in uppgifter från gårdsägare som väljer att skapa ett
-            konto, göra anspråk på sin gård eller lägga till en ny gård:
+            Vi samlar in uppgifter från gårdsägare som skapar ett konto, och
+            från den som lägger till en ny gård:
           </p>
           <ul className="list-disc list-inside space-y-1 text-stone-600">
             <li><strong>E-postadress</strong> — används för att skapa konto och logga in via Clerk.</li>
             <li><strong>Namn</strong> — valfritt, visas inte publikt.</li>
+            <li>
+              <strong>E-postadress vid inskickad gård</strong> — sparas med
+              ansökan för att vi ska kunna meddela dig när gården har granskats.
+              Visas inte publikt.
+            </li>
           </ul>
           <p>
             Om du rapporterar en gård med knappen &rdquo;Det här verkar inte vara

@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import { getDb } from "../../../../lib/db";
 import { generateId, isValidEmail } from "../../../../lib/utils";
 import { sendEmail, emailHtml, table, row, ADMIN_EMAIL } from "../../../../lib/email";
+import { visitorHash } from "../../../../lib/visitor";
+import { requestAlertSlot, ALERT_CAP_NOTICE } from "../../../../lib/alertBudget";
+import { MAX_EMAIL } from "../../../../lib/limits";
 import { submissionModerationButtons } from "../../../../lib/moderationEmail";
 
 export const dynamic = "force-dynamic";
@@ -32,7 +34,12 @@ export async function POST(req: NextRequest) {
   if (name.length > 200) {
     return NextResponse.json({ error: "Gårdsnamnet är för långt" }, { status: 400 });
   }
-  if (!submittedEmail || typeof submittedEmail !== "string" || !isValidEmail(submittedEmail)) {
+  if (
+    !submittedEmail ||
+    typeof submittedEmail !== "string" ||
+    !isValidEmail(submittedEmail) ||
+    submittedEmail.length > MAX_EMAIL
+  ) {
     return NextResponse.json({ error: "Ange en giltig e-postadress" }, { status: 400 });
   }
   if (lan && !VALID_LAN.includes(lan as string)) {
@@ -47,24 +54,30 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Ett av fälten är för långt (max 500 tecken)" }, { status: 400 });
   }
 
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: "Inte inloggad" }, { status: 401 });
-
   const db = getDb();
   const submissionId = generateId();
 
-  // Ensure the user row exists — the Clerk webhook may not have fired yet.
-  db.prepare(`
-    INSERT INTO users (id, email, role)
-    VALUES (?, ?, 'farmer')
-    ON CONFLICT (id) DO NOTHING
-  `).run(userId, (submittedEmail as string).trim());
+  // Until this stage a login was the only thing standing between this endpoint
+  // and unlimited submissions.  Same guards as the other public writes: one
+  // pending submission per visitor, and a shared ceiling on admin email.
+  const visitor = visitorHash(req.headers, "submit");
+  const pending = db.prepare(`
+    SELECT COUNT(*) AS n FROM farm_submissions
+    WHERE visitor_hash = ? AND created_at > datetime('now', '-1 hour')
+  `).get(visitor) as { n: number };
+
+  if (pending.n >= 3) {
+    return NextResponse.json(
+      { error: "Du har redan skickat in flera gårdar. Försök igen om en stund." },
+      { status: 429 }
+    );
+  }
 
   db.prepare(`
     INSERT INTO farm_submissions
       (id, name, description, address, kommun, lan, website, phone, email,
        products, opening_hours, season, on_site_sales, tasting_room,
-       facebook, instagram, submitted_email, user_id)
+       facebook, instagram, submitted_email, visitor_hash)
     VALUES
       (?, ?, ?, ?, ?, ?, ?, ?, ?,
        ?, ?, ?, ?, ?,
@@ -87,10 +100,13 @@ export async function POST(req: NextRequest) {
     typeof facebook    === "string" && facebook.trim()   ? facebook.trim()    : null,
     typeof instagram   === "string" && instagram.trim()  ? instagram.trim()   : null,
     (submittedEmail as string).trim(),
-    userId ?? null,
+    visitor,
   );
 
   const productList = Array.isArray(products) ? (products as string[]).join(", ") : null;
+
+  const decision = requestAlertSlot();
+  if (decision === "suppress") return NextResponse.json({ ok: true });
 
   sendEmail({
     to: ADMIN_EMAIL,
@@ -107,6 +123,7 @@ export async function POST(req: NextRequest) {
         row("Produkter",  productList)
       )}
       ${submissionModerationButtons(submissionId)}
+      ${decision === "send-last" ? ALERT_CAP_NOTICE : ""}
     `),
   });
 

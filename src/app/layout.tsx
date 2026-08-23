@@ -86,24 +86,8 @@ export const viewport: Viewport = {
 
 const clerkLocalization = {
   ...svSE,
-  signIn: {
-    ...svSE.signIn,
-    start: {
-      ...svSE.signIn?.start,
-      title: "Logga in som gårdsägare",
-      subtitle:
-        "Här loggar du in för att hantera din gårds visning på Gårdsguiden. Letar du efter gårdar? Inget konto behövs — gå till kartan eller listan.",
-    },
-  },
-  signUp: {
-    ...svSE.signUp,
-    start: {
-      ...svSE.signUp?.start,
-      title: "Registrera din gård",
-      subtitle:
-        "Skapa ett konto för att lägga till och hantera din gårds visning på Gårdsguiden.",
-    },
-  },
+  // No sign-in/sign-up copy overrides: they promised farm management, which
+  // no longer exists. Plain svSE until Clerk itself goes in Stage 6.
 };
 
 const organizationJsonLd = {

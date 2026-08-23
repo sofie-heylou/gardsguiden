@@ -244,6 +244,9 @@ function initSchema(db: Database.Database): void {
   if (!columnExists(db, "farm_submissions", "instagram")) {
     db.exec(`ALTER TABLE farm_submissions ADD COLUMN instagram TEXT`);
   }
+  if (!columnExists(db, "farm_submissions", "visitor_hash")) {
+    db.exec(`ALTER TABLE farm_submissions ADD COLUMN visitor_hash TEXT`);
+  }
 
   // ── Anonymous flag dedup ───────────────────────────────────────────────────
   // One row per (farm, visitor). visitor_hash is a keyed hash of the caller's

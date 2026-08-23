@@ -1,9 +1,5 @@
-import { redirect } from "next/navigation";
 import type { Metadata } from "next";
-import { currentUser } from "@clerk/nextjs/server";
 import SubmitFarmForm from "./SubmitFarmForm";
-
-export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Lägg till din gård",
@@ -12,12 +8,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/lagg-till" },
 };
 
-export default async function LaggTillPage() {
-  const user = await currentUser();
-  if (!user) redirect("/logga-in");
-
-  const email = user.emailAddresses[0]?.emailAddress ?? "";
-
+export default function LaggTillPage() {
   return (
     <div className="h-full overflow-y-auto" style={{ background: "#FAFAF8" }}>
       <div className="max-w-lg mx-auto px-4 py-6 pb-12 space-y-6">
@@ -30,7 +21,7 @@ export default async function LaggTillPage() {
           </p>
         </div>
 
-        <SubmitFarmForm userEmail={email} />
+        <SubmitFarmForm />
 
       </div>
     </div>

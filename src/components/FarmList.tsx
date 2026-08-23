@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import Link from "next/link";
 import {
   Search, X, ShoppingBag, GlassWater, Clock,
-  MapPin, LocateFixed, Loader2, BadgeCheck,
+  MapPin, LocateFixed, Loader2,
 } from "lucide-react";
 import { CATEGORIES, farmMatchesCategory } from "../lib/categories";
 import { farmPath, COUNTY_NAMES } from "../lib/counties";
@@ -243,12 +243,6 @@ export default function FarmList({ initialFarms, initialCounty }: Props) {
                     <div className="flex items-start justify-between gap-2 mb-0.5">
                       <h2 className="font-display text-[15px] text-stone-900 leading-snug">{farm.name}</h2>
                       <div className="flex items-center gap-1.5 shrink-0 mt-0.5">
-                        {farm.isClaimed && (
-                          <span className="flex items-center gap-0.5 text-[10px] font-medium text-emerald-600" title="Verifierad gård">
-                            <BadgeCheck size={12} />
-                            Verifierad
-                          </span>
-                        )}
                         {dist !== null && (
                           <span className={`flex items-center gap-0.5 text-[11px] ${nearMeActive ? "text-amber-600 font-medium" : "text-stone-400"}`}>
                             <MapPin size={10} />

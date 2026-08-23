@@ -22,7 +22,6 @@ interface FarmRow {
   openingHours: string;
   season: string;
   source: string;
-  claimed_by: string | null;
   facebook: string | null;
   instagram: string | null;
 }
@@ -41,7 +40,6 @@ function rowToFarm(row: FarmRow): Farm {
     tastingRoom: row.tastingRoom === 1,
     gardsförsäljningLicense: row.gardsförsäljningLicense === 1,
     isArchipelago: row.isArchipelago === 1,
-    isClaimed: Boolean(row.claimed_by),
     facebook: row.facebook ?? null,
     instagram: row.instagram ?? null,
   };

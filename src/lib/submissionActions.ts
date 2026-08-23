@@ -11,6 +11,8 @@ import type { Database } from "better-sqlite3";
 import { getDb } from "./db";
 import { sendEmail, emailHtml, btn, escapeHtml, ADMIN_EMAIL } from "./email";
 import { slugify } from "./utils";
+import { COUNTY_TO_SLUG, farmPath } from "./counties";
+import type { Farm } from "../types/farm";
 import { notFound, type ActionFailure } from "./actionResult";
 import { SITE_URL } from "./site";
 
@@ -33,7 +35,6 @@ interface SubmissionRow extends PendingSubmission {
   season: string | null;
   on_site_sales: number;
   tasting_room: number;
-  user_id: string | null;
 }
 
 export type ApproveResult = { ok: true; farmId: string } | ActionFailure;
@@ -85,15 +86,6 @@ function insertApprovedFarm(db: Database, submission: SubmissionRow, farmId: str
       submission.tasting_room,
     );
 
-    if (submission.user_id) {
-      db.prepare(`
-        INSERT INTO farm_ownership (farm_id, user_id, status)
-        VALUES (?, ?, 'approved')
-      `).run(farmId, submission.user_id);
-
-      db.prepare(`UPDATE farms SET claimed_by = ? WHERE id = ?`).run(submission.user_id, farmId);
-    }
-
     db.prepare(`
       UPDATE farm_submissions
       SET status = 'approved', reviewed_at = datetime('now')
@@ -102,18 +94,32 @@ function insertApprovedFarm(db: Database, submission: SubmissionRow, farmId: str
   })();
 }
 
+/** A farm is only reachable once it has a county slug we recognise plus the
+ *  address and website that getFarmById requires — a website is optional at
+ *  submission time, so an approved farm can legitimately have no public page
+ *  yet.  Linking to one would 404 in the very email announcing it. */
+function publicFarmUrl(submission: SubmissionRow, farmId: string): string | null {
+  const lan = submission.lan as Farm["lan"] | null;
+  if (!lan || !COUNTY_TO_SLUG[lan]) return null;
+  if (!submission.address?.trim() || !submission.website?.trim()) return null;
+  return `${SITE_URL}${farmPath({ id: farmId, lan })}`;
+}
+
 function notifyApproved(submission: SubmissionRow, farmId: string): void {
+  const url = publicFarmUrl(submission, farmId);
   sendEmail({
     to: submission.submitted_email,
     subject: `${submission.name} är nu med i Gårdsguiden!`,
     html: emailHtml(`
       <p style="margin:0 0 12px;font-size:15px;color:#1c1917;">
-        Din gård <strong>${escapeHtml(submission.name)}</strong> har godkänts och är nu synlig på Gårdsguiden.
+        Din gård <strong>${escapeHtml(submission.name)}</strong> har godkänts och är nu med i Gårdsguiden.
       </p>
       <p style="margin:0 0 20px;font-size:14px;color:#57534e;line-height:1.6;">
-        Logga in för att hantera din gårds visning, uppdatera öppettider och mer.
+        ${url
+          ? "Hittar du något som behöver rättas? Använd &rdquo;Föreslå en ändring&rdquo; på gårdens sida, så uppdaterar vi den."
+          : "Vi kompletterar uppgifterna innan gården visas publikt. Hör av dig till hej@gardsguiden.se om något behöver ändras."}
       </p>
-      ${btn("Hantera din gård", `${SITE_URL}/min-gard`)}
+      ${url ? btn("Visa gårdsidan", url) : ""}
     `),
   });
 
@@ -134,7 +140,7 @@ export function approveSubmission(id: string): ApproveResult {
   const submission = db.prepare(`
     SELECT id, name, description, address, kommun, lan,
            website, phone, email, products, opening_hours, season,
-           on_site_sales, tasting_room, submitted_email, user_id
+           on_site_sales, tasting_room, submitted_email
     FROM farm_submissions WHERE id = ? AND status = 'pending'
   `).get(id) as SubmissionRow | undefined;
 

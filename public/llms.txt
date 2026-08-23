@@ -41,7 +41,6 @@ Gårdsguiden listar gårdar som säljer:
 - **Gårdsförsäljning**: Direktförsäljning av egentillverkade produkter från gården, ofta med licens för alkohol
 - **Gårdsbutik**: Butik på eller vid gården där producenten säljer direkt till konsument
 - **Direktförsäljning**: Kortaste möjliga leveranskedja — från producent till konsument utan mellanled
-- **Verifierad gård**: Gårdar vars ägare gjort anspråk på sin sida och håller information aktuell
 
 ## Om tjänsten
 
