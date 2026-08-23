@@ -47,10 +47,11 @@ Three small, independent commits. Each gets a `validate-relevance-gate.js` repla
 
 The new script (`verify-onsite`) fetches each farm's homepage and looks for first-person production language: "vår gård", "vi odlar", "egen uppfödning", "eget slakteri", "bryggt på gården", "självplock hos oss"… It produces a **report**, and nothing else — it gets no power over the catalog until the report has earned trust.
 
-- [ ] Build the fetcher + keyword pass. Output per farm: verdict (**verified / unclear / contradicted**) plus the matching phrases as evidence, so the report shows its work.
-- [ ] Run it against the existing ~865 catalog entries. Review the report the same way as the August cleanup — sample the three buckets, note where the script's judgment differs from a human's.
-- [ ] Tune until it matches human judgment on the sample. If keywords aren't enough, add an LLM classification step here ("does this site describe selling things produced at this location? which products?") — but only after seeing where keywords fall short.
-- [ ] Handle the boring realities: dead links, Facebook-only "websites", sites that block fetches. These land in **unclear**, never in **contradicted** — absence of evidence is not evidence of absence.
+- [x] Build the fetcher + keyword pass: `scripts/verify-onsite.js` (fetching, per-URL cache in `data/tmp/onsite-cache/`, report writing) + `scripts/onsite-evidence.js` (phrase tiers and verdict — the judgment module stage 4 will reuse at intake). Homepage plus up to two same-site about-pages; charset-aware so latin-1 sites keep their åäö; evidence snippets in every verdict.
+- [x] Run against the catalog: 757 local rows audited 2026-08-23 (prod holds ~865 — the prod-only rows need a DB export to audit, noted below). Result after tuning: **427 verified / 321 unclear / 9 contradicted**. Report in `data/tmp/verify-onsite-report.{json,md}`.
+- [ ] Tune until it matches human judgment. Two rounds done against cached pages (mjölkautomat, bigård, uppfödning, familjedriven gård, English-language sites…; false contradictions Bjällansås gård and two vineyards fixed). **Sofie's review of the report is the gate that remains** — especially the 9 contradicted and a sample of no-signals.
+- [x] Handle the boring realities: dead links and HTTP errors (32), Facebook/Instagram-only links (45), thin/JS-only pages (30) all land in **unclear** with a reason, never contradicted. Bonus find, verified by hand: **5 farm domains are expired and now serve casino spam** (attanasgard.se, mormorsihamnen.se, charlis.se, fruemollansbar.se, rottlebryggeri.se) — flagged `off-topic-content`; the live site links to these today and should probably stop regardless of the audit.
+- [ ] Audit the prod-only rows (export prod DB farm list, rerun with `--in`).
 
 **Done when:** the report's verdicts match Sofie's judgment on a reviewed sample, and we know the false-flag rate before the verifier gates anything.
 
