@@ -1,0 +1,76 @@
+# Plan: A scraper that only lets real farms in
+
+*Written 2026-08-23, based on a review of the scrape → filter → compile pipeline. Goal: the catalog should only contain places where you can buy things made on site — food grown there, meat from animals raised and slaughtered there, beer brewed there, flowers you pick there. Everything here is offline tooling: `farms.json` is in git, prod is untouched until we choose to reseed, and rollback is always just a revert.*
+
+## What the pipeline looks like today (short version)
+
+Five near-identical scraper scripts (`scrape-google-places.js`, three `expansion` variants, `scrape-google-places-new-terms.js`) query Google Places with Swedish search terms around county center points. Each has its own inline pre-filter, then pays for a Place Details call per result, silently drops anything without a website, and guesses product tags and flags from text. Downstream, `filter-google-results.ts` and `compile-farms.js` both run the shared rulebook in `farm-relevance.js` — the module that encodes the August cleanup's lessons — and `validate-relevance-gate.js` can score any rule change against the human-reviewed ground truth.
+
+The problems, in order of how much they matter:
+
+- **Nothing ever verifies on-site production.** Every signal is a proxy: name words, Google place types, distance from city centers. Every kept entry is *required* to have a website — and the site is never looked at. That website is the strongest unused evidence we have.
+- **The scrapers' pre-filters contradict the cleanup's lessons.** `farm-relevance.js` deliberately refuses to trust bare "bryggeri"/"mejeri" as farm evidence; the scrapers' inline patterns still accept them, plus `lokal` (matches "festlokal"), bare "bageri", and "lanthandel" (a reseller). The new-terms scraper auto-accepts *every* result from *every* one of its search terms.
+- **The search term leaks into the data we show users.** Product tags and `onSiteSales`/`tastingRoom` are computed from `name + searchTerm + types` — so every hit from the "bryggeri" search is tagged öl whether it brews anything or not, every "musteri" hit is tagged vin (a straight bug — a musteri makes juice), and a random café found via the "gårdsbutik" query gets `onSiteSales: true`.
+- **Some search terms invite the wrong kind of place.** "bondens marknad" finds markets (farms selling *elsewhere*), "destilleri" finds city distilleries.
+- **Five copies drift.** A lesson learned in one scraper doesn't reach the other four.
+
+---
+
+## Stage 1 — One scraper, no behavior change (do first)
+
+Merge the five scripts into one, driven by a small config of search terms and county points. The single pre-filter calls the shared `assess()` from `farm-relevance.js` **before** paying for a Place Details call — text search results already carry name, types, and coordinates, which is everything `assess()` needs.
+
+- [ ] New `scrape-places.js` + config listing all terms and county center points from the five old scripts.
+- [ ] Pre-filter = shared `assess()` (reject → skip the details call) plus the skip-types check. Delete the five inline `isRelevant()` copies and their drifted `FARM_NAME_PATTERN`s.
+- [ ] Keep the resume-file support from the new-terms scraper (it's the one good addition).
+- [ ] Replay: run the raw `data/tmp` scrapes through the new pre-filter and confirm the keep-set matches what the old scripts plus `filter-google-results.ts` produced. Old scripts stay in the repo until this passes, then delete them.
+- [ ] While in there: swap `curl` via `execSync` for Node's built-in `fetch` (the API key currently shows up in the process list, and errors are swallowed).
+
+This stage deliberately fixes nothing else — it gives every later change one place to live.
+
+**Done when:** one scraper, same keep-set on replay, fewer paid API calls, and a rule added to `farm-relevance.js` automatically guards the next scrape with no other file needing to change.
+
+*(If the project stalls after stage 1, the drift problem is still permanently dead.)*
+
+## Stage 2 — Stop the data lying
+
+Three small, independent commits. Each gets a `validate-relevance-gate.js` replay.
+
+- [ ] **Term leak:** compute product tags and `onSiteSales`/`tastingRoom` from the place's own name and types only — never from the search term. Fix the musteri→vin regex while there.
+- [ ] **Prune mismatched terms and patterns:** drop "bondens marknad" as a search term (or capture markets as a separate content type later), drop "lanthandel" from any farm-word pattern, and review "destilleri" (keep the term, but no auto-accept — let `assess()` judge each result).
+- [ ] **No-website rows:** write them to a review file instead of silently dropping them. Many real small farms only have a Facebook page; if website-required stays policy, we should at least see what it costs.
+
+**Done when:** nothing in the pipeline asserts something about a farm that came from what *we searched for*, and dropped farms are visible instead of invisible.
+
+## Stage 3 — Website verification, as a read-only audit first (the main event)
+
+The new script (`verify-onsite`) fetches each farm's homepage and looks for first-person production language: "vår gård", "vi odlar", "egen uppfödning", "eget slakteri", "bryggt på gården", "självplock hos oss"… It produces a **report**, and nothing else — it gets no power over the catalog until the report has earned trust.
+
+- [ ] Build the fetcher + keyword pass. Output per farm: verdict (**verified / unclear / contradicted**) plus the matching phrases as evidence, so the report shows its work.
+- [ ] Run it against the existing ~865 catalog entries. Review the report the same way as the August cleanup — sample the three buckets, note where the script's judgment differs from a human's.
+- [ ] Tune until it matches human judgment on the sample. If keywords aren't enough, add an LLM classification step here ("does this site describe selling things produced at this location? which products?") — but only after seeing where keywords fall short.
+- [ ] Handle the boring realities: dead links, Facebook-only "websites", sites that block fetches. These land in **unclear**, never in **contradicted** — absence of evidence is not evidence of absence.
+
+**Done when:** the report's verdicts match Sofie's judgment on a reviewed sample, and we know the false-flag rate before the verifier gates anything.
+
+## Stage 4 — Give the verified signal power
+
+Only once stage 3's report has earned trust:
+
+- [ ] Wire `verify-onsite` into intake as a third gate: **contradicted** → reject, **unclear** → the maybe/review bucket, **verified** → through. Score it with `validate-relevance-gate.js` like every other rule.
+- [ ] Replace the guessed product tags with ones derived from website evidence, for entries where the site gave a clear answer.
+- [ ] Act on the stage 3 audit findings for existing entries — same pattern as the trust cleanup: small reviewed batches, names onto `removed-farms.json` so a re-scrape can't bring them back, backup before applying.
+
+**Done when:** a place can only enter the catalog if its own website supports on-site production — and the products shown are the ones the farm itself talks about.
+
+## Backlog (not scheduled)
+
+- Migrate to Google's new Places API v1 (`primaryType` includes `farm`; `editorialSummary` is free relevance text). Nice-to-have, not load-bearing.
+- Fill the gaps in the hand-kept kommun/county keyword lists (Salem, Sollentuna, Nykvarn missing from Stockholm) — or retire those lists in favor of the coordinate-based `kommun-lookup.js`.
+- Markets ("bondens marknad") as their own content type, if we ever want them.
+
+---
+
+## Suggested order
+
+1 → 2 → 3 → 4, strictly. Stages 1 and 2 are each an afternoon; stage 3 is the real work (a day or two plus review time); stage 4 is small once 3 is settled. The one ordering rule that matters: **the verifier audits before it gates.** A new filter that's wrong quietly deletes real farms — running it as a report first means its mistakes cost a re-read, not a farm.
