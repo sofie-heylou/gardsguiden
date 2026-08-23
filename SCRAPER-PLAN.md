@@ -20,11 +20,12 @@ The problems, in order of how much they matter:
 
 Merge the five scripts into one, driven by a small config of search terms and county points. The single pre-filter calls the shared `assess()` from `farm-relevance.js` **before** paying for a Place Details call — text search results already carry name, types, and coordinates, which is everything `assess()` needs.
 
-- [ ] New `scrape-places.js` + config listing all terms and county center points from the five old scripts.
-- [ ] Pre-filter = shared `assess()` (reject → skip the details call) plus the skip-types check. Delete the five inline `isRelevant()` copies and their drifted `FARM_NAME_PATTERN`s.
-- [ ] Keep the resume-file support from the new-terms scraper (it's the one good addition).
-- [ ] Replay: run the raw `data/tmp` scrapes through the new pre-filter and confirm the keep-set matches what the old scripts plus `filter-google-results.ts` produced. Old scripts stay in the repo until this passes, then delete them.
-- [ ] While in there: swap `curl` via `execSync` for Node's built-in `fetch` (the API key currently shows up in the process list, and errors are swallowed).
+- [x] New `scrape-places.js` + config (`scrape-config.js`) listing all terms and county center points from the five old scripts. Supports `--counties`, `--terms`, `--out`; default output `data/tmp/google-places-scrape.json`, wired into `filter-google-results.ts` (now takes an input path, defaults to the new file), `compile-farms.js`, and `validate-relevance-gate.js`.
+- [x] Pre-filter = shared `assess()` (reject → skip the details call) plus the skip-types check. The five inline `isRelevant()` copies and their drifted `FARM_NAME_PATTERN`s are gone.
+- [x] Kept the resume-file support from the new-terms scraper (progress saved per county centre, done-marker file cleaned up on completion).
+- [x] Replay passed 2026-08-23 over the 2118 unique raw places in `data/tmp`: zero raw rows carry a skip-type, all 686 pre-filter drops are `assess()` rejects (which `filter-google-results.ts` already removes today — so the post-filter keep-set is unchanged, and ~32% of Place Details calls are saved). One current catalog farm would be blocked (Henrys Bageri — the same row the gate already flags; no new false rejects). Gate score unchanged: 84.6% of confirmed junk rejected outright. Old scripts deleted.
+- [x] `curl` via `execSync` replaced with Node's built-in `fetch` (20 s timeout; the API key no longer shows up in the process list, and HTTP errors are reported instead of swallowed).
+- [x] Cleanup-review pass (replay re-run afterwards, identical results): `SKIP_TYPES` moved into `farm-relevance.js` with the other relevance rules; the raw-scrape-file roster single-homed in `scrape-config.js` and consumed by `compile-farms.js` + `validate-relevance-gate.js` (their two lists had already drifted — compile never merged the core file, preserved and documented as an open stage-2 question); dropped place_ids remembered within a run so a place recurring under another term or centre never costs a second Details call.
 
 This stage deliberately fixes nothing else — it gives every later change one place to live.
 

@@ -59,8 +59,10 @@ producerar en ny SQLite-databas som du sedan driftsätter.
 
 ```bash
 # 1. Skrapa nya gårdar från Google Places
-#    (kräver GOOGLE_PLACES_API_KEY som miljövariabel)
-GOOGLE_PLACES_API_KEY=din_nyckel node scripts/scrape-google-places.js
+#    (kräver GOOGLE_PLACES_API_KEY i .env.local eller som miljövariabel)
+#    Alla län och söktermer som standard; begränsa med --counties/--terms.
+#    Relevansreglerna körs redan här, innan detaljanropet betalas.
+GOOGLE_PLACES_API_KEY=din_nyckel node scripts/scrape-places.js
 
 # 2. Filtrera resultaten i tre hinkar: keep / maybe / removed
 #    Relevansreglerna i scripts/farm-relevance.js kör först och kan bara vara
@@ -196,7 +198,8 @@ data/
   gardsguiden.db          # SQLite-databas (bakas in i Docker-imagen som seed)
 
 scripts/                  # ENBART LOKALT — driftsätts aldrig
-  scrape-google-places.js    # Google Places Text Search + Details API
+  scrape-places.js           # Google Places Text Search + Details API
+  scrape-config.js           # Söktermer, länscentrum, adresslistor
   farm-relevance.js          # "Är det här en gård?" — delade regler för både
                              #   intag (filter/compile) och granskning
   validate-relevance-gate.js # Poängsätt reglerna mot 2026-08-23 års granskning

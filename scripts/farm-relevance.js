@@ -56,6 +56,17 @@ const RURAL_FARM_WORDS =
 // "…gatan NN" reads as a town grid; rural rows are "Byvägen 123".
 const TOWN_STREET = /gatan\s+\d|gatan\b[^,]*,/i;
 
+// Google place types that rule a result out before any name/location
+// judgment — businesses of the wrong kind entirely. The scraper's pre-filter
+// checks these to skip the paid Place Details call. filter-google-results.ts
+// still keeps its own larger SKIP_GOOGLE_TYPES with a strong-name escape
+// hatch; unifying the two changes verdicts, so that is a stage-2 question
+// (SCRAPER-PLAN), not a relocation.
+const SKIP_TYPES = new Set([
+  "hospital", "school", "university", "bank", "atm", "gas_station",
+  "car_dealer", "car_repair", "lodging",
+]);
+
 // Google place types describing a drinking/eating venue rather than a
 // producer. Never a rejection on its own: Google tags any brewery with a
 // taproom as "bar", so this fires on rural craft breweries (Boxholms
@@ -187,6 +198,6 @@ module.exports = {
   // assess() is the module's job; the rest is exported for the scripts that
   // report on individual signals (relevance-review.js) or reuse the matcher.
   assess, wordMatcher, hasFarmWord,
-  SUSPECT_KEYWORDS, BORDERLINE_KEYWORDS, RURAL_FARM_WORDS, TOWN_STREET,
+  SUSPECT_KEYWORDS, BORDERLINE_KEYWORDS, RURAL_FARM_WORDS, TOWN_STREET, SKIP_TYPES,
   suspectKeyword, borderlineKeyword, isCoarseAddress, urbanCentre,
 };

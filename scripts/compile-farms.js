@@ -7,6 +7,7 @@
 const fs = require('fs');
 const path = require('path');
 const { assess } = require('./farm-relevance');
+const { RAW_SCRAPE_FILES } = require('./scrape-config');
 
 const TMP_DIR = path.join(__dirname, '../data/tmp');
 const PRE_GEOCODE = path.join(TMP_DIR, 'compiled-pre-geocode.json');
@@ -184,12 +185,11 @@ async function main() {
 
   console.log('[Compile] Loading all data sources...\n');
 
-  const sourceFiles = [
-    { file: path.join(TMP_DIR, 'google-places-farms-expansion.json'),   label: 'Google Places (Skåne, Kalmar, Gotland)' },
-    { file: path.join(TMP_DIR, 'google-places-farms-expansion-2.json'), label: 'Google Places (Västra Götaland, Halland, Blekinge)' },
-    { file: path.join(TMP_DIR, 'google-places-farms-expansion-3.json'), label: 'Google Places (Kronoberg, Jönköping, Östergötland)' },
-    { file: path.join(TMP_DIR, 'google-places-farms-new-terms.json'),   label: 'Google Places (all counties, new terms)' },
-  ];
+  // The roster lives in scrape-config.js; inCompile preserves which files
+  // this step merged before the roster existed.
+  const sourceFiles = RAW_SCRAPE_FILES
+    .filter((s) => s.inCompile)
+    .map((s) => ({ file: path.join(TMP_DIR, s.file), label: s.label }));
 
   const allRaw = [];
   const sourceCounts = {};

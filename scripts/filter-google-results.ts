@@ -4,8 +4,13 @@ import path from "path";
 // audit in scripts/relevance-review.js. Everything the 2026-08-23 cleanup
 // learned about city breweries and town bars is enforced here, at intake.
 import { assess } from "./farm-relevance";
+import { DEFAULT_SCRAPE_OUT } from "./scrape-config";
 
-const IN_FILE      = path.join(process.cwd(), "data/tmp/google-places-farms.json");
+// Input defaults to the consolidated scraper's output; pass a path to filter
+// one of the older per-scraper files instead.
+const IN_FILE      = process.argv[2]
+  ? path.resolve(process.argv[2])
+  : path.join(process.cwd(), "data/tmp", DEFAULT_SCRAPE_OUT);
 const OUT_KEEP     = path.join(process.cwd(), "data/tmp/filtered-keep.json");
 const OUT_MAYBE    = path.join(process.cwd(), "data/tmp/filtered-maybe.json");
 const OUT_REMOVED  = path.join(process.cwd(), "data/tmp/filtered-removed.json");
@@ -144,6 +149,11 @@ function classifyGoogleSignals(r: PlaceResult): { verdict: Verdict; reason: stri
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 
+if (!fs.existsSync(IN_FILE)) {
+  console.error(`Input not found: ${IN_FILE}`);
+  console.error("Run scripts/scrape-places.js first, or pass a raw scrape file path.");
+  process.exit(1);
+}
 const all: PlaceResult[] = JSON.parse(fs.readFileSync(IN_FILE, "utf-8"));
 console.log(`Read ${all.length} results from ${IN_FILE}\n`);
 
