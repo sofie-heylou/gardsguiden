@@ -1,30 +1,34 @@
 /**
  * Admin script: reject a farm submission.
  *
- * Usage:
- *   npx tsx scripts/reject-submission.ts <submission-id> [optional reason]
+ * A thin wrapper over src/lib/submissionActions.ts so that this and the
+ * "Avvisa" button in the notification email do exactly the same thing — in
+ * particular, both now send the submitter the rejection email. The previous
+ * version updated the row silently and the submitter was never told.
  *
- * Examples:
- *   npx tsx scripts/reject-submission.ts abc123
- *   npx tsx scripts/reject-submission.ts abc123 "Duplicate of existing farm"
+ * Usage:
+ *   npx tsx scripts/reject-submission.ts <submission-id> [reason]
+ *
+ * The reason is stored in farm_submissions.notes for your own reference. It is
+ * NOT included in the email to the submitter.
+ *
+ * Against production:
+ *   railway ssh
+ *   DB_PATH=/data/gardsguiden.db npx tsx scripts/reject-submission.ts <id> "duplicate"
  */
 
-import Database from "better-sqlite3";
-import path from "path";
-
-const DB_PATH = process.env.DB_PATH ?? path.join(process.cwd(), "data", "gardsguiden.db");
+import { getDb } from "../src/lib/db";
+import { rejectSubmission } from "../src/lib/submissionActions";
 
 const submissionId = process.argv[2];
-const reason       = process.argv[3] ?? null;
+const reason = process.argv[3] ?? null;
 
 if (!submissionId) {
   console.error("Usage: npx tsx scripts/reject-submission.ts <submission-id> [reason]");
   process.exit(1);
 }
 
-const db = new Database(DB_PATH);
-db.pragma("journal_mode = WAL");
-db.pragma("foreign_keys = ON");
+const db = getDb();
 
 const sub = db.prepare(
   "SELECT id, name, status, submitted_email FROM farm_submissions WHERE id = ?"
@@ -36,17 +40,17 @@ if (!sub) {
   console.error(`Submission not found: ${submissionId}`);
   process.exit(1);
 }
-
 if (sub.status !== "pending") {
   console.error(`Submission is already "${sub.status}". Nothing to do.`);
   process.exit(1);
 }
 
-db.prepare(`
-  UPDATE farm_submissions
-  SET status = 'rejected', reviewed_at = datetime('now'), notes = COALESCE(?, notes)
-  WHERE id = ?
-`).run(reason, submissionId);
+const result = rejectSubmission(submissionId, reason);
+if (!result.ok) {
+  console.error(`Could not reject: ${result.reason}`);
+  process.exit(1);
+}
 
-console.log(`✓ Submission rejected: ${sub.name} (from ${sub.submitted_email})`);
-if (reason) console.log(`  Reason: ${reason}`);
+console.log(`✓ Submission rejected: ${sub.name}`);
+console.log(`  Rejection email sent to ${sub.submitted_email}`);
+if (reason) console.log(`  Reason stored in notes: ${reason}`);

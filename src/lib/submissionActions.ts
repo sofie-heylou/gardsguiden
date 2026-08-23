@@ -45,8 +45,16 @@ interface SubmissionRow extends PendingSubmission {
 export type ApproveResult = { ok: true; farmId: string } | ActionFailure;
 export type RejectResult = { ok: true } | ActionFailure;
 
-function newFarmId(name: string): string {
-  return `${slugify(name)}-${crypto.randomBytes(3).toString("hex")}`;
+/** A 3-byte suffix collides roughly once in 16 million, but the check is one
+ *  indexed lookup and a duplicate id would throw on INSERT. */
+function newFarmId(db: Database, name: string): string {
+  const base = slugify(name);
+  const exists = db.prepare("SELECT 1 FROM farms WHERE id = ?");
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const id = `${base}-${crypto.randomBytes(3).toString("hex")}`;
+    if (!exists.get(id)) return id;
+  }
+  throw new Error(`Could not mint a free farm id for "${name}"`);
 }
 
 /** The submission behind a pending id, or null.  Used to name the target on the
@@ -168,22 +176,22 @@ export async function approveSubmission(id: string): Promise<ApproveResult> {
       ? { lat: submission.lat, lng: submission.lng }
       : await geocodeAddress(submission.address ?? "");
 
-  const farmId = newFarmId(submission.name);
+  const farmId = newFarmId(db, submission.name);
   insertApprovedFarm(db, submission, farmId, coords);
   notifyApproved(submission, farmId);
 
   return { ok: true, farmId };
 }
 
-export function rejectSubmission(id: string): RejectResult {
+export function rejectSubmission(id: string, notes?: string | null): RejectResult {
   const submission = getPendingSubmission(id);
   if (!submission) return notFound();
 
   getDb().prepare(`
     UPDATE farm_submissions
-    SET status = 'rejected', reviewed_at = datetime('now')
+    SET status = 'rejected', reviewed_at = datetime('now'), notes = COALESCE(?, notes)
     WHERE id = ?
-  `).run(id);
+  `).run(notes?.trim() || null, id);
 
   sendEmail({
     to: submission.submitted_email,

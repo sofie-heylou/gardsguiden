@@ -1,271 +1,103 @@
 /**
- * Admin script: approve a farm submission, create the farm, and link it to the submitter.
+ * Admin script: approve a farm submission.
+ *
+ * A thin wrapper over src/lib/submissionActions.ts so that this and the
+ * "Godkänn" button in the notification email do exactly the same thing. The
+ * previous version was a second implementation and had drifted: it geocoded
+ * with a different provider, wrote ownership rows, and — most importantly —
+ * never sent the submitter the approval email that the web path sends.
  *
  * Usage:
  *   npx tsx scripts/approve-submission.ts <submission-id>
+ *
+ * Against production:
+ *   railway ssh
+ *   DB_PATH=/data/gardsguiden.db npx tsx scripts/approve-submission.ts <id>
+ *
+ * Normally you would just press the button in the email. Reach for this when
+ * the email is lost or its token has expired (30 days).
  */
 
-import Database from "better-sqlite3";
-import crypto from "crypto";
-import path from "path";
-import fs from "fs";
-import { execSync } from "child_process";
+import { getDb } from "../src/lib/db";
+import { approveSubmission } from "../src/lib/submissionActions";
+import { COUNTY_TO_SLUG, farmPath } from "../src/lib/counties";
+import { SITE_URL } from "../src/lib/site";
+import type { Farm } from "../src/types/farm";
 
-// ── Config ────────────────────────────────────────────────────────────────────
-
-const DB_PATH    = process.env.DB_PATH    ?? path.join(process.cwd(), "data", "gardsguiden.db");
-const FARMS_JSON = process.env.FARMS_JSON ?? path.join(process.cwd(), "data", "farms.json");
-const SITE_URL   = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.gardsguiden.se";
-
-// ── Types ─────────────────────────────────────────────────────────────────────
-
-interface Submission {
+interface SubmissionPreview {
   id: string;
   name: string;
-  description: string | null;
-  address: string | null;
-  kommun: string | null;
-  lan: string | null;
-  website: string | null;
-  phone: string | null;
-  email: string | null;
-  products: string | null;       // JSON
-  opening_hours: string | null;
-  season: string | null;
-  on_site_sales: number;
-  tasting_room: number;
-  facebook: string | null;
-  instagram: string | null;
-  submitted_email: string;
   status: string;
-  notes: string | null;
-}
-
-interface FarmJson {
-  id: string;
-  place_id: string;
-  name: string;
-  description: string;
-  address: string;
-  kommun: string;
-  lan: string;
+  submitted_email: string;
+  address: string | null;
+  lan: string | null;
   lat: number | null;
   lng: number | null;
-  website: string;
-  phone: string;
-  email: string;
-  products: string[];
-  onSiteSales: boolean;
-  tastingRoom: boolean;
-  gardsförsäljningLicense: boolean;
-  isArchipelago: boolean;
-  openingHours: string;
-  season: string;
-  source: string;
 }
 
-// ── County slug mapping ───────────────────────────────────────────────────────
-
-const COUNTY_TO_SLUG: Record<string, string> = {
-  Stockholm:        "stockholm",
-  Uppsala:          "uppsala",
-  Västmanland:      "vastmanland",
-  Södermanland:     "sodermanland",
-  Skåne:            "skane",
-  Kalmar:           "kalmar",
-  Gotland:          "gotland",
-  "Västra Götaland": "vastra-gotaland",
-  Halland:          "halland",
-  Blekinge:         "blekinge",
-  Kronoberg:        "kronoberg",
-  Jönköping:        "jonkoping",
-  Östergötland:     "ostergotland",
-};
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
-function generateId(): string {
-  return crypto.randomUUID();
-}
-
-/** Convert a farm name to a URL-safe slug. */
-function toSlug(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/å/g, "a").replace(/ä/g, "a").replace(/ö/g, "o")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
-
-/** Pick a unique farm ID that doesn't clash with existing rows. */
-function uniqueFarmId(db: Database.Database, base: string): string {
-  let candidate = base;
-  let n = 2;
-  while (db.prepare("SELECT 1 FROM farms WHERE id = ?").get(candidate)) {
-    candidate = `${base}-${n++}`;
+async function main(): Promise<void> {
+  const submissionId = process.argv[2];
+  if (!submissionId) {
+    console.error("Usage: npx tsx scripts/approve-submission.ts <submission-id>");
+    process.exit(1);
   }
-  return candidate;
-}
 
-/** Geocode an address with Nominatim (via curl). Returns [lat, lng] or null. */
-function geocode(address: string): [number, number] | null {
-  if (!address.trim()) return null;
-  try {
-    const encoded = encodeURIComponent(address);
-    const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encoded}`;
-    const out = execSync(
-      `curl -s --max-time 10 "${url}" -H "User-Agent: Gardsguiden/1.0 (admin-script)"`,
-      { encoding: "utf8" }
-    );
-    const results = JSON.parse(out) as { lat: string; lon: string }[];
-    if (!results.length) return null;
-    return [parseFloat(results[0].lat), parseFloat(results[0].lon)];
-  } catch {
-    return null;
+  const db = getDb();
+
+  // Read first, purely so the operator sees what they are approving and gets a
+  // precise message when it is not actionable. approveSubmission re-checks.
+  const sub = db.prepare(`
+    SELECT id, name, status, submitted_email, address, lan, lat, lng
+    FROM farm_submissions WHERE id = ?
+  `).get(submissionId) as SubmissionPreview | undefined;
+
+  if (!sub) {
+    console.error(`Submission not found: ${submissionId}`);
+    process.exit(1);
   }
-}
-
-// ── Main ──────────────────────────────────────────────────────────────────────
-
-const submissionId = process.argv[2];
-
-if (!submissionId) {
-  console.error("Usage: npx tsx scripts/approve-submission.ts <submission-id>");
-  process.exit(1);
-}
-
-const db = new Database(DB_PATH);
-db.pragma("journal_mode = WAL");
-db.pragma("foreign_keys = ON");
-
-// 1. Read the submission
-const sub = db.prepare(
-  "SELECT * FROM farm_submissions WHERE id = ?"
-).get(submissionId) as Submission | undefined;
-
-if (!sub) {
-  console.error(`Submission not found: ${submissionId}`);
-  process.exit(1);
-}
-
-if (sub.status !== "pending") {
-  console.error(`Submission is already "${sub.status}". Nothing to do.`);
-  process.exit(1);
-}
-
-console.log(`\nSubmission: ${sub.name}`);
-console.log(`  From    : ${sub.submitted_email}`);
-console.log(`  Address : ${sub.address ?? "(none)"}`);
-console.log(`  County  : ${sub.lan ?? "(none)"}`);
-
-// 2. Geocode if lat/lng are missing from address
-let lat: number | null = null;
-let lng: number | null = null;
-
-if (sub.address) {
-  process.stdout.write(`\nGeocoding "${sub.address}"... `);
-  const coords = geocode(sub.address);
-  if (coords) {
-    [lat, lng] = coords;
-    console.log(`${lat}, ${lng}`);
-  } else {
-    console.log("not found — farm will have no coordinates");
+  if (sub.status !== "pending") {
+    console.error(`Submission is already "${sub.status}". Nothing to do.`);
+    process.exit(1);
   }
+
+  console.log(`\nSubmission: ${sub.name}`);
+  console.log(`  From    : ${sub.submitted_email}`);
+  console.log(`  Address : ${sub.address ?? "(none)"}`);
+  console.log(`  County  : ${sub.lan ?? "(none)"}`);
+  console.log(
+    sub.lat != null && sub.lng != null
+      ? `  Coords  : ${sub.lat}, ${sub.lng} (from the address autofill)`
+      : `  Coords  : none stored — will geocode from the address`
+  );
+
+  const result = await approveSubmission(submissionId);
+  if (!result.ok) {
+    console.error(`\nCould not approve: ${result.reason}`);
+    process.exit(1);
+  }
+
+  const farm = db.prepare("SELECT lat, lng FROM farms WHERE id = ?").get(result.farmId) as
+    | { lat: number | null; lng: number | null }
+    | undefined;
+
+  console.log(`\n✓ Farm created: ${result.farmId}`);
+  console.log(`  Coords  : ${farm?.lat != null ? `${farm.lat}, ${farm.lng}` : "none"}`);
+  console.log(`  Emails  : sent to ${sub.submitted_email} and the admin inbox`);
+
+  const lan = sub.lan as Farm["lan"] | null;
+  if (lan && COUNTY_TO_SLUG[lan]) {
+    console.log(`  URL     : ${SITE_URL}${farmPath({ id: result.farmId, lan })}`);
+  }
+
+  console.log("\nTwo caveats when running this outside the app:");
+  console.log("  1. Farm pages are statically cached. The new farm appears after the");
+  console.log("     hourly revalidate window, or immediately after a service restart.");
+  console.log("  2. The farm exists only in the runtime database. The committed seed");
+  console.log("     (data/gardsguiden.db) is rebuilt from scrapes and does not include");
+  console.log("     submissions — same as farms approved from the email links.");
 }
 
-// 3. Build farm ID and farm record
-const slug    = toSlug(sub.name);
-const farmId  = uniqueFarmId(db, slug);
-const products: string[] = sub.products
-  ? (JSON.parse(sub.products) as string[])
-  : [];
-
-const farmRecord = {
-  id:                    farmId,
-  name:                  sub.name,
-  description:           sub.description ?? "",
-  address:               sub.address ?? "",
-  kommun:                sub.kommun ?? "",
-  lan:                   sub.lan ?? "",
-  lat,
-  lng,
-  website:               sub.website ?? "",
-  phone:                 sub.phone ?? "",
-  email:                 sub.email ?? "",
-  products:              JSON.stringify(products),
-  onSiteSales:           sub.on_site_sales,
-  tastingRoom:           sub.tasting_room,
-  gardsförsäljningLicense: 0,
-  isArchipelago:         0,
-  openingHours:          sub.opening_hours ?? "",
-  season:                sub.season ?? "",
-  source:                "submission",
-  facebook:              sub.facebook ?? null,
-  instagram:             sub.instagram ?? null,
-};
-
-// 4. Insert into SQLite (transaction covers everything)
-const approveTx = db.transaction(() => {
-  db.prepare(`
-    INSERT INTO farms (
-      id, name, description, address, kommun, lan, lat, lng,
-      website, phone, email, products, onSiteSales, tastingRoom,
-      "gardsförsäljningLicense", isArchipelago, openingHours, season,
-      source, facebook, instagram
-    ) VALUES (
-      @id, @name, @description, @address, @kommun, @lan, @lat, @lng,
-      @website, @phone, @email, @products, @onSiteSales, @tastingRoom,
-      @gardsförsäljningLicense, @isArchipelago, @openingHours, @season,
-      @source, @facebook, @instagram
-    )
-  `).run(farmRecord);
-
-  db.prepare(`
-    UPDATE farm_submissions
-    SET status = 'approved', reviewed_at = datetime('now')
-    WHERE id = ?
-  `).run(submissionId);
+main().catch((err) => {
+  console.error("Approve failed:", err);
+  process.exit(1);
 });
-
-approveTx();
-
-// 5. Update farms.json
-const farmsJson: FarmJson[] = JSON.parse(fs.readFileSync(FARMS_JSON, "utf8"));
-farmsJson.push({
-  id:                    farmId,
-  place_id:              "",
-  name:                  sub.name,
-  description:           sub.description ?? "",
-  address:               sub.address ?? "",
-  kommun:                sub.kommun ?? "",
-  lan:                   sub.lan ?? "",
-  lat,
-  lng,
-  website:               sub.website ?? "",
-  phone:                 sub.phone ?? "",
-  email:                 sub.email ?? "",
-  products,
-  onSiteSales:           sub.on_site_sales === 1,
-  tastingRoom:           sub.tasting_room === 1,
-  gardsförsäljningLicense: false,
-  isArchipelago:         false,
-  openingHours:          sub.opening_hours ?? "",
-  season:                sub.season ?? "",
-  source:                "submission",
-});
-fs.writeFileSync(FARMS_JSON, JSON.stringify(farmsJson, null, 2), "utf8");
-
-// 6. Print result
-const countySlug = sub.lan ? (COUNTY_TO_SLUG[sub.lan] ?? sub.lan.toLowerCase()) : null;
-const farmUrl    = countySlug ? `${SITE_URL}/${countySlug}/${farmId}` : null;
-
-console.log(`\n✓ Farm created:`);
-console.log(`  ID      : ${farmId}`);
-console.log(`  Name    : ${sub.name}`);
-console.log(`  County  : ${sub.lan ?? "(none)"}`);
-console.log(`  Coords  : ${lat != null ? `${lat}, ${lng}` : "none"}`);
-console.log(`  Sent by : ${sub.submitted_email}`);
-if (farmUrl) {
-  console.log(`  URL     : ${farmUrl}`);
-}
-console.log(`  farms.json updated (${farmsJson.length} total farms)`);
