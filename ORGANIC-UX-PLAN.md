@@ -22,11 +22,13 @@ Data gaps that quietly break things: 0 of 988 farms have a description, 501 lack
 
 These are small fixes, but every organic visitor hits at least one of them.
 
-- [ ] Remove the "Vi håller på att bygga klart" banner (or show it once and let it be dismissed). It tells every new visitor the site isn't ready.
-- [ ] Backfill **kommun** for the ~500 farms missing it (derivable from address/coordinates). This also fixes their broken page titles ("… – Gårdsbutik i ").
-- [ ] For the 49 farms without coordinates: geocode them from the address, and until then hide the map and directions button instead of showing a broken one.
-- [ ] Fix the county page back link: it points at `/lista`, which just redirects to `/gardar`. Link straight to `/gardar`.
-- [ ] Curation pass on the Stockholm list (then the other counties): move city breweries out of the default "gårdsbutik" view (own category or clearly separated section), and fix wrong-county entries like Resta gård. Someone who searched "gårdsbutik stockholm" should see farm shops first, not a sports bar.
+- [x] Remove the "Vi håller på att bygga klart" banner. *(941afc3)*
+- [x] Backfill **kommun** — 362 of 487 filled from coordinates via `scripts/backfill-kommun.js` (seed DB; prod run pending). Remaining 125: 27 lack coordinates, 98 are held back because their county looks wrong (see below). Pages now fall back to "{län} län" instead of showing blanks. *(941afc3, 8fbbf9c)*
+- [x] Farms without coordinates: map and directions now hidden instead of broken. Geocoding the 49 addresses still to do. *(941afc3)*
+- [x] Fix the county page back link (`/lista` → `/gardar`). *(941afc3)*
+- [x] Breweries: beer-only places without gårdsförsäljning (156 nationally) now sit in their own "Bryggerier & taprooms" section under the county list. *(941afc3)*
+- [ ] **New, found by the backfill dry run:** 102 farms are filed under the wrong county and 55 names are duplicated (the same farm stored once per scraped county, up to 3 copies). Needs a review pass: keep the copy whose county matches the coordinates, delete the rest, move the genuine one-offs. Note: moving a farm's county changes its URL. 11 farms are physically outside the 13 covered counties (Värmland, Örebro, Jämtland).
+- [ ] Run the kommun backfill against the production database (`railway ssh`, `DB_PATH=/data/gardsguiden.db` — prod has ~134 more rows than the seed).
 
 **Done when:** a visitor landing on /stockholm sees no construction banner, no blank locations, and a list that actually matches "gårdsbutik".
 
