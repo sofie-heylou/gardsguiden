@@ -18,6 +18,7 @@ export const ADMIN_ACTIONS = [
   "submission:reject",
   "farm:clear-flags",
   "farm:delete",
+  "suggestion:mark-handled",
 ] as const;
 
 export type AdminAction = (typeof ADMIN_ACTIONS)[number];

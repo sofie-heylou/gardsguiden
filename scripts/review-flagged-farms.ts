@@ -19,6 +19,7 @@
  *   npx tsx scripts/review-flagged-farms.ts --user-flagged     # visitors only
  *   npx tsx scripts/review-flagged-farms.ts --delete <id>...   # remove farms
  *   npx tsx scripts/review-flagged-farms.ts --clear <id>...    # reset flags
+ *   npx tsx scripts/review-flagged-farms.ts --handled <id>...  # close suggestions
  *
  * Against production: the runner image has no tsx and does not ship this
  * script, so it cannot be run with `railway ssh` directly.
@@ -28,6 +29,7 @@
 import Database from "better-sqlite3";
 import path from "path";
 import { COUNTY_TO_SLUG } from "../src/lib/counties";
+import { listPendingSuggestions, markSuggestionHandled } from "../src/lib/suggestionActions";
 import type { Farm } from "../src/types/farm";
 
 const DB_PATH = process.env.DB_PATH ?? path.join(process.cwd(), "data", "gardsguiden.db");
@@ -87,6 +89,26 @@ function list(db: Database.Database, title: string, where: string): void {
  * The happy path is the Godkänn/Avvisa buttons in the notification email, but
  * a lost email or an expired token would otherwise leave the queue invisible
  * short of opening SQLite by hand. */
+/** Correction suggestions nobody has closed yet.
+ *
+ * Nothing can apply free text automatically — you correct the farm, then mark
+ * the suggestion handled here or from the button in the notification email. */
+function listSuggestions(): void {
+  const rows = listPendingSuggestions();
+  console.log(`\nPending suggestions (${rows.length})`);
+  if (rows.length === 0) {
+    console.log("  none");
+    return;
+  }
+  for (const r of rows) {
+    console.log(`  ${r.id}`);
+    console.log(`      ${r.farm_name} (${r.farm_id}) — från ${r.email}, ${r.created_at}`);
+    for (const line of r.message.split("\n")) console.log(`      | ${line}`);
+  }
+  console.log("\n  Close one with:");
+  console.log("    npx tsx scripts/review-flagged-farms.ts --handled <id>");
+}
+
 function listPendingSubmissions(db: Database.Database): void {
   const rows = db.prepare(`
     SELECT id, name, submitted_email, lan, kommun, created_at
@@ -124,14 +146,19 @@ function main(): void {
 
   const toDelete = idsAfter("--delete");
   const toClear = idsAfter("--clear");
+  const toHandle = idsAfter("--handled");
 
-  if (toDelete.length && toClear.length) {
-    console.error("Use --delete or --clear, not both in one run.");
+  if ([toDelete, toClear, toHandle].filter((a) => a.length).length > 1) {
+    console.error("Use only one of --delete, --clear or --handled per run.");
     process.exit(1);
   }
-  for (const [flag, ids] of [["--delete", toDelete], ["--clear", toClear]] as const) {
+  for (const [flag, ids, noun] of [
+    ["--delete", toDelete, "farm id"],
+    ["--clear", toClear, "farm id"],
+    ["--handled", toHandle, "suggestion id"],
+  ] as const) {
     if (process.argv.includes(flag) && ids.length === 0) {
-      console.error(`${flag} needs at least one farm id.`);
+      console.error(`${flag} needs at least one ${noun}.`);
       process.exit(1);
     }
   }
@@ -204,6 +231,16 @@ function main(): void {
     return;
   }
 
+  if (toHandle.length) {
+    console.log("Marking suggestions handled:");
+    for (const id of toHandle) {
+      const res = markSuggestionHandled(id);
+      console.log(`  ${id} — ${res.ok ? `handled (${res.farmName})` : "not found or already handled, skipped"}`);
+    }
+    db.close();
+    return;
+  }
+
   const onlyNeedsReview = process.argv.includes("--needs-review");
   const onlyUserFlagged = process.argv.includes("--user-flagged");
   const showBoth = !onlyNeedsReview && !onlyUserFlagged;
@@ -223,6 +260,7 @@ function main(): void {
   }
 
   if (showBoth) listPendingSubmissions(db);
+  if (showBoth) listSuggestions();
 
   console.log("\nAct on flagged farms with:");
   console.log("  npx tsx scripts/review-flagged-farms.ts --delete <id> [<id>...]");

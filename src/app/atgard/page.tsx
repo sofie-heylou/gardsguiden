@@ -17,6 +17,7 @@ import {
   rejectSubmission,
 } from "../../lib/submissionActions";
 import { getFarmSummary, clearFarmFlags, deleteFarm } from "../../lib/farmActions";
+import { getPendingSuggestion, markSuggestionHandled } from "../../lib/suggestionActions";
 
 export const dynamic = "force-dynamic";
 
@@ -70,6 +71,17 @@ function loadFarm(targetId: string): Target | null {
 
 const SUBMISSION_GONE = "Ansökan är redan godkänd eller avvisad — ingenting har ändrats.";
 const FARM_GONE = "Gården finns inte längre — ingenting har ändrats.";
+const SUGGESTION_GONE =
+  "Förslaget är redan hanterat, eller så finns gården inte längre — ingenting har ändrats.";
+
+function loadSuggestion(targetId: string): Target | null {
+  const s = getPendingSuggestion(targetId);
+  if (!s) return null;
+  // The message is the whole point of the confirmation step: you should see
+  // what you are marking done, not just which farm it concerns.
+  const excerpt = s.message.length > 180 ? `${s.message.slice(0, 180)}…` : s.message;
+  return { name: s.farm_name, subtitle: `”${excerpt}” — från ${s.email}` };
+}
 
 /** The single registry of what a token may do.  Because it is keyed by
  *  AdminAction, adding an action to that union fails to compile until it is
@@ -110,6 +122,15 @@ const ACTIONS: Record<AdminAction, ActionSpec> = {
     goneText: FARM_GONE,
     run: deleteFarm,
     revalidates: true,
+  },
+  "suggestion:mark-handled": {
+    load: loadSuggestion,
+    question: (t) => `Markera förslaget om ${t.name} som hanterat?`,
+    confirmLabel: "Ja, markera som hanterat",
+    tone: "approve",
+    goneText: SUGGESTION_GONE,
+    run: markSuggestionHandled,
+    revalidates: false, // suggestions are never rendered publicly
   },
 };
 

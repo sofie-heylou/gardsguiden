@@ -21,6 +21,17 @@ export function farmModerationButtons(farmId: string): string {
   ]);
 }
 
+/** Mark-handled button for a correction suggestion.
+ *
+ * Only one action: nothing can apply free text automatically, so the button
+ * closes the loop once you have actually corrected the farm. */
+export function suggestionModerationButtons(suggestionId: string): string {
+  if (!actionTokensAvailable()) return "";
+  return btnRow([
+    { label: "Markera som hanterat", href: actionUrl("suggestion:mark-handled", suggestionId), tone: "approve" },
+  ]);
+}
+
 /** Approve / reject pair, for new submission notifications. */
 export function submissionModerationButtons(submissionId: string): string {
   if (!actionTokensAvailable()) return "";

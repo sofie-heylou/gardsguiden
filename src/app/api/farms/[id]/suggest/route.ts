@@ -4,6 +4,7 @@ import { generateId, isValidEmail } from "../../../../../lib/utils";
 import { getFarmSummary, type FarmSummary } from "../../../../../lib/farmActions";
 import { visitorHash } from "../../../../../lib/visitor";
 import { requestAlertSlot, ALERT_CAP_NOTICE } from "../../../../../lib/alertBudget";
+import { suggestionModerationButtons } from "../../../../../lib/moderationEmail";
 import {
   sendEmail, emailHtml, table, row, linkRow, senderMessage, ADMIN_EMAIL,
 } from "../../../../../lib/email";
@@ -23,6 +24,7 @@ const DEDUP_WINDOW = "-1 day";
 
 function suggestionEmail(
   farm: FarmSummary,
+  suggestionId: string,
   email: string,
   message: string,
   isLast: boolean
@@ -36,6 +38,7 @@ function suggestionEmail(
       linkRow("Sida", `${SITE_URL}${farmPath(farm)}`)
     )}
     ${senderMessage(email, message)}
+    ${suggestionModerationButtons(suggestionId)}
     ${isLast ? ALERT_CAP_NOTICE : ""}
   `);
 }
@@ -87,17 +90,18 @@ export async function POST(
   // whether the first one registered.
   if (recent) return NextResponse.json({ ok: true });
 
+  const suggestionId = generateId();
   db.prepare(`
     INSERT INTO farm_suggestions (id, farm_id, email, message, visitor_hash)
     VALUES (?, ?, ?, ?, ?)
-  `).run(generateId(), id, cleanEmail, cleanMessage, visitor);
+  `).run(suggestionId, id, cleanEmail, cleanMessage, visitor);
 
   const decision = requestAlertSlot();
   if (decision !== "suppress") {
     sendEmail({
       to: ADMIN_EMAIL,
       subject: `Ändringsförslag: ${farm.name}`,
-      html: suggestionEmail(farm, cleanEmail, cleanMessage, decision === "send-last"),
+      html: suggestionEmail(farm, suggestionId, cleanEmail, cleanMessage, decision === "send-last"),
     });
   }
 
