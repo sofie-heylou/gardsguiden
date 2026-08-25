@@ -7,6 +7,7 @@ import { SLUG_TO_COUNTY, COUNTY_SLUGS, farmPath } from "../../lib/counties";
 import { COUNTY_DESCRIPTIONS } from "../../lib/county-descriptions";
 import { SITE_URL } from "../../lib/site";
 import FarmList from "../../components/FarmList";
+import AdvertiseCallout from "../../components/AdvertiseCallout";
 import type { Farm } from "../../types/farm";
 
 // Unknown slugs fall through to notFound() in the component below.
@@ -184,6 +185,8 @@ export default async function CountyPage({ params }: Props) {
               Visa på karta
             </Link>
           </div>
+
+          <AdvertiseCallout lan={lan} />
 
           <FarmList initialFarms={gardar} lockedCounty={lan} embedded />
 

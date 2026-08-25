@@ -109,7 +109,7 @@ export default function OmPage() {
         <hr className="border-stone-100" />
 
         {/* ── Kontakta oss ──────────────────────────────────────────────────── */}
-        <div className="space-y-4">
+        <div id="kontakt" className="scroll-mt-6 space-y-4">
           <h2 className="font-display text-xl text-stone-900">Kontakta oss</h2>
           <p className="text-sm text-stone-500 leading-relaxed">
             Har du frågor, vill rapportera felaktig information, eller saknar
