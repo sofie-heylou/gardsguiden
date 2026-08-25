@@ -21,31 +21,6 @@ const TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
 const SWEDEN = { latitude: 59.3, longitude: 16.5, zoom: 7 };
 const RADIUS_OPTIONS = [10, 25, 50, 100] as const;
 
-function pickFeatured(farms: Farm[], max = 8): Farm[] {
-  const sorted = [...farms].sort(
-    (a, b) => b.products.filter((p) => p !== "annat").length - a.products.filter((p) => p !== "annat").length
-  );
-  const seenCounties = new Set<string>();
-  const seenIds = new Set<string>();
-  const featured: Farm[] = [];
-  for (const farm of sorted) {
-    if (featured.length >= max) break;
-    if (!seenCounties.has(farm.lan)) {
-      seenCounties.add(farm.lan);
-      seenIds.add(farm.id);
-      featured.push(farm);
-    }
-  }
-  for (const farm of sorted) {
-    if (featured.length >= max) break;
-    if (!seenIds.has(farm.id)) {
-      seenIds.add(farm.id);
-      featured.push(farm);
-    }
-  }
-  return featured;
-}
-
 type FarmPoint = Supercluster.PointFeature<{ farm: Farm }>;
 
 
@@ -285,14 +260,6 @@ export default function MapView() {
   );
 
   const locating = geoStatus === "requesting" && wantsNearMe;
-
-  const stripLabel = useMemo(() => {
-    if (nearMeActive) return `${farms.length} gårdar nära dig`;
-    if (county.size > 0) return `${farms.length} gårdar i ${[...county].join(" · ")}`;
-    return `${allFarms.length} gårdar i Sverige`;
-  }, [farms.length, allFarms.length, county, nearMeActive]);
-
-  const featuredFarms = useMemo(() => pickFeatured(farms), [farms]);
 
   return (
     <div className="h-full flex flex-col">
@@ -613,60 +580,6 @@ export default function MapView() {
         }
         Nära mig
       </button>
-    </div>
-
-    {/* Discovery strip */}
-    <div className="shrink-0 bg-[#FAFAF8] border-t border-stone-200">
-      {/* Active filter label. The county links that used to live here moved
-          to the server-rendered PopularAreas section below the map. */}
-      <div className="flex items-center px-4 pt-2.5 pb-2">
-        <span className="shrink-0 text-[10px] font-semibold text-stone-400 uppercase tracking-widest">
-          {stripLabel}
-        </span>
-      </div>
-
-      {/* Divider */}
-      <div className="mx-4 h-px bg-stone-100" />
-
-      {/* Featured farm cards */}
-      <div
-        className="flex gap-2 overflow-x-auto px-4 py-2.5"
-        style={{ scrollbarWidth: "none" }}
-      >
-        {featuredFarms.map((farm) => {
-          const primaryProduct = farm.products.find((p) => p !== "annat");
-          return (
-            <Link
-              key={farm.id}
-              href={farmPath(farm)}
-              onClick={() => track("farm_card_clicked", { farm_id: farm.id, farm_name: farm.name, farm_county: farm.lan })}
-              className="shrink-0 flex flex-col justify-between bg-white border border-stone-100 rounded-xl px-3 py-2.5 hover:border-stone-300 hover:shadow-sm active:scale-[0.98] transition-all"
-              style={{ width: 152 }}
-            >
-              <span className="text-[12px] font-semibold text-stone-800 leading-snug line-clamp-2">
-                {farm.name}
-              </span>
-              <div className="flex items-center justify-between mt-2">
-                <span className="text-[10px] text-stone-400 truncate pr-1">{farm.lan}</span>
-                {primaryProduct && (
-                  <span className="shrink-0 text-[10px] bg-amber-50 text-amber-800 px-1.5 py-0.5 rounded capitalize">
-                    {primaryProduct}
-                  </span>
-                )}
-              </div>
-            </Link>
-          );
-        })}
-
-        <Link
-          href="/gardar"
-          className="shrink-0 flex flex-col items-center justify-center bg-stone-50 border border-stone-100 rounded-xl px-4 py-2.5 hover:bg-stone-100 transition-colors text-center"
-          style={{ width: 100 }}
-        >
-          <span className="text-[11px] font-medium text-stone-500">Se alla</span>
-          <span className="text-[10px] text-stone-400 mt-0.5">{farms.length} gårdar</span>
-        </Link>
-      </div>
     </div>
     </div>
   );
