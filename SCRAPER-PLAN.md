@@ -61,9 +61,9 @@ The new script (`verify-onsite`) fetches each farm's homepage and looks for firs
 
 Only once stage 3's report has earned trust:
 
-- [ ] Wire `verify-onsite` into intake as a third gate: **contradicted** → reject, **unclear** → the maybe/review bucket, **verified** → through. Score it with `validate-relevance-gate.js` like every other rule.
-- [ ] Replace the guessed product tags with ones derived from website evidence, for entries where the site gave a clear answer.
-- [ ] Act on the stage 3 audit findings for existing entries — same pattern as the trust cleanup: small reviewed batches, names onto `removed-farms.json` so a re-scrape can't bring them back, backup before applying.
+- [x] `verify-onsite` wired into intake (2026-08-25): `filter-google-results.ts` reads every surviving candidate's own website after the relevance rules — **contradicted → removed** (with the site's quote as reason), **unclear → maybe**, **verified → through** (a verified maybe promotes to keep). Human judgment outranks the gate in both directions: `removed-farms.json` blocks, new `kept-farms.json` (Sofie's 12 review-keeps) protects. `--no-verify` is the kill switch; fetches share `data/tmp/onsite-cache`. Validated on the Skåne/Kalmar/Gotland raw file: 188 candidates → 119 verified (19 promoted), 68 unclear (51 demoted to review), 0 contradicted (the junk was already name-blocked upstream — the review feeding intake, working as designed), Friden Gårdskrog protected by the keep-list.
+- [x] Product tags now come from the website where it gives a clear answer: verified candidates get `categorizeProducts` run over their page text (103 of 120 keeps in the validation run gained real assortment tags — e.g. Bärgården Källunge: kött/grönsaker/bär). Name-guessing remains only the fallback.
+- [x] Stage-3 findings for existing entries: fully acted on during the stage-3 review itself (23 dead-site removals, 74 review removals with names blocked, 6 link fixes, 5 spam-domain blanks, 45 social splits — all applied to prod with snapshots).
 
 **Done when:** a place can only enter the catalog if its own website supports on-site production — and the products shown are the ones the farm itself talks about.
 

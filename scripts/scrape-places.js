@@ -380,5 +380,6 @@ if (require.main === module) {
 
 // preFilter and buildRow are exported for the replay/validation tooling that
 // scores the pre-filter and row derivation against saved scrapes (SCRAPER-PLAN
-// stages 1–2).
-module.exports = { preFilter, buildRow };
+// stages 1–2). categorizeProducts also runs over website text in the stage-4
+// intake gate — the site's own words beat name-guessing for product tags.
+module.exports = { preFilter, buildRow, categorizeProducts };

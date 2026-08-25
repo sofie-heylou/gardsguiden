@@ -68,7 +68,11 @@ GOOGLE_PLACES_API_KEY=din_nyckel node scripts/scrape-places.js
 # 2. Filtrera resultaten i tre hinkar: keep / maybe / removed
 #    Relevansreglerna i scripts/farm-relevance.js kör först och kan bara vara
 #    strängare än Google-signalerna: stadsadresser, barord och tidigare
-#    borttagna namn stoppas här. Gå alltid igenom "maybe"-hinken för hand.
+#    borttagna namn stoppas här. Därefter läser webbgrinden varje kandidats
+#    egen webbplats (cache i data/tmp/onsite-cache): motsägs → removed,
+#    otydlig → maybe, verifierad → keep med produkttaggar från sajtens egna
+#    ord. Namn i scripts/data/kept-farms.json rörs aldrig. Hoppa över grinden
+#    med --no-verify. Gå alltid igenom "maybe"-hinken för hand.
 npx tsx scripts/filter-google-results.ts
 
 # 3. Slå ihop filtrerade resultat med befintlig data/farms.json

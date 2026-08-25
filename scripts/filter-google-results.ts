@@ -5,12 +5,28 @@ import path from "path";
 // learned about city breweries and town bars is enforced here, at intake.
 import { assess } from "./farm-relevance";
 import { DEFAULT_SCRAPE_OUT } from "./scrape-config";
+// Stage-4 website gate: reads each surviving candidate's own site and lets the
+// verdict act — contradicted removes, unclear demotes to maybe, verified
+// passes (and its page text supplies real product tags).
+import { auditFarm } from "./verify-onsite";
+import { categorizeProducts } from "./scrape-places";
 
 // Input defaults to the consolidated scraper's output; pass a path to filter
-// one of the older per-scraper files instead.
-const IN_FILE      = process.argv[2]
-  ? path.resolve(process.argv[2])
+// one of the older per-scraper files instead. --no-verify skips the website
+// gate (kill switch: fetches ~one page per candidate and needs the network).
+const argPaths = process.argv.slice(2).filter((a) => !a.startsWith("--"));
+const NO_VERIFY = process.argv.includes("--no-verify");
+const IN_FILE      = argPaths[0]
+  ? path.resolve(argPaths[0])
   : path.join(process.cwd(), "data/tmp", DEFAULT_SCRAPE_OUT);
+
+// Names a human reviewed and KEPT (the mirror of removed-farms.json): the
+// website gate must never overrule Sofie's judgment — several of her keeps
+// (Österlens Kött & Vilt, HAFI) would otherwise re-trip on reseller wording.
+const KEPT_NAMES = new Set(
+  (JSON.parse(fs.readFileSync(path.join(process.cwd(), "scripts/data/kept-farms.json"), "utf-8")) as { name: string }[])
+    .map((k) => k.name.toLowerCase().trim()),
+);
 const OUT_KEEP     = path.join(process.cwd(), "data/tmp/filtered-keep.json");
 const OUT_MAYBE    = path.join(process.cwd(), "data/tmp/filtered-maybe.json");
 const OUT_REMOVED  = path.join(process.cwd(), "data/tmp/filtered-removed.json");
@@ -184,6 +200,81 @@ for (const r of all) {
   else                           removed.push(tagged);
 }
 
+// ── Website gate (stage 4) ────────────────────────────────────────────────────
+// Every candidate that survived on name/type/location signals now has its own
+// website read (cached in data/tmp/onsite-cache). The site's words act:
+//   contradicted → removed        verified → through (maybe promotes to keep)
+//   unclear      → maybe          human-kept names → untouched
+// Rows without a website (social-only farms) pass unchanged — Sofie's policy.
+const gateStats = { verified: 0, contradicted: 0, unclear: 0, promoted: 0, demoted: 0, keptList: 0, skipped: 0 };
+
+async function websiteGate() {
+  type Tagged = PlaceResult & { _reason: string };
+  const candidates: { row: Tagged; from: "keep" | "maybe" }[] = [
+    ...keep.map((row) => ({ row, from: "keep" as const })),
+    ...maybe.map((row) => ({ row, from: "maybe" as const })),
+  ];
+  keep.length = 0; maybe.length = 0;
+
+  const CONCURRENCY = 6;
+  let next = 0;
+  async function worker() {
+    while (next < candidates.length) {
+      const { row, from } = candidates[next++];
+
+      if (!row.website) { gateStats.skipped++; (from === "keep" ? keep : maybe).push(row); continue; }
+      if (KEPT_NAMES.has(row.name.toLowerCase().trim())) {
+        gateStats.keptList++;
+        (from === "keep" ? keep : maybe).push(row);
+        continue;
+      }
+
+      const audit = await auditFarm(
+        { id: row.place_id, name: row.name, lan: row.lan, website: row.website as string },
+        true,
+      );
+
+      if (audit.verdict === "contradicted") {
+        gateStats.contradicted++;
+        const quote = audit.reseller?.[0]?.context ?? "";
+        removed.push({ ...row, _reason: `website contradicts: "${quote}"` });
+        continue;
+      }
+
+      if (audit.verdict === "verified") {
+        gateStats.verified++;
+        // The site's own words beat name-guessing for product tags.
+        const pageProducts = categorizeProducts(audit.text ?? "");
+        if (pageProducts.length && !(pageProducts.length === 1 && pageProducts[0] === "annat")) {
+          row.products = pageProducts;
+        }
+        if (from === "maybe") { gateStats.promoted++; row._reason += " — website verifies production"; }
+        keep.push(row);
+        continue;
+      }
+
+      // unclear: never damning on its own, but a keep without readable
+      // website evidence deserves a human look.
+      gateStats.unclear++;
+      if (from === "keep") { gateStats.demoted++; row._reason += ` — website unclear (${audit.reason})`; }
+      maybe.push(row);
+    }
+  }
+  await Promise.all(Array.from({ length: CONCURRENCY }, worker));
+}
+
+(async () => {
+if (NO_VERIFY) {
+  console.log("(website gate skipped: --no-verify)\n");
+} else {
+  await websiteGate();
+  console.log(
+    `Website gate: ${gateStats.verified} verified (${gateStats.promoted} promoted), ` +
+    `${gateStats.unclear} unclear (${gateStats.demoted} demoted), ` +
+    `${gateStats.contradicted} contradicted, ${gateStats.keptList} human-kept, ${gateStats.skipped} no-website\n`,
+  );
+}
+
 fs.writeFileSync(OUT_KEEP,    JSON.stringify(keep,    null, 2));
 fs.writeFileSync(OUT_MAYBE,   JSON.stringify(maybe,   null, 2));
 fs.writeFileSync(OUT_REMOVED, JSON.stringify(removed, null, 2));
@@ -217,3 +308,4 @@ console.log(`\nWrote:`);
 console.log(`  ${OUT_KEEP}`);
 console.log(`  ${OUT_MAYBE}`);
 console.log(`  ${OUT_REMOVED}`);
+})().catch((err) => { console.error(err); process.exit(1); });

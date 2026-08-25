@@ -97,6 +97,10 @@ function decodeBody(buf, contentType) {
 
 // ── Fetch with cache ──────────────────────────────────────────────────────────
 
+// The gate imports fetchPage/auditFarm without running main(), so the cache
+// dir must exist regardless of entry point.
+fs.mkdirSync(CACHE_DIR, { recursive: true });
+
 function cachePath(url) {
   return path.join(CACHE_DIR, crypto.createHash('sha1').update(url).digest('hex') + '.json');
 }
@@ -164,7 +168,7 @@ async function auditFarm(farm, useCache) {
   const base = { id: farm.id, name: farm.name, lan: farm.lan, website: farm.website };
 
   if (SOCIAL_ONLY.test(farm.website)) {
-    return { ...base, verdict: 'unclear', reason: 'social-only', strong: [], supporting: [], reseller: [] };
+    return { ...base, verdict: 'unclear', reason: 'social-only', strong: [], supporting: [], reseller: [], localSupport: [], text: '' };
   }
 
   const url = /^https?:\/\//i.test(farm.website) ? farm.website : `http://${farm.website}`;
@@ -172,7 +176,7 @@ async function auditFarm(farm, useCache) {
 
   if (page.status === 0 || page.status >= 400) {
     const reason = page.status === 0 ? `dead-link:${page.error}` : `http-${page.status}`;
-    return { ...base, verdict: 'unclear', reason, strong: [], supporting: [], reseller: [] };
+    return { ...base, verdict: 'unclear', reason, strong: [], supporting: [], reseller: [], localSupport: [], text: '' };
   }
 
   // The homepage is often a teaser; pull up to two same-site about-pages in.
@@ -195,6 +199,9 @@ async function auditFarm(farm, useCache) {
     reason,
     finalUrl: page.finalUrl,
     textChars: text.length,
+    // The combined page text rides along so callers (the intake gate) can
+    // derive product tags from the site's own words.
+    text,
   };
 }
 
@@ -275,7 +282,9 @@ async function main() {
   }
   await Promise.all(Array.from({ length: CONCURRENCY }, worker));
 
-  fs.writeFileSync(`${REPORT_BASE}.json`, JSON.stringify(results, null, 2));
+  // Page text is for programmatic callers, not the report — it would bloat
+  // the JSON by megabytes.
+  fs.writeFileSync(`${REPORT_BASE}.json`, JSON.stringify(results.map(({ text, ...r }) => r), null, 2));
   writeMarkdown(results, `${REPORT_BASE}.md`);
 
   const counts = {};
@@ -295,3 +304,7 @@ async function main() {
 if (require.main === module) {
   main().catch((err) => { console.error(err); process.exit(1); });
 }
+
+// auditFarm powers the stage-4 intake gate in filter-google-results.ts;
+// fetchPage is exported for tooling that wants the same cache.
+module.exports = { auditFarm, fetchPage };
