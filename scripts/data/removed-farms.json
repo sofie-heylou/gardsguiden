@@ -670,5 +670,301 @@
   {
     "name": "Ölkompaniet",
     "reason": "stadssmuts: urban-centre:Göteborg:2.3km,no-farm-word"
+  },
+  {
+    "name": "Aspö mad vin & café",
+    "reason": "webbgranskning: återförsäljarspråk utan produktion"
+  },
+  {
+    "name": "Blekingeplantan",
+    "reason": "webbgranskning: butik/återförsäljare"
+  },
+  {
+    "name": "Butik Öljersjö",
+    "reason": "webbgranskning: butik/återförsäljare"
+  },
+  {
+    "name": "Gannarve skeppssättning",
+    "reason": "webbgranskning: ingen kommersiell gårdsverksamhet"
+  },
+  {
+    "name": "Kränku Te & Kaffe",
+    "reason": "webbgranskning: butik/återförsäljare"
+  },
+  {
+    "name": "Wisby Ost AB",
+    "reason": "webbgranskning: butik/återförsäljare"
+  },
+  {
+    "name": "AB Hembergs Trädgårdsprodukter",
+    "reason": "webbgranskning: återförsäljarspråk utan produktion"
+  },
+  {
+    "name": "Ateljé Leja, Gamla Bryggeriet i Weinge anno 1869",
+    "reason": "webbgranskning: butik/återförsäljare"
+  },
+  {
+    "name": "LPM-Potatis AB",
+    "reason": "webbgranskning: återförsäljarspråk utan produktion"
+  },
+  {
+    "name": "Lerbergs lunch o gårdscafe",
+    "reason": "webbgranskning: restaurang/kafé/lokal utan egen produktion"
+  },
+  {
+    "name": "Långås Potatis & Rotfrukter AB",
+    "reason": "webbgranskning: producent utan försäljning på plats"
+  },
+  {
+    "name": "Rit & Målerigården, Butik, utställning & café (våffelstuga vår sommar, helger på hösten) (farmcafé and designshop)",
+    "reason": "webbgranskning: restaurang/kafé/lokal utan egen produktion"
+  },
+  {
+    "name": "Särdals kvarn",
+    "reason": "webbgranskning: restaurang/kafé/lokal utan egen produktion"
+  },
+  {
+    "name": "Trädgårdscompaniet AB",
+    "reason": "webbgranskning: butik/återförsäljare"
+  },
+  {
+    "name": "Ebbarps Norrgård",
+    "reason": "webbgranskning: restaurang/kafé/lokal utan egen produktion"
+  },
+  {
+    "name": "Huskvarna Brewing Company",
+    "reason": "webbgranskning: producent utan försäljning på plats"
+  },
+  {
+    "name": "Nyströms Trädgård Axamo AB",
+    "reason": "webbgranskning: butik/återförsäljare"
+  },
+  {
+    "name": "Polfärskt Bröd Jönköping",
+    "reason": "webbgranskning: producent utan försäljning på plats"
+  },
+  {
+    "name": "Kläckeberga Gård",
+    "reason": "webbgranskning: restaurang/kafé/lokal utan egen produktion"
+  },
+  {
+    "name": "Ölands köksmejeri",
+    "reason": "webbgranskning: producent utan försäljning på plats"
+  },
+  {
+    "name": "Bergqvara Gård AB",
+    "reason": "webbgranskning: restaurang/kafé/lokal utan egen produktion"
+  },
+  {
+    "name": "Elisabeths Trädgård Restaurang & Café",
+    "reason": "webbgranskning: restaurang/kafé/lokal utan egen produktion"
+  },
+  {
+    "name": "Hembygdsgården Sjövillan i Åby",
+    "reason": "webbgranskning: ingen kommersiell gårdsverksamhet"
+  },
+  {
+    "name": "Ingers Smörgåsar",
+    "reason": "webbgranskning: restaurang/kafé/lokal utan egen produktion"
+  },
+  {
+    "name": "Piggaboda Kvarn",
+    "reason": "webbgranskning: ingen kommersiell gårdsverksamhet"
+  },
+  {
+    "name": "Bosjökloster Trädgårdscaféet - en del av Bosjökloster Slott",
+    "reason": "webbgranskning: restaurang/kafé/lokal utan egen produktion"
+  },
+  {
+    "name": "Den Engelska Trädgården",
+    "reason": "webbgranskning: restaurang/kafé/lokal utan egen produktion"
+  },
+  {
+    "name": "Färg Från Förr",
+    "reason": "webbgranskning: butik/återförsäljare"
+  },
+  {
+    "name": "Grisen & Draken Brösarp",
+    "reason": "webbgranskning: restaurang/kafé/lokal utan egen produktion"
+  },
+  {
+    "name": "Gårdsfisk",
+    "reason": "webbgranskning: producent utan försäljning på plats"
+  },
+  {
+    "name": "Gårdstånga Vägkrog",
+    "reason": "webbgranskning: restaurang/kafé/lokal utan egen produktion"
+  },
+  {
+    "name": "Heberleins Delikatess Kött & Chark AB",
+    "reason": "webbgranskning: återförsäljarspråk utan produktion"
+  },
+  {
+    "name": "Häxans Hus",
+    "reason": "webbgranskning: restaurang/kafé/lokal utan egen produktion"
+  },
+  {
+    "name": "Kulla Gunnarstorp Gårdsbutik",
+    "reason": "webbgranskning: butik/återförsäljare"
+  },
+  {
+    "name": "Linas lanthandel",
+    "reason": "webbgranskning: restaurang/kafé/lokal utan egen produktion"
+  },
+  {
+    "name": "Purity Distillery",
+    "reason": "webbgranskning: producent utan försäljning på plats"
+  },
+  {
+    "name": "Slottsmagnolian trädgårdsbutik AB",
+    "reason": "webbgranskning: butik/återförsäljare"
+  },
+  {
+    "name": "Slättarps gård",
+    "reason": "webbgranskning: restaurang/kafé/lokal utan egen produktion"
+  },
+  {
+    "name": "Tunneberga Gästgifvargård AB",
+    "reason": "webbgranskning: restaurang/kafé/lokal utan egen produktion"
+  },
+  {
+    "name": "Whiskyprovning Skåne vinprovning Malmö ölprovning Malmö romprovning Malmö",
+    "reason": "webbgranskning: ingen kommersiell gårdsverksamhet"
+  },
+  {
+    "name": "Dahliaträdgården",
+    "reason": "webbgranskning: ingen kommersiell gårdsverksamhet"
+  },
+  {
+    "name": "Herrängens Gård",
+    "reason": "webbgranskning: restaurang/kafé/lokal utan egen produktion"
+  },
+  {
+    "name": "Kanaans Trädgårdscafé",
+    "reason": "webbgranskning: restaurang/kafé/lokal utan egen produktion"
+  },
+  {
+    "name": "Smedjans trädgård - Handelsträdgård i Mariefred",
+    "reason": "webbgranskning: butik/återförsäljare"
+  },
+  {
+    "name": "Taxinge Bryggeri",
+    "reason": "webbgranskning: producent utan försäljning på plats"
+  },
+  {
+    "name": "Broby Gård Vintage, inredning och café, galleri",
+    "reason": "webbgranskning: restaurang/kafé/lokal utan egen produktion"
+  },
+  {
+    "name": "Änga Gård",
+    "reason": "webbgranskning: butik/återförsäljare"
+  },
+  {
+    "name": "Jädersbruks eko herrgård butik & café",
+    "reason": "webbgranskning: restaurang/kafé/lokal utan egen produktion"
+  },
+  {
+    "name": "Nybynäs Gård",
+    "reason": "webbgranskning: restaurang/kafé/lokal utan egen produktion"
+  },
+  {
+    "name": "Åsby Hem & Trädgård",
+    "reason": "webbgranskning: butik/återförsäljare"
+  },
+  {
+    "name": "Ale Kött AB",
+    "reason": "webbgranskning: återförsäljarspråk utan produktion"
+  },
+  {
+    "name": "Fregatten Trädgårdscafé",
+    "reason": "webbgranskning: restaurang/kafé/lokal utan egen produktion"
+  },
+  {
+    "name": "Gårdskassen",
+    "reason": "webbgranskning: producent utan försäljning på plats"
+  },
+  {
+    "name": "Götala Herrgård AB",
+    "reason": "webbgranskning: restaurang/kafé/lokal utan egen produktion"
+  },
+  {
+    "name": "Helensgården",
+    "reason": "webbgranskning: restaurang/kafé/lokal utan egen produktion"
+  },
+  {
+    "name": "Holm Gård Ab",
+    "reason": "webbgranskning: producent utan försäljning på plats"
+  },
+  {
+    "name": "Jonsereds Trädgårdskafé",
+    "reason": "webbgranskning: restaurang/kafé/lokal utan egen produktion"
+  },
+  {
+    "name": "Kvibille Gästgivaregård",
+    "reason": "webbgranskning: restaurang/kafé/lokal utan egen produktion"
+  },
+  {
+    "name": "Kärrstegens Gård på Berg AB",
+    "reason": "webbgranskning: restaurang/kafé/lokal utan egen produktion"
+  },
+  {
+    "name": "Magasinet Erikstorp",
+    "reason": "webbgranskning: restaurang/kafé/lokal utan egen produktion"
+  },
+  {
+    "name": "Mölnlycke Garden Center",
+    "reason": "webbgranskning: butik/återförsäljare"
+  },
+  {
+    "name": "Naturbruksförvaltningen Angereds gård",
+    "reason": "webbgranskning: ingen kommersiell gårdsverksamhet"
+  },
+  {
+    "name": "Orusts Lantbrukshandel",
+    "reason": "webbgranskning: butik/återförsäljare"
+  },
+  {
+    "name": "Pernmyrs Gård (Karebygården)",
+    "reason": "webbgranskning: återförsäljarspråk utan produktion"
+  },
+  {
+    "name": "Poppels Öl&Mat",
+    "reason": "webbgranskning: återförsäljarspråk utan produktion"
+  },
+  {
+    "name": "Råda Säteri Trädgårdscafé",
+    "reason": "webbgranskning: restaurang/kafé/lokal utan egen produktion"
+  },
+  {
+    "name": "Rådanäs Bryggeri",
+    "reason": "webbgranskning: producent utan försäljning på plats"
+  },
+  {
+    "name": "Skövde Slakteri AB",
+    "reason": "webbgranskning: producent utan försäljning på plats"
+  },
+  {
+    "name": "Sävedalens Gårdscafé",
+    "reason": "webbgranskning: restaurang/kafé/lokal utan egen produktion"
+  },
+  {
+    "name": "Tegens Butik",
+    "reason": "webbgranskning: butik/återförsäljare"
+  },
+  {
+    "name": "Tofta Odlarförening",
+    "reason": "webbgranskning: ingen kommersiell gårdsverksamhet"
+  },
+  {
+    "name": "Trollabo Kvarn",
+    "reason": "webbgranskning: restaurang/kafé/lokal utan egen produktion"
+  },
+  {
+    "name": "Hester Gård - Upplevelser",
+    "reason": "webbgranskning: restaurang/kafé/lokal utan egen produktion"
+  },
+  {
+    "name": "Minsjö Säteri",
+    "reason": "webbgranskning: butik/återförsäljare"
   }
 ]

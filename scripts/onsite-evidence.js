@@ -74,6 +74,19 @@ const SUPPORTING = [
   /på gården finns/,
 ];
 
+// Places that champion local producers — Sofie's call 2026-08-25, drawn from
+// her review keeps (Freadals & Friden Gårdskrog, HAFI's fabriksbutik, Forshems
+// slow food, Vävra Gårdsdeli, Haddorps' närproducerat focus): these terms mark
+// businesses worth keeping even without own production, so they are never
+// auto-rejected — a match neutralizes "contradicted" and goes to review.
+const LOCAL_SUPPORT = [
+  /gårdskrog/,
+  /fabriksbutik/,
+  /slow ?food/,
+  /gårdsdeli/,
+  /närproducera|närodla/,
+];
+
 // Reseller/venue language — evidence AGAINST on-site production, but only when
 // nothing above matched: a farm shop proudly selling neighbours' goods next to
 // its own says both, and its own production wins.
@@ -120,15 +133,18 @@ function classifyText(text) {
   const strong = collectMatches(t, STRONG);
   const supporting = collectMatches(t, SUPPORTING);
   const reseller = collectMatches(t, RESELLER);
+  const localSupport = collectMatches(t, LOCAL_SUPPORT);
 
   const offTopic = OFF_TOPIC.test(t) && strong.length === 0;
 
   let verdict = 'unclear';
   if (strong.length >= 1 || supporting.length >= 2) verdict = 'verified';
-  else if (reseller.length >= 1 && supporting.length === 0) verdict = 'contradicted';
+  else if (reseller.length >= 1 && supporting.length === 0 && localSupport.length === 0) {
+    verdict = 'contradicted'; // local-producer champions are a human call, never auto-out
+  }
   if (offTopic) verdict = 'unclear'; // hijacked domain says nothing about the farm
 
-  return { verdict, offTopic, strong, supporting, reseller };
+  return { verdict, offTopic, strong, supporting, reseller, localSupport };
 }
 
-module.exports = { classifyText, STRONG, SUPPORTING, RESELLER, OFF_TOPIC };
+module.exports = { classifyText, STRONG, SUPPORTING, RESELLER, LOCAL_SUPPORT, OFF_TOPIC };
