@@ -121,6 +121,8 @@ function normalizeFarm(raw, index) {
     lat: raw.lat || null,
     lng: raw.lng || null,
     website: (raw.website || '').trim(),
+    facebook: (raw.facebook || '').trim(),
+    instagram: (raw.instagram || '').trim(),
     phone: (raw.phone || '').trim(),
     email: (raw.email || '').trim(),
     products: normalizeProducts(raw.products),

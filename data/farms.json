@@ -357,7 +357,7 @@
     "lan": "Blekinge",
     "lat": 56.0354719,
     "lng": 14.6088324,
-    "website": "https://instagram.com/0procentbonde?igshid=jibttheoylb1",
+    "website": "",
     "phone": "",
     "email": "",
     "products": [
@@ -369,7 +369,8 @@
     "isArchipelago": false,
     "openingHours": "måndag: 08:00–20:00, tisdag: 08:00–20:00, onsdag: 08:00–20:00, torsdag: 08:00–20:00, fredag: 08:00–20:00, lördag: 08:00–20:00, söndag: 08:00–20:00",
     "season": "",
-    "source": "google-places:gårdsbutik"
+    "source": "google-places:gårdsbutik",
+    "instagram": "https://instagram.com/0procentbonde?igshid=jibttheoylb1"
   },
   {
     "id": "ekne-gards-frukt-gront-ab",
@@ -542,7 +543,7 @@
     "lan": "Blekinge",
     "lat": 56.1905102,
     "lng": 14.9997825,
-    "website": "https://www.eriksberg.se/butiker",
+    "website": "https://www.eriksberg.se/",
     "phone": "0454-56 43 00",
     "email": "",
     "products": [
@@ -635,7 +636,7 @@
     "lan": "Blekinge",
     "lat": 56.1022268,
     "lng": 14.6169385,
-    "website": "https://www.facebook.com/matsagarden",
+    "website": "",
     "phone": "",
     "email": "",
     "products": [
@@ -647,7 +648,8 @@
     "isArchipelago": false,
     "openingHours": "",
     "season": "",
-    "source": "google-places:självplock"
+    "source": "google-places:självplock",
+    "facebook": "https://www.facebook.com/matsagarden"
   },
   {
     "id": "mundekulla-gardsbutik-och-caf",
@@ -658,7 +660,7 @@
     "lan": "Kalmar",
     "lat": 56.6154963,
     "lng": 15.4179755,
-    "website": "https://www.mundekulla.se/mundekullacafe",
+    "website": "https://www.mundekulla.se/",
     "phone": "",
     "email": "",
     "products": [
@@ -913,7 +915,7 @@
     "lan": "Blekinge",
     "lat": 56.27141899999999,
     "lng": 15.1800885,
-    "website": "https://www.facebook.com/Skogsbrynetperma/",
+    "website": "",
     "phone": "076-878 61 90",
     "email": "",
     "products": [
@@ -925,7 +927,8 @@
     "isArchipelago": false,
     "openingHours": "måndag: Öppet dygnet runt, tisdag: Öppet dygnet runt, onsdag: Öppet dygnet runt, torsdag: Öppet dygnet runt, fredag: Öppet dygnet runt, lördag: Öppet dygnet runt, söndag: Öppet dygnet runt",
     "season": "",
-    "source": "google-places:gårdsbutik"
+    "source": "google-places:gårdsbutik",
+    "facebook": "https://www.facebook.com/Skogsbrynetperma/"
   },
   {
     "id": "stora-horns-vingard-2",
@@ -1051,7 +1054,7 @@
     "lan": "Blekinge",
     "lat": 56.4262958,
     "lng": 15.4466513,
-    "website": "https://www.facebook.com/Anghagengard",
+    "website": "",
     "phone": "073-375 39 56",
     "email": "",
     "products": [
@@ -1063,7 +1066,8 @@
     "isArchipelago": false,
     "openingHours": "måndag: Öppet dygnet runt, tisdag: Öppet dygnet runt, onsdag: Öppet dygnet runt, torsdag: Öppet dygnet runt, fredag: Öppet dygnet runt, lördag: Öppet dygnet runt, söndag: Öppet dygnet runt",
     "season": "",
-    "source": "google-places:gårdsbutik"
+    "source": "google-places:gårdsbutik",
+    "facebook": "https://www.facebook.com/Anghagengard"
   },
   {
     "id": "appelboden-musteri",
@@ -1110,29 +1114,6 @@
     "openingHours": "",
     "season": "",
     "source": "google-places:gårdsförsäljning"
-  },
-  {
-    "id": "alskute-farm-brewery-ab",
-    "name": "Alskute Farm & Brewery AB",
-    "description": "",
-    "address": "sockerbruket, 622 54 Romakloster, Sverige",
-    "kommun": "",
-    "lan": "Gotland",
-    "lat": 57.5074234,
-    "lng": 18.4489267,
-    "website": "http://www.alskute.com/",
-    "phone": "",
-    "email": "",
-    "products": [
-      "öl"
-    ],
-    "onSiteSales": false,
-    "tastingRoom": true,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "",
-    "season": "",
-    "source": "google-places:bryggeri"
   },
   {
     "id": "bondeblom-gardsbutik",
@@ -1583,7 +1564,7 @@
     "lan": "Gotland",
     "lat": 56.9917995,
     "lng": 18.2471013,
-    "website": "http://www.bottarve.se/kaffestuga/",
+    "website": "http://www.bottarve.se/",
     "phone": "",
     "email": "",
     "products": [
@@ -1907,7 +1888,7 @@
     "lan": "Gotland",
     "lat": 57.7081915,
     "lng": 18.5136986,
-    "website": "https://www.facebook.com/nyplingsgardsbutik",
+    "website": "",
     "phone": "073-393 99 33",
     "email": "",
     "products": [
@@ -1919,7 +1900,8 @@
     "isArchipelago": false,
     "openingHours": "måndag: 07:00–21:00, tisdag: 07:00–21:00, onsdag: 07:00–21:00, torsdag: 07:00–21:00, fredag: 07:00–21:00, lördag: 07:00–21:00, söndag: 07:00–21:00",
     "season": "",
-    "source": "google-places:gårdsbutik"
+    "source": "google-places:gårdsbutik",
+    "facebook": "https://www.facebook.com/nyplingsgardsbutik"
   },
   {
     "id": "ollajvs-gard",
@@ -1953,7 +1935,7 @@
     "lan": "Gotland",
     "lat": 57.0052466,
     "lng": 18.3139628,
-    "website": "http://facebook.com/ranarvegardshandel",
+    "website": "",
     "phone": "070-493 15 02",
     "email": "",
     "products": [
@@ -1965,7 +1947,8 @@
     "isArchipelago": false,
     "openingHours": "måndag: Öppet dygnet runt, tisdag: Öppet dygnet runt, onsdag: Öppet dygnet runt, torsdag: Öppet dygnet runt, fredag: Öppet dygnet runt, lördag: Öppet dygnet runt, söndag: Öppet dygnet runt",
     "season": "",
-    "source": "google-places:gårdsförsäljning"
+    "source": "google-places:gårdsförsäljning",
+    "facebook": "http://facebook.com/ranarvegardshandel"
   },
   {
     "id": "rommunds-fargard",
@@ -2161,7 +2144,7 @@
     "lan": "Gotland",
     "lat": 57.7856221,
     "lng": 18.4878219,
-    "website": "https://sv-se.facebook.com/SorbyBi/",
+    "website": "",
     "phone": "070-640 00 83",
     "email": "",
     "products": [
@@ -2173,7 +2156,8 @@
     "isArchipelago": false,
     "openingHours": "måndag: Öppet dygnet runt, tisdag: Öppet dygnet runt, onsdag: Öppet dygnet runt, torsdag: Öppet dygnet runt, fredag: Öppet dygnet runt, lördag: Öppet dygnet runt, söndag: Öppet dygnet runt",
     "season": "",
-    "source": "google-places:gårdsbutik"
+    "source": "google-places:gårdsbutik",
+    "facebook": "https://sv-se.facebook.com/SorbyBi/"
   },
   {
     "id": "stafva-gardsbutik",
@@ -2276,7 +2260,7 @@
     "lan": "Gotland",
     "lat": 57.79450809999999,
     "lng": 18.4986241,
-    "website": "https://sv-se.facebook.com/ungesmissgard/",
+    "website": "",
     "phone": "070-296 30 21",
     "email": "",
     "products": [
@@ -2288,7 +2272,8 @@
     "isArchipelago": false,
     "openingHours": "måndag: Öppet dygnet runt, tisdag: Öppet dygnet runt, onsdag: Öppet dygnet runt, torsdag: Öppet dygnet runt, fredag: Öppet dygnet runt, lördag: Öppet dygnet runt, söndag: Öppet dygnet runt",
     "season": "",
-    "source": "google-places:gårdsbutik"
+    "source": "google-places:gårdsbutik",
+    "facebook": "https://sv-se.facebook.com/ungesmissgard/"
   },
   {
     "id": "widegrens-gard",
@@ -2728,29 +2713,6 @@
     "openingHours": "måndag: Stängt, tisdag: 10:00–17:00, onsdag: 10:00–17:00, torsdag: 10:00–17:00, fredag: 10:00–17:00, lördag: 10:00–15:00, söndag: Stängt",
     "season": "",
     "source": "google-places:gårdsbutik"
-  },
-  {
-    "id": "hallands-kombucha",
-    "name": "Hallands Kombucha",
-    "description": "",
-    "address": "Varbergsvägen 985, 439 74 Fjärås, Sverige",
-    "kommun": "Kungsbacka",
-    "lan": "Halland",
-    "lat": 57.41528299999999,
-    "lng": 12.1536858,
-    "website": "http://www.hallandskombucha.se/",
-    "phone": "070-754 22 80",
-    "email": "",
-    "products": [
-      "öl"
-    ],
-    "onSiteSales": false,
-    "tastingRoom": true,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "",
-    "season": "",
-    "source": "google-places:bryggeri"
   },
   {
     "id": "halmstad-brygghus",
@@ -3594,7 +3556,7 @@
     "lan": "Halland",
     "lat": 57.01581969999999,
     "lng": 13.3229948,
-    "website": "https://www.facebook.com/VJ-Vilt-Nissaryd-AB-2029463424026111",
+    "website": "",
     "phone": "073-507 79 82",
     "email": "",
     "products": [
@@ -3606,7 +3568,8 @@
     "isArchipelago": false,
     "openingHours": "måndag: Stängt, tisdag: 11:00–16:00, onsdag: 11:00–16:00, torsdag: 11:00–16:00, fredag: 11:00–17:00, lördag: Stängt, söndag: Stängt",
     "season": "",
-    "source": "google-places:gårdsrestaurang"
+    "source": "google-places:gårdsrestaurang",
+    "facebook": "https://www.facebook.com/VJ-Vilt-Nissaryd-AB-2029463424026111"
   },
   {
     "id": "vilsharads-gardsbutik",
@@ -3676,29 +3639,6 @@
     "openingHours": "",
     "season": "",
     "source": "google-places:bryggeri"
-  },
-  {
-    "id": "drefseryd-gard",
-    "name": "Drefseryd Gård",
-    "description": "",
-    "address": "Drevseryd Södergård 1, 563 93 Gränna, Sverige",
-    "kommun": "",
-    "lan": "Jönköping",
-    "lat": 57.9275844,
-    "lng": 14.4482994,
-    "website": "http://drefseryd.wordpress.com/",
-    "phone": "070-493 99 06",
-    "email": "",
-    "products": [
-      "annat"
-    ],
-    "onSiteSales": true,
-    "tastingRoom": false,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "",
-    "season": "",
-    "source": "google-places:gårdsbutik"
   },
   {
     "id": "ebbarps-norrgard",
@@ -4170,7 +4110,7 @@
     "lan": "Kalmar",
     "lat": 56.519225,
     "lng": 16.0617572,
-    "website": "https://www.facebook.com/Germundslycke",
+    "website": "",
     "phone": "073-644 09 17",
     "email": "",
     "products": [
@@ -4182,7 +4122,8 @@
     "isArchipelago": false,
     "openingHours": "måndag: 08:00–20:00, tisdag: 08:00–20:00, onsdag: 08:00–20:00, torsdag: 08:00–20:00, fredag: 08:00–20:00, lördag: 08:00–20:00, söndag: 08:00–20:00",
     "season": "",
-    "source": "google-places:lokal producent mat"
+    "source": "google-places:lokal producent mat",
+    "facebook": "https://www.facebook.com/Germundslycke"
   },
   {
     "id": "hagalundstomater-ab-gardsbutik-tomat-sant",
@@ -4630,7 +4571,7 @@
     "lan": "Kronoberg",
     "lat": 57.0692815,
     "lng": 14.5104094,
-    "website": "http://www.broaskogsislandshastar.dinstudio.se/gallery_16.html",
+    "website": "http://www.broaskogsislandshastar.dinstudio.se/",
     "phone": "070-215 66 75",
     "email": "",
     "products": [
@@ -6087,7 +6028,7 @@
     "lan": "Skåne",
     "lat": 55.4694824,
     "lng": 13.3529575,
-    "website": "https://m.facebook.com/pages/category/Local-Business/gronbyblabar/about/",
+    "website": "",
     "phone": "072-152 82 00",
     "email": "",
     "products": [
@@ -6099,7 +6040,8 @@
     "isArchipelago": false,
     "openingHours": "",
     "season": "",
-    "source": "google-places:självplock"
+    "source": "google-places:självplock",
+    "facebook": "https://m.facebook.com/pages/category/Local-Business/gronbyblabar/about/"
   },
   {
     "id": "gunnars-granar-ab",
@@ -6295,7 +6237,7 @@
     "lan": "Skåne",
     "lat": 55.6129466,
     "lng": 13.1200113,
-    "website": "https://m.facebook.com/p/Haga-Produkter-100057343784377/",
+    "website": "",
     "phone": "070-849 43 40",
     "email": "",
     "products": [
@@ -6307,7 +6249,8 @@
     "isArchipelago": false,
     "openingHours": "",
     "season": "",
-    "source": "google-places:odlare gård"
+    "source": "google-places:odlare gård",
+    "facebook": "https://m.facebook.com/p/Haga-Produkter-100057343784377/"
   },
   {
     "id": "hallongarden",
@@ -6341,7 +6284,7 @@
     "lan": "Skåne",
     "lat": 56.0527623,
     "lng": 12.8810525,
-    "website": "https://m.facebook.com/hattmakarensbryggeri/",
+    "website": "",
     "phone": "076-105 46 97",
     "email": "",
     "products": [
@@ -6353,7 +6296,8 @@
     "isArchipelago": false,
     "openingHours": "",
     "season": "",
-    "source": "google-places:bryggeri"
+    "source": "google-places:bryggeri",
+    "facebook": "https://m.facebook.com/hattmakarensbryggeri/"
   },
   {
     "id": "heberleins-delikatess-kott-chark-ab",
@@ -6377,29 +6321,6 @@
     "openingHours": "måndag: 10:00–18:00, tisdag: 10:00–18:00, onsdag: 10:00–18:00, torsdag: 10:00–18:00, fredag: 10:00–18:00, lördag: 09:00–13:00, söndag: Stängt",
     "season": "",
     "source": "google-places:lokal producent mat"
-  },
-  {
-    "id": "helgagardens-gardsbutik-ostbutik",
-    "name": "Helgagårdens Gårdsbutik & Ostbutik",
-    "description": "",
-    "address": "Hemmestorpsvägen 21, 275 63 Blentarp, Sverige",
-    "kommun": "",
-    "lan": "Skåne",
-    "lat": 55.6238126,
-    "lng": 13.5818714,
-    "website": "http://www.islandshastarskane.se/",
-    "phone": "070-575 07 73",
-    "email": "",
-    "products": [
-      "annat"
-    ],
-    "onSiteSales": true,
-    "tastingRoom": false,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "måndag: Stängt, tisdag: Stängt, onsdag: Stängt, torsdag: Stängt, fredag: 11:00–16:00, lördag: 11:00–16:00, söndag: 11:00–16:00",
-    "season": "",
-    "source": "google-places:gårdsbutik"
   },
   {
     "id": "hobjersgarden",
@@ -6433,7 +6354,7 @@
     "lan": "Skåne",
     "lat": 55.7334745,
     "lng": 13.0124762,
-    "website": "https://www.facebook.com/Holl%C3%A4ndarehusg%C3%A5rdens-G%C3%A5rdsbutik-819874784763706/",
+    "website": "",
     "phone": "",
     "email": "",
     "products": [
@@ -6445,7 +6366,8 @@
     "isArchipelago": false,
     "openingHours": "måndag: 12:00–18:00, tisdag: 12:00–18:00, onsdag: 12:00–18:00, torsdag: 12:00–18:00, fredag: 12:00–18:00, lördag: 10:00–15:00, söndag: 10:00–15:00",
     "season": "",
-    "source": "google-places:gårdsbutik"
+    "source": "google-places:gårdsbutik",
+    "facebook": "https://www.facebook.com/Holl%C3%A4ndarehusg%C3%A5rdens-G%C3%A5rdsbutik-819874784763706/"
   },
   {
     "id": "hurva-gastgivaregard",
@@ -6618,7 +6540,7 @@
     "lan": "Skåne",
     "lat": 55.72396329999999,
     "lng": 13.098322,
-    "website": "http://www.kiviksmusteri.se/sv/besoek-oss/solnaes-gard/",
+    "website": "http://www.kiviksmusteri.se/",
     "phone": "046-24 70 89",
     "email": "",
     "products": [
@@ -6703,29 +6625,6 @@
     "source": "google-places:odlare gård"
   },
   {
-    "id": "kornheddinge-bryggerikompani",
-    "name": "Kornheddinge Bryggerikompani",
-    "description": "",
-    "address": "Kornheddingevägen 7, 245 91 Staffanstorp, Sverige",
-    "kommun": "Staffanstorp",
-    "lan": "Skåne",
-    "lat": 55.6324875,
-    "lng": 13.2873986,
-    "website": "http://www.kornheddingebryggerikompani.se/",
-    "phone": "070-946 15 62",
-    "email": "",
-    "products": [
-      "öl"
-    ],
-    "onSiteSales": false,
-    "tastingRoom": true,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "",
-    "season": "",
-    "source": "google-places:bryggeri"
-  },
-  {
     "id": "kulla-gunnarstorp-gardsbutik",
     "name": "Kulla Gunnarstorp Gårdsbutik",
     "description": "",
@@ -6803,7 +6702,7 @@
     "lan": "Skåne",
     "lat": 55.8330411,
     "lng": 13.2183198,
-    "website": "https://www.facebook.com/Kungsg%C3%A5rdens-musteri-110591234687812/",
+    "website": "",
     "phone": "070-291 93 40",
     "email": "",
     "products": [
@@ -6815,7 +6714,8 @@
     "isArchipelago": false,
     "openingHours": "måndag: 10:00–18:00, tisdag: 10:00–18:00, onsdag: 10:00–18:00, torsdag: 10:00–18:00, fredag: 10:00–18:00, lördag: 10:00–18:00, söndag: 10:00–18:00",
     "season": "",
-    "source": "google-places:musteri"
+    "source": "google-places:musteri",
+    "facebook": "https://www.facebook.com/Kungsg%C3%A5rdens-musteri-110591234687812/"
   },
   {
     "id": "kallunda-gard",
@@ -7519,7 +7419,7 @@
     "lan": "Skåne",
     "lat": 55.7027687,
     "lng": 13.5717094,
-    "website": "https://www.facebook.com/sjogardenscafe/",
+    "website": "",
     "phone": "046-600 10",
     "email": "",
     "products": [
@@ -7531,7 +7431,8 @@
     "isArchipelago": false,
     "openingHours": "måndag: Stängt, tisdag: Stängt, onsdag: Stängt, torsdag: Stängt, fredag: Stängt, lördag: 14:00–17:00, söndag: 14:00–17:00",
     "season": "",
-    "source": "google-places:gårdscafé"
+    "source": "google-places:gårdscafé",
+    "facebook": "https://www.facebook.com/sjogardenscafe/"
   },
   {
     "id": "skepparps-vingard",
@@ -7588,7 +7489,7 @@
     "lan": "Skåne",
     "lat": 55.9195023,
     "lng": 13.95021,
-    "website": "https://www.facebook.com/profile.php?id=100046231087762",
+    "website": "",
     "phone": "",
     "email": "",
     "products": [
@@ -7600,7 +7501,8 @@
     "isArchipelago": false,
     "openingHours": "måndag: Stängt, tisdag: Stängt, onsdag: Stängt, torsdag: Stängt, fredag: Stängt, lördag: 11:00–15:00, söndag: 11:00–15:00",
     "season": "",
-    "source": "google-places:gårdsbutik"
+    "source": "google-places:gårdsbutik",
+    "facebook": "https://www.facebook.com/profile.php?id=100046231087762"
   },
   {
     "id": "skogstradgardens-vaxter",
@@ -7717,29 +7619,6 @@
     "openingHours": "måndag: Stängt, tisdag: Stängt, onsdag: 11:00–17:00, torsdag: 11:00–17:00, fredag: 11:00–17:00, lördag: 11:00–16:00, söndag: 11:00–16:00",
     "season": "",
     "source": "google-places:gårdsrestaurang"
-  },
-  {
-    "id": "snarestad-vingard",
-    "name": "Snårestad Vingård",
-    "description": "",
-    "address": "Snårestad Lyckeväg 121, 271 93 Ystad, Sverige",
-    "kommun": "Ystad",
-    "lan": "Skåne",
-    "lat": 55.430085,
-    "lng": 13.6607857,
-    "website": "http://snarestadvin.se/kontakt/",
-    "phone": "070-412 88 33",
-    "email": "",
-    "products": [
-      "vin"
-    ],
-    "onSiteSales": false,
-    "tastingRoom": true,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "",
-    "season": "",
-    "source": "google-places:vingård"
   },
   {
     "id": "solakra-gard",
@@ -8866,30 +8745,6 @@
     "source": "google-places:gårdsbutik"
   },
   {
-    "id": "macken-bryggeri",
-    "place_id": "ChIJMULh7wR3X0YRpwWFj2eWVHQ",
-    "name": "Macken Bryggeri",
-    "description": "",
-    "address": "Gustafsvägen 9, 169 58 Solna, Sverige",
-    "kommun": "Solna",
-    "lan": "Stockholm",
-    "lat": 59.3648399,
-    "lng": 18.0047464,
-    "website": "http://mackenbryggeri.se/",
-    "phone": "",
-    "email": "",
-    "products": [
-      "öl"
-    ],
-    "onSiteSales": false,
-    "tastingRoom": true,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "",
-    "season": "",
-    "source": "google-places:bryggeri"
-  },
-  {
     "id": "malma-gard-ab",
     "place_id": "ChIJt-rFEV-dX0YRw7cz_D6I4FE",
     "name": "Malma Gård AB",
@@ -8971,7 +8826,7 @@
     "lan": "Stockholm",
     "lat": 59.31572,
     "lng": 18.5509597,
-    "website": "https://www.facebook.com/gardsloppisenpanoragard/",
+    "website": "",
     "phone": "073-735 11 11",
     "email": "",
     "products": [
@@ -8983,7 +8838,8 @@
     "isArchipelago": false,
     "openingHours": "måndag: Stängt, tisdag: Stängt, onsdag: Stängt, torsdag: Stängt, fredag: Stängt, lördag: 10:00–15:00, söndag: Stängt",
     "season": "",
-    "source": "google-places:gårdsbutik"
+    "source": "google-places:gårdsbutik",
+    "facebook": "https://www.facebook.com/gardsloppisenpanoragard/"
   },
   {
     "id": "pangpang-brewery-hokarangen-endast-sommaroppet-hornstull-oppet-aret-runt",
@@ -9563,30 +9419,6 @@
     "source": "google-places:gårdsförsäljning"
   },
   {
-    "id": "cafe-grassagarden",
-    "place_id": "ChIJeZIUnJ_-XkYRLGl43W6NVUY",
-    "name": "Café Grassagården",
-    "description": "",
-    "address": "Kvarngatan 2, 645 30 Strängnäs, Sverige",
-    "kommun": "Strängnäs",
-    "lan": "Södermanland",
-    "lat": 59.37783940000001,
-    "lng": 17.0313203,
-    "website": "http://www.cafe-grassagarden.se/",
-    "phone": "073-744 86 02",
-    "email": "",
-    "products": [
-      "annat"
-    ],
-    "onSiteSales": true,
-    "tastingRoom": true,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "måndag: 10:00–17:00, tisdag: 10:00–17:00, onsdag: 10:00–17:00, torsdag: 10:00–17:00, fredag: 10:00–17:00, lördag: 10:00–17:00, söndag: 10:00–17:00",
-    "season": "",
-    "source": "google-places:gårdscafé"
-  },
-  {
     "id": "ekenas-tradgard-ab",
     "place_id": "ChIJ47OUQ4faXkYRmZJfgUwSG4M",
     "name": "Ekenäs Trädgård AB",
@@ -9836,7 +9668,7 @@
     "lan": "Södermanland",
     "lat": 59.4371903,
     "lng": 17.1745032,
-    "website": "https://www.facebook.com/people/Kilfr%C3%B6slunda-g%C3%A5rd/100052005942866/",
+    "website": "",
     "phone": "070-260 68 46",
     "email": "",
     "products": [
@@ -9848,7 +9680,8 @@
     "isArchipelago": true,
     "openingHours": "måndag: 15:00–20:00, tisdag: 15:00–20:00, onsdag: 15:00–20:00, torsdag: 15:00–20:00, fredag: 10:00–19:00, lördag: 11:00–16:00, söndag: 11:00–16:00",
     "season": "",
-    "source": "google-places:gårdsförsäljning"
+    "source": "google-places:gårdsförsäljning",
+    "facebook": "https://www.facebook.com/people/Kilfr%C3%B6slunda-g%C3%A5rd/100052005942866/"
   },
   {
     "id": "krogstorps-gard",
@@ -9884,7 +9717,7 @@
     "lan": "Södermanland",
     "lat": 59.4389233,
     "lng": 16.9363163,
-    "website": "https://www.facebook.com/share/1BgccXUXP4/",
+    "website": "",
     "phone": "072-366 74 96",
     "email": "",
     "products": [
@@ -9896,7 +9729,8 @@
     "isArchipelago": false,
     "openingHours": "",
     "season": "",
-    "source": "google-places:gårdsbutik"
+    "source": "google-places:gårdsbutik",
+    "facebook": "https://www.facebook.com/share/1BgccXUXP4/"
   },
   {
     "id": "lida-gard",
@@ -10389,7 +10223,7 @@
     "lan": "Södermanland",
     "lat": 58.9709679,
     "lng": 16.3708445,
-    "website": "https://www.facebook.com/Oijagardsbutik/",
+    "website": "",
     "phone": "070-548 00 83",
     "email": "",
     "products": [
@@ -10401,7 +10235,8 @@
     "isArchipelago": false,
     "openingHours": "måndag: 08:00–21:00, tisdag: 08:00–21:00, onsdag: 08:00–21:00, torsdag: 08:00–21:00, fredag: 08:00–21:00, lördag: 09:00–21:09, söndag: 09:00–21:00",
     "season": "",
-    "source": "google-places:gårdsbutik"
+    "source": "google-places:gårdsbutik",
+    "facebook": "https://www.facebook.com/Oijagardsbutik/"
   },
   {
     "id": "oja-gard",
@@ -10426,30 +10261,6 @@
     "openingHours": "",
     "season": "",
     "source": "google-places:gårdsförsäljning"
-  },
-  {
-    "id": "alsike-tradgard",
-    "place_id": "ChIJiZHS-C63X0YRM9M0QS_ycVk",
-    "name": "Alsike trädgård",
-    "description": "",
-    "address": "prästgård, 741 92 Knivsta, Sverige",
-    "kommun": "Knivsta",
-    "lan": "Uppsala",
-    "lat": 59.73749429999999,
-    "lng": 17.7285016,
-    "website": "http://www.alsiketradgard.se/",
-    "phone": "070-045 37 80",
-    "email": "",
-    "products": [
-      "grönsaker"
-    ],
-    "onSiteSales": true,
-    "tastingRoom": false,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "",
-    "season": "",
-    "source": "google-places:gårdsbutik"
   },
   {
     "id": "breds-vreta-gard",
@@ -10509,7 +10320,7 @@
     "lan": "Uppsala",
     "lat": 59.8131121,
     "lng": 17.4125601,
-    "website": "https://www.facebook.com/Ekbolanda",
+    "website": "",
     "phone": "070-343 82 68",
     "email": "",
     "products": [
@@ -10521,7 +10332,8 @@
     "isArchipelago": false,
     "openingHours": "måndag: Stängt, tisdag: Stängt, onsdag: Stängt, torsdag: Stängt, fredag: Stängt, lördag: 11:00–16:00, söndag: 11:00–16:00",
     "season": "",
-    "source": "google-places:gårdsbutik"
+    "source": "google-places:gårdsbutik",
+    "facebook": "https://www.facebook.com/Ekbolanda"
   },
   {
     "id": "fredrikslunds-gard-ab",
@@ -11124,30 +10936,6 @@
     "source": "google-places:gårdsbutik"
   },
   {
-    "id": "malby-tradgard",
-    "place_id": "ChIJBxU4SWpEXkYRc7qcMDfIgtE",
-    "name": "Mälby trädgård",
-    "description": "",
-    "address": "FRÖSTHULTS-MÄLBY 3, 749 71 Fjärdhundra, Sverige",
-    "kommun": "Enköping",
-    "lan": "Uppsala",
-    "lat": 59.7403031,
-    "lng": 16.9439019,
-    "website": "https://malbytradgard.se/",
-    "phone": "070-760 81 13",
-    "email": "",
-    "products": [
-      "grönsaker"
-    ],
-    "onSiteSales": true,
-    "tastingRoom": false,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": true,
-    "openingHours": "måndag: 09:00–19:00, tisdag: 09:00–19:00, onsdag: 09:00–19:00, torsdag: 09:00–19:00, fredag: 09:00–19:00, lördag: 09:00–19:00, söndag: 09:00–19:00",
-    "season": "",
-    "source": "google-places:gårdsförsäljning"
-  },
-  {
     "id": "nibble-gardsgris",
     "place_id": "ChIJDzFrEOlnXkYRNVdCmtDa2M0",
     "name": "Nibble Gårdsgris",
@@ -11373,7 +11161,7 @@
     "lan": "Västmanland",
     "lat": 59.46990880000001,
     "lng": 15.8232898,
-    "website": "http://facebook.com/tvetalundlantbruk/",
+    "website": "",
     "phone": "070-268 35 68",
     "email": "",
     "products": [
@@ -11385,7 +11173,8 @@
     "isArchipelago": true,
     "openingHours": "måndag: 10:00–18:00, tisdag: 10:00–18:00, onsdag: 10:00–18:00, torsdag: 10:00–18:00, fredag: 10:00–18:00, lördag: 10:00–18:00, söndag: 10:00–18:00",
     "season": "",
-    "source": "google-places:gårdsbutik"
+    "source": "google-places:gårdsbutik",
+    "facebook": "http://facebook.com/tvetalundlantbruk/"
   },
   {
     "id": "tangsta-gard",
@@ -11410,30 +11199,6 @@
     "openingHours": "",
     "season": "",
     "source": "google-places:gårdsrestaurang"
-  },
-  {
-    "id": "vigelshus-gardsbutik",
-    "place_id": "ChIJS2hPM2FrXkYRvZegPpRR-1I",
-    "name": "Vigelshus gårdsbutik",
-    "description": "",
-    "address": "VIGELSHUS 105, 733 93 Sala, Sverige",
-    "kommun": "Sala",
-    "lan": "Västmanland",
-    "lat": 59.8305249,
-    "lng": 16.7233944,
-    "website": "https://www.vigelshus-gard.se/",
-    "phone": "070-799 45 08",
-    "email": "",
-    "products": [
-      "annat"
-    ],
-    "onSiteSales": true,
-    "tastingRoom": false,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "",
-    "season": "",
-    "source": "google-places:gårdsbutik"
   },
   {
     "id": "wiborgs-gardsbutik-kolsva-lantbruk",
@@ -11527,29 +11292,6 @@
     "gardsförsäljningLicense": false,
     "isArchipelago": false,
     "openingHours": "måndag: Stängt, tisdag: Stängt, onsdag: Stängt, torsdag: Stängt, fredag: 10:00–18:00, lördag: 10:00–13:00, söndag: Stängt",
-    "season": "",
-    "source": "google-places:gårdsbutik"
-  },
-  {
-    "id": "agnesbergs-gardsbutik",
-    "name": "Agnesbergs Gårdsbutik",
-    "description": "",
-    "address": "Ramnebacken 2, 424 38 Agnesberg, Sverige",
-    "kommun": "",
-    "lan": "Västra Götaland",
-    "lat": 57.78931509999999,
-    "lng": 12.0207123,
-    "website": "http://www.agnesbergsgardsbutik.se/",
-    "phone": "076-071 83 78",
-    "email": "",
-    "products": [
-      "annat"
-    ],
-    "onSiteSales": true,
-    "tastingRoom": false,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "",
     "season": "",
     "source": "google-places:gårdsbutik"
   },
@@ -11853,52 +11595,6 @@
     "source": "google-places:gårdsförsäljning"
   },
   {
-    "id": "bjorrods-agg",
-    "name": "Björröds Ägg",
-    "description": "",
-    "address": "Björröd 252, 442 96 Kode, Sverige",
-    "kommun": "",
-    "lan": "Västra Götaland",
-    "lat": 57.93761389999999,
-    "lng": 11.9424684,
-    "website": "http://www.bjorrodsagg.se/",
-    "phone": "070-730 54 62",
-    "email": "",
-    "products": [
-      "annat"
-    ],
-    "onSiteSales": true,
-    "tastingRoom": false,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "måndag: 08:30–19:30, tisdag: 08:30–19:30, onsdag: 08:30–19:30, torsdag: 08:30–19:30, fredag: 08:30–19:30, lördag: 08:30–19:30, söndag: 08:30–19:30",
-    "season": "",
-    "source": "google-places:gårdsbutik"
-  },
-  {
-    "id": "blekslattens-gard",
-    "name": "Blekslättens gård",
-    "description": "",
-    "address": "Blekslätten Gård, 462 96 Frändefors, Sverige",
-    "kommun": "",
-    "lan": "Västra Götaland",
-    "lat": 58.50669919999999,
-    "lng": 12.1715641,
-    "website": "http://www.blekslattengard.se/",
-    "phone": "070-396 19 26",
-    "email": "",
-    "products": [
-      "annat"
-    ],
-    "onSiteSales": true,
-    "tastingRoom": false,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "",
-    "season": "",
-    "source": "google-places:gårdsförsäljning"
-  },
-  {
     "id": "blommor-och-jord-i-alboga",
     "name": "Blommor och Jord i Alboga",
     "description": "",
@@ -11943,29 +11639,6 @@
     "openingHours": "",
     "season": "",
     "source": "google-places:odlare gård"
-  },
-  {
-    "id": "blomsterbacken-sjalvplock-tradgardsmasteri",
-    "name": "Blomsterbacken Självplock & Trädgårdsmästeri",
-    "description": "",
-    "address": "Säteriallén 11, 435 32 Mölnlycke, Sverige",
-    "kommun": "",
-    "lan": "Västra Götaland",
-    "lat": 57.65946700000001,
-    "lng": 12.0919178,
-    "website": "http://blomsterbackensjalvplock.se/",
-    "phone": "",
-    "email": "",
-    "products": [
-      "grönsaker"
-    ],
-    "onSiteSales": true,
-    "tastingRoom": false,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "måndag: 07:00–23:00, tisdag: 07:00–23:00, onsdag: 07:00–23:00, torsdag: 07:00–23:00, fredag: 07:00–23:00, lördag: 11:00–16:00, söndag: 11:00–16:00",
-    "season": "",
-    "source": "google-places:självplock"
   },
   {
     "id": "bondfruns-gardsbutik-majslabyrint",
@@ -12252,7 +11925,7 @@
     "lan": "Västra Götaland",
     "lat": 57.7969333,
     "lng": 11.9101785,
-    "website": "https://www.facebook.com/plocken/",
+    "website": "",
     "phone": "",
     "email": "",
     "products": [
@@ -12264,7 +11937,8 @@
     "isArchipelago": false,
     "openingHours": "måndag: 09:00–18:00, tisdag: 09:00–18:00, onsdag: 09:00–18:00, torsdag: 09:00–18:00, fredag: 09:00–18:00, lördag: 09:00–18:00, söndag: 09:00–18:00",
     "season": "",
-    "source": "google-places:gårdsbutik"
+    "source": "google-places:gårdsbutik",
+    "facebook": "https://www.facebook.com/plocken/"
   },
   {
     "id": "christians-tradgard-och-caf",
@@ -12275,7 +11949,7 @@
     "lan": "Västra Götaland",
     "lat": 58.6307947,
     "lng": 13.4364869,
-    "website": "https://www.instagram.com/christians_cafe_och_tradgard",
+    "website": "",
     "phone": "073-824 91 81",
     "email": "",
     "products": [
@@ -12287,7 +11961,8 @@
     "isArchipelago": false,
     "openingHours": "måndag: Stängt, tisdag: Stängt, onsdag: Stängt, torsdag: Stängt, fredag: Stängt, lördag: 10:00–18:00, söndag: 10:00–18:00",
     "season": "",
-    "source": "google-places:gårdscafé"
+    "source": "google-places:gårdscafé",
+    "instagram": "https://www.instagram.com/christians_cafe_och_tradgard"
   },
   {
     "id": "dalslands-struts",
@@ -12312,29 +11987,6 @@
     "openingHours": "måndag: 09:00–21:00, tisdag: 09:00–21:00, onsdag: 09:00–21:00, torsdag: 09:00–21:00, fredag: 09:00–21:00, lördag: 09:00–21:00, söndag: 09:00–21:00",
     "season": "",
     "source": "google-places:gårdsbutik"
-  },
-  {
-    "id": "dalsspira-mejeri",
-    "name": "Dalsspira Mejeri",
-    "description": "",
-    "address": "Håbynvägen 6, 458 30 Färgelanda, Sverige",
-    "kommun": "Färgelanda",
-    "lan": "Västra Götaland",
-    "lat": 58.5718554,
-    "lng": 12.002821,
-    "website": "http://dalsspira.se/",
-    "phone": "0528-500 01",
-    "email": "",
-    "products": [
-      "mejeri"
-    ],
-    "onSiteSales": false,
-    "tastingRoom": false,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "måndag: 08:00–16:00, tisdag: 08:00–16:00, onsdag: 08:00–16:00, torsdag: 08:00–16:00, fredag: 08:00–16:00, lördag: Stängt, söndag: Stängt",
-    "season": "",
-    "source": "google-places:gårdsmejeri"
   },
   {
     "id": "dotetorps-agg-gardsbutik",
@@ -12460,7 +12112,7 @@
     "lan": "Västra Götaland",
     "lat": 58.3659303,
     "lng": 14.0489733,
-    "website": "https://www.facebook.com/share/1CUZJ7UCyT/?mibextid=wwXIfr",
+    "website": "",
     "phone": "070-550 69 00",
     "email": "",
     "products": [
@@ -12472,7 +12124,8 @@
     "isArchipelago": false,
     "openingHours": "måndag: 06:00–22:00, tisdag: 06:00–22:00, onsdag: 06:00–22:00, torsdag: 06:00–22:00, fredag: 06:00–22:00, lördag: 06:00–22:00, söndag: 06:00–22:00",
     "season": "",
-    "source": "google-places:gårdsförsäljning"
+    "source": "google-places:gårdsförsäljning",
+    "facebook": "https://www.facebook.com/share/1CUZJ7UCyT/?mibextid=wwXIfr"
   },
   {
     "id": "evenstorps-gard",
@@ -13097,29 +12750,6 @@
     "source": "google-places:gårdsbutik"
   },
   {
-    "id": "herrydet-gard-ab",
-    "name": "Herrydet Gård AB",
-    "description": "",
-    "address": "Herrydet 32, 565 97 Bottnaryd, Sverige",
-    "kommun": "Jönköping",
-    "lan": "Jönköping",
-    "lat": 57.59784510000001,
-    "lng": 13.6897681,
-    "website": "https://herrydet.se/",
-    "phone": "",
-    "email": "",
-    "products": [
-      "mejeri"
-    ],
-    "onSiteSales": false,
-    "tastingRoom": false,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "",
-    "season": "",
-    "source": "google-places:gårdsmejeri"
-  },
-  {
     "id": "holm-gard-ab",
     "name": "Holm Gård Ab",
     "description": "",
@@ -13381,7 +13011,7 @@
     "lan": "Västra Götaland",
     "lat": 58.6422331,
     "lng": 13.5751065,
-    "website": "https://www.facebook.com/profile.php?id=100063325203091",
+    "website": "",
     "phone": "",
     "email": "",
     "products": [
@@ -13393,7 +13023,8 @@
     "isArchipelago": false,
     "openingHours": "",
     "season": "",
-    "source": "google-places:gårdsbutik"
+    "source": "google-places:gårdsbutik",
+    "facebook": "https://www.facebook.com/profile.php?id=100063325203091"
   },
   {
     "id": "koberg-vilt-kobergs-garden-cafe",
@@ -13542,7 +13173,7 @@
     "lan": "Västra Götaland",
     "lat": 57.7486476,
     "lng": 12.146517,
-    "website": "https://www.facebook.com/people/K%C3%A5h%C3%B6gs-g%C3%A5rd/100064450849504/",
+    "website": "",
     "phone": "",
     "email": "",
     "products": [
@@ -13554,7 +13185,8 @@
     "isArchipelago": false,
     "openingHours": "måndag: 09:00–19:00, tisdag: 09:00–19:00, onsdag: 09:00–19:00, torsdag: 09:00–19:00, fredag: 09:00–18:00, lördag: 09:00–16:00, söndag: 09:00–16:00",
     "season": "",
-    "source": "google-places:gårdsbutik"
+    "source": "google-places:gårdsbutik",
+    "facebook": "https://www.facebook.com/people/K%C3%A5h%C3%B6gs-g%C3%A5rd/100064450849504/"
   },
   {
     "id": "kott-pa-riktigt",
@@ -13844,7 +13476,7 @@
     "lan": "Halland",
     "lat": 56.9963452,
     "lng": 12.4291375,
-    "website": "https://m.facebook.com/langasbar/?ref=aymt_homepage_panel&wtsid=rdr_0Uoj5pOwtR0Fzema1",
+    "website": "",
     "phone": "070-246 65 89",
     "email": "",
     "products": [
@@ -13856,7 +13488,8 @@
     "isArchipelago": false,
     "openingHours": "måndag: Öppet dygnet runt, tisdag: Öppet dygnet runt, onsdag: Öppet dygnet runt, torsdag: Öppet dygnet runt, fredag: Öppet dygnet runt, lördag: Öppet dygnet runt, söndag: Öppet dygnet runt",
     "season": "",
-    "source": "google-places:självplock"
+    "source": "google-places:självplock",
+    "facebook": "https://m.facebook.com/langasbar/?ref=aymt_homepage_panel&wtsid=rdr_0Uoj5pOwtR0Fzema1"
   },
   {
     "id": "logens-kvarn",
@@ -13950,29 +13583,6 @@
     "openingHours": "måndag: Stängt, tisdag: Stängt, onsdag: Stängt, torsdag: 11:00–17:00, fredag: 11:00–17:00, lördag: 11:00–17:00, söndag: 11:00–17:00",
     "season": "",
     "source": "google-places:gårdsbutik"
-  },
-  {
-    "id": "mini-bryggeriet",
-    "name": "Mini Bryggeriet",
-    "description": "",
-    "address": "Kåsatorpsvägen 5, 541 34 Skövde, Sverige",
-    "kommun": "Skövde",
-    "lan": "Västra Götaland",
-    "lat": 58.39719700000001,
-    "lng": 13.893993,
-    "website": "https://www.minibryggeriet.se/",
-    "phone": "",
-    "email": "",
-    "products": [
-      "öl"
-    ],
-    "onSiteSales": false,
-    "tastingRoom": true,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "måndag: 13:00–17:00, tisdag: 13:00–17:00, onsdag: 14:00–18:00, torsdag: 13:00–17:00, fredag: Stängt, lördag: 10:00–14:00, söndag: Stängt",
-    "season": "",
-    "source": "google-places:bryggeri"
   },
   {
     "id": "mjoviks-bageri-gardsbutik-ab",
@@ -14584,7 +14194,7 @@
     "lan": "Västra Götaland",
     "lat": 58.8074717,
     "lng": 11.1944975,
-    "website": "https://www.facebook.com/groups/resogard",
+    "website": "",
     "phone": "070-739 73 41",
     "email": "",
     "products": [
@@ -14596,7 +14206,8 @@
     "isArchipelago": false,
     "openingHours": "måndag: Stängt, tisdag: Stängt, onsdag: Stängt, torsdag: 17:00–19:00, fredag: 11:00–13:00, lördag: Stängt, söndag: 13:00–16:00",
     "season": "",
-    "source": "google-places:odlare gård"
+    "source": "google-places:odlare gård",
+    "facebook": "https://www.facebook.com/groups/resogard"
   },
   {
     "id": "ridgedale-farm",
@@ -14745,7 +14356,7 @@
     "lan": "Västra Götaland",
     "lat": 58.55429160000001,
     "lng": 11.566728,
-    "website": "https://www.facebook.com/share/19Xb6HCiHJ/?mibextid=wwXIfr",
+    "website": "",
     "phone": "0523-331 61",
     "email": "",
     "products": [
@@ -14757,7 +14368,8 @@
     "isArchipelago": false,
     "openingHours": "",
     "season": "",
-    "source": "google-places:självplock"
+    "source": "google-places:självplock",
+    "facebook": "https://www.facebook.com/share/19Xb6HCiHJ/?mibextid=wwXIfr"
   },
   {
     "id": "roe-gard-butik",
@@ -15070,7 +14682,7 @@
     "lan": "Västra Götaland",
     "lat": null,
     "lng": null,
-    "website": "https://facebook.com/Snickaretorpet/",
+    "website": "",
     "phone": "070-972 32 34",
     "email": "",
     "products": [
@@ -15082,7 +14694,8 @@
     "isArchipelago": false,
     "openingHours": "",
     "season": "",
-    "source": "google-places:gårdsbutik"
+    "source": "google-places:gårdsbutik",
+    "facebook": "https://facebook.com/Snickaretorpet/"
   },
   {
     "id": "stjernsunds-gard-butiken-stjernsund",
@@ -15197,29 +14810,6 @@
     "gardsförsäljningLicense": false,
     "isArchipelago": false,
     "openingHours": "måndag: Stängt, tisdag: 15:00–19:00, onsdag: Stängt, torsdag: 15:00–19:00, fredag: Stängt, lördag: Stängt, söndag: Stängt",
-    "season": "",
-    "source": "google-places:gårdsbutik"
-  },
-  {
-    "id": "tinas-kottbutik-i-molnlycke",
-    "name": "Tinas Köttbutik i Mölnlycke",
-    "description": "",
-    "address": "Metodvägen 1, 435 33 Mölnlycke, Sverige",
-    "kommun": "",
-    "lan": "Västra Götaland",
-    "lat": 57.6793601,
-    "lng": 12.0925043,
-    "website": "https://www.tinaskottbutik.com/",
-    "phone": "",
-    "email": "",
-    "products": [
-      "kött"
-    ],
-    "onSiteSales": true,
-    "tastingRoom": false,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "måndag: Stängt, tisdag: Stängt, onsdag: 11:00–17:00, torsdag: 11:00–17:00, fredag: 11:00–17:00, lördag: Stängt, söndag: Stängt",
     "season": "",
     "source": "google-places:gårdsbutik"
   },
@@ -15370,7 +14960,7 @@
     "lan": "Halland",
     "lat": 56.8268143,
     "lng": 12.6287826,
-    "website": "https://www.facebook.com/Ullarps-G%C3%A5rd-112015543572089/",
+    "website": "",
     "phone": "070-597 41 78",
     "email": "",
     "products": [
@@ -15382,7 +14972,8 @@
     "isArchipelago": false,
     "openingHours": "måndag: 10:00–18:00, tisdag: 10:00–18:00, onsdag: 10:00–18:00, torsdag: 10:00–18:00, fredag: 10:00–18:00, lördag: 10:00–15:00, söndag: 11:00–15:00",
     "season": "",
-    "source": "google-places:gårdsförsäljning"
+    "source": "google-places:gårdsförsäljning",
+    "facebook": "https://www.facebook.com/Ullarps-G%C3%A5rd-112015543572089/"
   },
   {
     "id": "uppegardens-vilt-kok-rum",
@@ -15486,7 +15077,7 @@
     "lan": "Västra Götaland",
     "lat": 57.57447560000001,
     "lng": 12.0939922,
-    "website": "http://www.vinland.se/kontakt-vinland-grossist-humle-malt-ol-vin-bryggning.html",
+    "website": "http://www.vinland.se/",
     "phone": "031-99 03 00",
     "email": "",
     "products": [
@@ -15509,7 +15100,7 @@
     "lan": "Västra Götaland",
     "lat": 58.5015563,
     "lng": 13.1743747,
-    "website": "https://m.facebook.com/vischan.gardsbutik/",
+    "website": "",
     "phone": "073-067 11 60",
     "email": "",
     "products": [
@@ -15521,7 +15112,8 @@
     "isArchipelago": false,
     "openingHours": "måndag: Stängt, tisdag: Stängt, onsdag: 10:00–18:00, torsdag: 10:00–18:00, fredag: 10:00–18:00, lördag: 10:00–13:00, söndag: Stängt",
     "season": "",
-    "source": "google-places:gårdsbutik"
+    "source": "google-places:gårdsbutik",
+    "facebook": "https://m.facebook.com/vischan.gardsbutik/"
   },
   {
     "id": "vanga-kvarncaf-bageri-surdegsbageri",
@@ -15637,29 +15229,6 @@
     "openingHours": "",
     "season": "",
     "source": "google-places:vingård"
-  },
-  {
-    "id": "wardins-gardsprodukter",
-    "name": "Wardins Gårdsprodukter",
-    "description": "",
-    "address": "Korsgården 2, 521 55 Floby församling, Sverige",
-    "kommun": "",
-    "lan": "Västra Götaland",
-    "lat": 58.0366668,
-    "lng": 13.3662214,
-    "website": "https://www.wardins.se/",
-    "phone": "070-892 11 19",
-    "email": "",
-    "products": [
-      "grönsaker"
-    ],
-    "onSiteSales": false,
-    "tastingRoom": false,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "måndag: Stängt, tisdag: Stängt, onsdag: Stängt, torsdag: 10:00–16:00, fredag: Stängt, lördag: Stängt, söndag: Stängt",
-    "season": "",
-    "source": "google-places:odlare gård"
   },
   {
     "id": "wid-n-garden",
@@ -15785,7 +15354,7 @@
     "lan": "Västra Götaland",
     "lat": 58.4669865,
     "lng": 13.3144571,
-    "website": "https://www.facebook.com/profile.php?id=100075660228830",
+    "website": "",
     "phone": "070-777 35 81",
     "email": "",
     "products": [
@@ -15797,7 +15366,8 @@
     "isArchipelago": false,
     "openingHours": "måndag: 07:00–21:00, tisdag: 07:00–21:00, onsdag: 07:00–21:00, torsdag: 07:00–21:00, fredag: 07:00–21:00, lördag: 07:00–21:00, söndag: 11:00–15:00",
     "season": "",
-    "source": "google-places:gårdsbutik"
+    "source": "google-places:gårdsbutik",
+    "facebook": "https://www.facebook.com/profile.php?id=100075660228830"
   },
   {
     "id": "ostangs-gard",
@@ -16479,7 +16049,7 @@
     "lan": "Östergötland",
     "lat": 58.498409,
     "lng": 15.869907,
-    "website": "https://www.facebook.com/people/Grimstad-G%C3%A5rdsbutik/61573172493469/",
+    "website": "",
     "phone": "070-340 41 40",
     "email": "",
     "products": [
@@ -16491,30 +16061,8 @@
     "isArchipelago": false,
     "openingHours": "",
     "season": "",
-    "source": "google-places:gårdsbutik"
-  },
-  {
-    "id": "gardsbutik",
-    "name": "Gårdsbutik",
-    "description": "",
-    "address": "5GGM+VC, 615 95 Holmtebo, Sverige",
-    "kommun": "",
-    "lan": "Östergötland",
-    "lat": 58.1897476,
-    "lng": 16.5574824,
-    "website": "http://holmtebogårdsbutik.se/",
-    "phone": "070-601 26 60",
-    "email": "",
-    "products": [
-      "annat"
-    ],
-    "onSiteSales": true,
-    "tastingRoom": false,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "måndag: 08:00–20:00, tisdag: 08:00–20:00, onsdag: 08:00–20:00, torsdag: 08:00–20:00, fredag: 08:00–20:00, lördag: 08:00–20:00, söndag: 08:00–20:00",
-    "season": "",
-    "source": "google-places:gårdsbutik"
+    "source": "google-places:gårdsbutik",
+    "facebook": "https://www.facebook.com/people/Grimstad-G%C3%A5rdsbutik/61573172493469/"
   },
   {
     "id": "gardsbutiken-i-torp-rusthall",
@@ -16732,7 +16280,7 @@
     "lan": "Östergötland",
     "lat": 58.57718859999999,
     "lng": 14.9917014,
-    "website": "https://www.facebook.com/Illersjogard/",
+    "website": "",
     "phone": "070-655 98 70",
     "email": "",
     "products": [
@@ -16744,7 +16292,8 @@
     "isArchipelago": false,
     "openingHours": "måndag: 09:00–19:00, tisdag: 09:00–19:00, onsdag: 09:00–19:00, torsdag: 09:00–19:00, fredag: 09:00–19:00, lördag: 09:00–19:00, söndag: 09:00–19:00",
     "season": "",
-    "source": "google-places:gårdsbutik"
+    "source": "google-places:gårdsbutik",
+    "facebook": "https://www.facebook.com/Illersjogard/"
   },
   {
     "id": "knyttes-gard",
@@ -16755,7 +16304,7 @@
     "lan": "Östergötland",
     "lat": 58.3320523,
     "lng": 14.8996744,
-    "website": "https://www.facebook.com/profile.php?id=100057260118298",
+    "website": "",
     "phone": "070-399 83 49",
     "email": "",
     "products": [
@@ -16767,7 +16316,8 @@
     "isArchipelago": false,
     "openingHours": "",
     "season": "",
-    "source": "google-places:gårdsförsäljning"
+    "source": "google-places:gårdsförsäljning",
+    "facebook": "https://www.facebook.com/profile.php?id=100057260118298"
   },
   {
     "id": "kolmardens-musteri",
@@ -16824,7 +16374,7 @@
     "lan": "Östergötland",
     "lat": 58.2761479,
     "lng": 15.9924423,
-    "website": "https://m.facebook.com/groups/2602783203355344?view=info&refid=18",
+    "website": "",
     "phone": "073-514 62 22",
     "email": "",
     "products": [
@@ -16836,7 +16386,8 @@
     "isArchipelago": false,
     "openingHours": "",
     "season": "",
-    "source": "google-places:gårdsbutik"
+    "source": "google-places:gårdsbutik",
+    "facebook": "https://m.facebook.com/groups/2602783203355344?view=info&refid=18"
   },
   {
     "id": "kvillinge-gardsbutik",
@@ -16908,30 +16459,6 @@
     "source": "google-places:gårdsförsäljning"
   },
   {
-    "id": "lyckans-land",
-    "place_id": "ChIJ7erawhp9WUYRwADUvyYod-s",
-    "name": "Lyckans Land",
-    "description": "",
-    "address": "Lyckans Land, 595 97 Mantorp, Sverige",
-    "kommun": "",
-    "lan": "Östergötland",
-    "lat": null,
-    "lng": null,
-    "website": "http://www.lyckans-land.se/",
-    "phone": "",
-    "email": "",
-    "products": [
-      "annat"
-    ],
-    "onSiteSales": true,
-    "tastingRoom": false,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "",
-    "season": "",
-    "source": "google-places:gårdsbutik"
-  },
-  {
     "id": "lot-gardsmejeri-ab-2",
     "name": "Löt Gårdsmejeri AB",
     "description": "",
@@ -16963,7 +16490,7 @@
     "lan": "Östergötland",
     "lat": 58.33854640000001,
     "lng": 15.3760811,
-    "website": "https://www.instagram.com/loten.lyckebo/",
+    "website": "",
     "phone": "070-301 28 02",
     "email": "",
     "products": [
@@ -16975,7 +16502,8 @@
     "isArchipelago": false,
     "openingHours": "",
     "season": "",
-    "source": "google-places:självplock"
+    "source": "google-places:självplock",
+    "instagram": "https://www.instagram.com/loten.lyckebo/"
   },
   {
     "id": "minsjo-sateri",
@@ -17048,29 +16576,6 @@
     "source": "google-places:självplock"
   },
   {
-    "id": "pantangens-tradgardsodling",
-    "name": "Pantängens Trädgårdsodling",
-    "description": "",
-    "address": "Lönsås 601, 591 79 Borensberg, Sverige",
-    "kommun": "",
-    "lan": "Östergötland",
-    "lat": 58.5328335,
-    "lng": 15.2696679,
-    "website": "https://moek.se/medlemmar/pantangens-tradgardsodling",
-    "phone": "070-557 96 55",
-    "email": "",
-    "products": [
-      "grönsaker"
-    ],
-    "onSiteSales": false,
-    "tastingRoom": false,
-    "gardsförsäljningLicense": false,
-    "isArchipelago": false,
-    "openingHours": "",
-    "season": "",
-    "source": "google-places:odlare gård"
-  },
-  {
     "id": "rydsnas-lanthandel",
     "place_id": "ChIJfSd_RpPyWUYRVSvvnG6d6gE",
     "name": "Rydsnäs Lanthandel",
@@ -17080,7 +16585,7 @@
     "lan": "Östergötland",
     "lat": null,
     "lng": null,
-    "website": "https://www.facebook.com/rydsnaslanthandel/",
+    "website": "",
     "phone": "0381-500 07",
     "email": "",
     "products": [
@@ -17092,7 +16597,8 @@
     "isArchipelago": false,
     "openingHours": "måndag: 09:00–18:00, tisdag: 09:00–18:00, onsdag: 09:00–18:00, torsdag: 09:00–18:00, fredag: 09:00–18:00, lördag: 10:00–15:00, söndag: Stängt",
     "season": "",
-    "source": "google-places:lokal producent mat"
+    "source": "google-places:lokal producent mat",
+    "facebook": "https://www.facebook.com/rydsnaslanthandel/"
   },
   {
     "id": "rykets-gard-2",
@@ -17242,7 +16748,7 @@
     "lan": "Östergötland",
     "lat": 58.6479425,
     "lng": 16.0661533,
-    "website": "https://www.facebook.com/BergstorpTradgard/?locale=sv_SE",
+    "website": "",
     "phone": "",
     "email": "",
     "products": [
@@ -17254,7 +16760,8 @@
     "isArchipelago": false,
     "openingHours": "måndag: 09:00–18:00, tisdag: 09:00–18:00, onsdag: 09:00–18:00, torsdag: 09:00–18:00, fredag: 09:00–18:00, lördag: 09:00–14:00, söndag: Stängt",
     "season": "",
-    "source": "google-places:gårdsbutik"
+    "source": "google-places:gårdsbutik",
+    "facebook": "https://www.facebook.com/BergstorpTradgard/?locale=sv_SE"
   },
   {
     "id": "stora-bjorksved-gardsbutik",
@@ -17427,7 +16934,7 @@
     "lan": "Östergötland",
     "lat": 58.48077169999999,
     "lng": 15.6798862,
-    "website": "https://www.facebook.com/tunakungsgard/",
+    "website": "",
     "phone": "070-659 70 95",
     "email": "",
     "products": [
@@ -17439,7 +16946,8 @@
     "isArchipelago": false,
     "openingHours": "",
     "season": "",
-    "source": "google-places:gårdsbutik"
+    "source": "google-places:gårdsbutik",
+    "facebook": "https://www.facebook.com/tunakungsgard/"
   },
   {
     "id": "visatter-kalkongard",
@@ -17473,7 +16981,7 @@
     "lan": "Östergötland",
     "lat": 58.3443874,
     "lng": 14.6974847,
-    "website": "http://www.facebook.com/vaversundabarodling",
+    "website": "",
     "phone": "",
     "email": "",
     "products": [
@@ -17485,7 +16993,8 @@
     "isArchipelago": false,
     "openingHours": "måndag: 08:00–20:00, tisdag: 08:00–20:00, onsdag: 08:00–20:00, torsdag: 08:00–20:00, fredag: 08:00–20:00, lördag: 08:00–20:00, söndag: 08:00–20:00",
     "season": "",
-    "source": "google-places:gårdsförsäljning"
+    "source": "google-places:gårdsförsäljning",
+    "facebook": "http://www.facebook.com/vaversundabarodling"
   },
   {
     "id": "wastana-gardsslakteri",
@@ -17519,7 +17028,7 @@
     "lan": "Östergötland",
     "lat": 58.56516389999999,
     "lng": 15.9475994,
-    "website": "https://www.facebook.com/people/%C3%85kerbys-G%C3%A5rdsbutik-och-Lantcafe/100095297945742/",
+    "website": "",
     "phone": "076-775 55 58",
     "email": "",
     "products": [
@@ -17531,7 +17040,8 @@
     "isArchipelago": false,
     "openingHours": "måndag: 08:00–17:30, tisdag: 08:00–17:30, onsdag: 08:00–17:30, torsdag: 08:00–17:30, fredag: 08:00–14:00, lördag: 08:00–14:00, söndag: Stängt",
     "season": "",
-    "source": "google-places:gårdsbutik"
+    "source": "google-places:gårdsbutik",
+    "facebook": "https://www.facebook.com/people/%C3%85kerbys-G%C3%A5rdsbutik-och-Lantcafe/100095297945742/"
   },
   {
     "id": "anstanga-lantbruk-handelstradgard",

@@ -190,6 +190,16 @@ function placeDetails(placeId) {
 // about the place — the retired scrapers let it set these fields, which is how
 // a random café found via the "gårdsbutik" query got onSiteSales: true.
 
+// Google's "website" for a small farm is often its Facebook or Instagram
+// page. Those belong in the social fields the site renders with their own
+// icons — not in `website`, where they used to masquerade as a homepage.
+function splitSocial(url) {
+  const u = (url || '').trim();
+  if (/facebook\.com|fb\.me|fb\.com/i.test(u)) return { website: '', facebook: u, instagram: '' };
+  if (/instagram\.com/i.test(u)) return { website: '', facebook: '', instagram: u };
+  return { website: u, facebook: '', instagram: '' };
+}
+
 function buildRow(r, detail, term, fallbackCounty) {
   const address = detail.formatted_address || r.formatted_address || r.vicinity || '';
   const name    = detail.name || r.name;
@@ -207,7 +217,7 @@ function buildRow(r, detail, term, fallbackCounty) {
     lat: detail.geometry?.location?.lat ?? r.geometry?.location?.lat,
     lng: detail.geometry?.location?.lng ?? r.geometry?.location?.lng,
     // contact
-    website: detail.website || '',
+    ...splitSocial(detail.website),
     phone:   detail.formatted_phone_number || '',
     email:   '',
     // products & flags

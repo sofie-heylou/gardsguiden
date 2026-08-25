@@ -47,7 +47,7 @@ const STRONG = [
   /vi säljer våra egna|våra egna produkter|egen gårdsbutik/,
   // A milk/egg vending machine on a farm sells the farm's own produce, and
   // having retailers of your own means you make something to retail.
-  /mjölkautomat|äggautomat|gårdsautomat/,
+  /mjölkautomat|äggautomat|gårdsautomat|äggbod|mjölkbod/,
   /våra återförsäljare|hitta återförsäljare/,
   // Musteries pressing visitors' apples are producing on site.
   /legopressning|vi pressar (?:dina|era)/,
@@ -66,7 +66,7 @@ const SUPPORTING = [
   /våra viner|vi driver/,
   /reko-ring|reko ring/,
   /naturbeteskött|mathantverk/,
-  /familjejordbruk|vårt (?:jordbruk|lantbruk)/,
+  /lantbruk|jordbruk/,
   /obemannad/,
   /på gården finns/,
 ];

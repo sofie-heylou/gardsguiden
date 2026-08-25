@@ -103,8 +103,11 @@ function cachePath(url) {
 
 // Same-site pages likely to carry the farm's story ("Om oss", "Gården",
 // "Besök oss") — the homepage is often a thin teaser while the evidence lives
-// one click away.
-const ABOUT_PATH = /om|about|histor|gard|gård|besok|besök/i;
+// one click away. Matched per path SEGMENT: a bare substring test grabbed
+// /comments/feed/ ("om" inside "comments") and icon uploads ("gard" inside a
+// filename) instead of the real about-pages.
+const ABOUT_SEGMENT = /^(om|om-[\w%-]+|about|about-us|historia|history|g[aå]rden|g[aå]rd|bes[oö]k|bes[oö]k-oss|verksamhet(en)?)$/i;
+const SKIP_LINK = /wp-content|wp-json|\/feed\/?$|\.(png|jpe?g|gif|svg|webp|pdf|css|js|xml|ico)(\?|$)/i;
 
 function aboutLinks(html, baseUrl) {
   const found = new Set();
@@ -113,14 +116,15 @@ function aboutLinks(html, baseUrl) {
       const u = new URL(m[1], baseUrl);
       if (!/^https?:$/.test(u.protocol)) continue;
       if (u.host !== new URL(baseUrl).host) continue;
-      if (u.pathname === '/' || !ABOUT_PATH.test(u.pathname)) continue;
+      if (SKIP_LINK.test(u.pathname)) continue;
+      if (!u.pathname.split('/').some((seg) => ABOUT_SEGMENT.test(seg))) continue;
       found.add(u.origin + u.pathname);
     } catch { /* unparseable href */ }
   }
   return [...found].slice(0, 3);
 }
 
-const CACHE_VERSION = 2; // bump when the cached shape changes; misses refetch
+const CACHE_VERSION = 3; // bump when the cached shape changes; misses refetch
 
 async function fetchPage(url, useCache) {
   const cached = cachePath(url);

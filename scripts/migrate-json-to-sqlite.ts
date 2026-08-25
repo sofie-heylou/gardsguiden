@@ -16,6 +16,8 @@ interface FarmJson {
   lat: number;
   lng: number;
   website: string;
+  facebook?: string;
+  instagram?: string;
   phone: string;
   email: string;
   products: string[];
@@ -50,6 +52,8 @@ db.exec(`
     lat REAL,
     lng REAL,
     website TEXT,
+    facebook TEXT,
+    instagram TEXT,
     phone TEXT,
     email TEXT,
     products TEXT,
@@ -66,12 +70,12 @@ db.exec(`
 const insert = db.prepare(`
   INSERT INTO farms (
     id, name, description, address, kommun, lan, lat, lng,
-    website, phone, email, products,
+    website, facebook, instagram, phone, email, products,
     onSiteSales, tastingRoom, gardsförsäljningLicense, isArchipelago,
     openingHours, season, source
   ) VALUES (
     @id, @name, @description, @address, @kommun, @lan, @lat, @lng,
-    @website, @phone, @email, @products,
+    @website, @facebook, @instagram, @phone, @email, @products,
     @onSiteSales, @tastingRoom, @gardsförsäljningLicense, @isArchipelago,
     @openingHours, @season, @source
   )
@@ -81,6 +85,8 @@ const insertMany = db.transaction((rows: FarmJson[]) => {
   for (const farm of rows) {
     insert.run({
       ...farm,
+      facebook: farm.facebook ?? null,
+      instagram: farm.instagram ?? null,
       products: JSON.stringify(farm.products),
       onSiteSales: farm.onSiteSales ? 1 : 0,
       tastingRoom: farm.tastingRoom ? 1 : 0,

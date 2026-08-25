@@ -59,7 +59,9 @@ export function getFilteredFarms(filters: FarmFilters = {}): Farm[] {
 
   const conditions: string[] = [
     "f.address IS NOT NULL AND f.address != ''",
-    "f.website IS NOT NULL AND f.website != ''",
+    // Reachable somewhere online: a website, or a social profile — many small
+    // farms only have a Facebook page, and those are shown with social icons.
+    "(COALESCE(f.website, '') != '' OR COALESCE(f.facebook, '') != '' OR COALESCE(f.instagram, '') != '')",
   ];
   const params: unknown[] = [];
 
@@ -125,7 +127,8 @@ export function getFarmsByCounty(county: string): Farm[] {
 export function getFarmById(id: string): Farm | null {
   const db = getDb();
   const row = db.prepare(
-    "SELECT * FROM farms WHERE id = ? AND address IS NOT NULL AND address != '' AND website IS NOT NULL AND website != ''"
+    "SELECT * FROM farms WHERE id = ? AND address IS NOT NULL AND address != '' " +
+    "AND (COALESCE(website, '') != '' OR COALESCE(facebook, '') != '' OR COALESCE(instagram, '') != '')"
   ).get(id) as FarmRow | undefined;
   return row ? rowToFarm(row) : null;
 }

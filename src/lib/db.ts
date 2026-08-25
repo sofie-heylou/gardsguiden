@@ -203,7 +203,7 @@ function initSchema(db: Database.Database): void {
       if (farms.length > 0) {
         const SYNC_COLS = [
           "id", "name", "description", "address", "kommun", "lan", "lat", "lng",
-          "website", "phone", "email", "products", "onSiteSales", "tastingRoom",
+          "website", "facebook", "instagram", "phone", "email", "products", "onSiteSales", "tastingRoom",
           "gardsförsäljningLicense", "isArchipelago", "openingHours", "season", "source",
         ] as const;
         const placeholders = SYNC_COLS.map(() => "?").join(", ");
