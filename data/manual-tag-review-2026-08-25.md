@@ -1,5 +1,7 @@
 # Manuell taggenomgång 2026-08-25 — flaggor för Sofies beslut
 
+> **BESLUTAT & VERKSTÄLLT 2026-08-25:** Sofie gick igenom flagglistan och beslutade ta bort samtliga fyra grupper enligt rekommendationen — alla 14 matställen, alla 14 med annan verksamhet, dubbletterna (båda Fredrikslund, Resta-dubbletten, Bergs MTB Arena + Veras Café; Resta gård och Bergs Gård Gårdsbutik behålls) samt Bondeblom (ingen konsumentförsäljning). 34 poster borttagna ur seed, lokal DB och prod (snapshot: `gardsguiden.db.pre-flagremoval-*`). Synliga gårdar 678 → 644; kategoritäckningen steg till 91 %. Listorna nedan står kvar som beslutsunderlag.
+
 *Genomgång av de 164 gårdar som saknade produkttagg efter de automatiska passen: varje gårds webbplats hämtades och lästes; 71 gårdar fick taggar utifrån vad deras egen sajt säger att de säljer (tillägg endast). Nedan det som INTE åtgärdades: gårdar som inte verkar höra hemma i guiden (ditt beslut — inget har tagits bort), trasiga webblänkar och upptäckta dubbletter.*
 
 ## Verkar inte vara gårdar med matförsäljning (granska för ev. borttag)

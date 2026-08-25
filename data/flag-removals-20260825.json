@@ -1,0 +1,140 @@
+{
+ "actions": [
+  {
+   "action": "delete-restaurant-cafe",
+   "id": "aviatoren-restaurang-caf-och-mathantverk"
+  },
+  {
+   "action": "delete-restaurant-cafe",
+   "id": "blaherremolla"
+  },
+  {
+   "action": "delete-restaurant-cafe",
+   "id": "butik-gul-i-kollerod"
+  },
+  {
+   "action": "delete-restaurant-cafe",
+   "id": "cafe-mandeltartan-b-b"
+  },
+  {
+   "action": "delete-restaurant-cafe",
+   "id": "friden-gardskrog"
+  },
+  {
+   "action": "delete-restaurant-cafe",
+   "id": "forshems-gastgivaregard"
+  },
+  {
+   "action": "delete-restaurant-cafe",
+   "id": "gastgivaregarden"
+  },
+  {
+   "action": "delete-restaurant-cafe",
+   "id": "gardshuset-selaon-ab"
+  },
+  {
+   "action": "delete-restaurant-cafe",
+   "id": "gardshuset-pa-aleby"
+  },
+  {
+   "action": "delete-restaurant-cafe",
+   "id": "hurva-gastgivaregard"
+  },
+  {
+   "action": "delete-restaurant-cafe",
+   "id": "rot"
+  },
+  {
+   "action": "delete-restaurant-cafe",
+   "id": "roda-langan-ab"
+  },
+  {
+   "action": "delete-restaurant-cafe",
+   "id": "mellomgardens-caf-gardsbutik"
+  },
+  {
+   "action": "delete-restaurant-cafe",
+   "id": "agesta-gardscafe"
+  },
+  {
+   "action": "delete-not-a-farm",
+   "id": "aspo-gard"
+  },
+  {
+   "action": "delete-not-a-farm",
+   "id": "gardsservice"
+  },
+  {
+   "action": "delete-not-a-farm",
+   "id": "gardschips"
+  },
+  {
+   "action": "delete-not-a-farm",
+   "id": "hafi-hallands-fruktindustri-ab"
+  },
+  {
+   "action": "delete-not-a-farm",
+   "id": "hantverksgarden-i-ledberg"
+  },
+  {
+   "action": "delete-not-a-farm",
+   "id": "lida-gard"
+  },
+  {
+   "action": "delete-not-a-farm",
+   "id": "mundekulla-gardsbutik-och-caf"
+  },
+  {
+   "action": "delete-not-a-farm",
+   "id": "perstorp101"
+  },
+  {
+   "action": "delete-not-a-farm",
+   "id": "skalby-4h-gard"
+  },
+  {
+   "action": "delete-not-a-farm",
+   "id": "tolfta-gard"
+  },
+  {
+   "action": "delete-not-a-farm",
+   "id": "tangsta-gard"
+  },
+  {
+   "action": "delete-not-a-farm",
+   "id": "vallby-sorgarden-kulturreservat"
+  },
+  {
+   "action": "delete-not-a-farm",
+   "id": "vastergarden"
+  },
+  {
+   "action": "delete-not-a-farm",
+   "id": "stora-sundby-gardsbutik"
+  },
+  {
+   "action": "delete-duplicate-or-clothing",
+   "id": "fredrikslunds-gardsbutik"
+  },
+  {
+   "action": "delete-duplicate-or-clothing",
+   "id": "fredrikslunds-gard-ab"
+  },
+  {
+   "action": "delete-duplicate-or-clothing",
+   "id": "resta-gardsbutik-2"
+  },
+  {
+   "action": "delete-duplicate-or-clothing",
+   "id": "bergs-gard-mtb-arena"
+  },
+  {
+   "action": "delete-duplicate-or-clothing",
+   "id": "bergs-gard-veras-cafe"
+  },
+  {
+   "action": "delete-no-consumer-sales",
+   "id": "bondeblom-gardsbutik"
+  }
+ ]
+}
