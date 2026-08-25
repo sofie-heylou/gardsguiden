@@ -41,13 +41,21 @@ function getTodayHours(openingHours: string): { open: boolean; label: string } |
 interface Props {
   initialFarms?: Farm[];
   initialCounty?: string | null;
+  /** Pin the list to one county: hides the county chips and keeps ?lan= out
+   *  of the URL (the page's path already says which county it is). */
+  lockedCounty?: string;
+  /** Render inline in a scrolling page (sticky filter bar, no own scroll
+   *  container) instead of filling a fixed-height shell. */
+  embedded?: boolean;
 }
 
-export default function FarmList({ initialFarms, initialCounty }: Props) {
+export default function FarmList({ initialFarms, initialCounty, lockedCounty, embedded }: Props) {
   const [farms, setFarms] = useState<Farm[]>(initialFarms ?? []);
   const [loading, setLoading] = useState(initialFarms === undefined);
   const [query, setQuery] = useState("");
-  const [county, setCounty] = useState<Set<string>>(new Set(initialCounty ? [initialCounty] : []));
+  const [county, setCounty] = useState<Set<string>>(
+    new Set(lockedCounty ? [lockedCounty] : initialCounty ? [initialCounty] : [])
+  );
   const [category, setCategory] = useState<Set<string>>(new Set());
   const [sortBy, setSortBy] = useState<SortKey>("name");
 
@@ -62,12 +70,13 @@ export default function FarmList({ initialFarms, initialCounty }: Props) {
 
   // Restore filters from the URL on mount. Each dimension only overrides when
   // its param is present, so /gardar/skane-lan keeps its initialCounty when a
-  // shared link carries only ?kat=.
+  // shared link carries only ?kat=. A locked county ignores ?lan= entirely.
   useEffect(() => {
     const fromUrl = parseFilterParams(window.location.search);
-    if (fromUrl.counties.size > 0) setCounty(fromUrl.counties);
+    if (!lockedCounty && fromUrl.counties.size > 0) setCounty(fromUrl.counties);
     if (fromUrl.categories.size > 0) setCategory(fromUrl.categories);
     if (fromUrl.query) setQuery(fromUrl.query);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const [wantsNearMe, setWantsNearMe] = useState(false);
@@ -103,9 +112,11 @@ export default function FarmList({ initialFarms, initialCounty }: Props) {
     urlDirty.current = true;
   }, []);
   const clearAll = useCallback(() => {
-    setQuery(""); setCounty(new Set()); setCategory(new Set()); setSortBy("name"); setWantsNearMe(false);
+    setQuery("");
+    setCounty(new Set(lockedCounty ? [lockedCounty] : []));
+    setCategory(new Set()); setSortBy("name"); setWantsNearMe(false);
     urlDirty.current = true;
-  }, []);
+  }, [lockedCounty]);
 
   const filters = useMemo<FilterState>(
     () => ({ counties: county, categories: category, query }),
@@ -115,11 +126,12 @@ export default function FarmList({ initialFarms, initialCounty }: Props) {
   // Mirror filters onto the URL, but only after the visitor has touched them —
   // never on mount, so /gardar/skane-lan stays param-free until interaction.
   // Writing from an effect (not the handlers) keeps rapid multi-toggles from
-  // racing each other with stale state.
+  // racing each other with stale state. A locked county never writes ?lan=.
   const urlDirty = useRef(false);
   useEffect(() => {
-    if (urlDirty.current) writeFilterParams(filters);
-  }, [filters]);
+    if (!urlDirty.current) return;
+    writeFilterParams(lockedCounty ? { ...filters, counties: new Set() } : filters);
+  }, [filters, lockedCounty]);
 
   const filtered = useMemo(() => farms.filter((f) => farmMatchesFilters(f, filters)), [farms, filters]);
 
@@ -139,13 +151,19 @@ export default function FarmList({ initialFarms, initialCounty }: Props) {
   }, [filtered, sortBy, pos]);
 
   const nearMeActive = sortBy === "distance";
-  const activeFilters = county.size + category.size + (query ? 1 : 0) + (nearMeActive ? 1 : 0);
+  const activeFilters =
+    (lockedCounty ? 0 : county.size) + category.size + (query ? 1 : 0) + (nearMeActive ? 1 : 0);
 
   return (
-    <div className="h-full flex flex-col overflow-hidden" style={{ background: "#FAFAF8" }}>
+    <div
+      className={embedded ? "flex flex-col" : "h-full flex flex-col overflow-hidden"}
+      style={{ background: "#FAFAF8" }}
+    >
 
       {/* Filter bar */}
-      <div className="bg-white border-b border-stone-200 px-3 pt-3 pb-2.5 space-y-2 shrink-0">
+      <div className={`bg-white border-b border-stone-200 px-3 pt-3 pb-2.5 space-y-2 shrink-0 ${
+        embedded ? "sticky top-0 z-10 rounded-xl border border-stone-200 shadow-sm mb-3" : ""
+      }`}>
 
         {/* Search */}
         <div className="relative">
@@ -164,8 +182,8 @@ export default function FarmList({ initialFarms, initialCounty }: Props) {
           )}
         </div>
 
-        {/* County chips */}
-        <div className="flex gap-1.5 overflow-x-auto pb-0.5 no-scrollbar">
+        {/* County chips — hidden when the page itself is one county */}
+        {!lockedCounty && <div className="flex gap-1.5 overflow-x-auto pb-0.5 no-scrollbar">
           {COUNTY_NAMES.map((c) => {
             const count = countyCounts[c] ?? 0;
             const isActive = county.has(c);
@@ -188,7 +206,7 @@ export default function FarmList({ initialFarms, initialCounty }: Props) {
               </button>
             );
           })}
-        </div>
+        </div>}
 
         {/* Category chips */}
         <div className="flex gap-1.5 overflow-x-auto pb-0.5 no-scrollbar">
@@ -268,7 +286,7 @@ export default function FarmList({ initialFarms, initialCounty }: Props) {
       </div>
 
       {/* List */}
-      <div className="flex-1 overflow-y-auto">
+      <div className={embedded ? "" : "flex-1 overflow-y-auto"}>
         {loading ? (
           <div className="flex items-center justify-center h-32">
             <p className="text-stone-400 text-sm">Laddar…</p>
@@ -279,7 +297,7 @@ export default function FarmList({ initialFarms, initialCounty }: Props) {
             <button onClick={clearAll} className="text-xs text-stone-500 underline underline-offset-2">Rensa filter</button>
           </div>
         ) : (
-          <ul className="px-3 pt-3 pb-6 space-y-2">
+          <ul className={embedded ? "space-y-2" : "px-3 pt-3 pb-6 space-y-2"}>
             {sorted.map((farm) => {
               const dist = pos ? haversineKm(pos.lat, pos.lng, farm.lat, farm.lng) : null;
               const todayHours = getTodayHours(farm.openingHours);
