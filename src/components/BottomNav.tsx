@@ -7,9 +7,10 @@ import { track } from "../lib/analytics";
 
 export default function BottomNav() {
   // The homepage carries this CTA inside the PopularAreas sheet instead, and
-  // the map needs every vertical pixel it can get there.
+  // the map needs every vertical pixel it can get there.  On /lagg-till the
+  // visitor is already where the CTA points, so the bar only repeats itself.
   const pathname = usePathname();
-  if (pathname === "/") return null;
+  if (pathname === "/" || pathname === "/lagg-till") return null;
 
   return (
     <nav className="h-14 shrink-0 bg-white border-t border-stone-200 flex items-center justify-between gap-3 px-4">

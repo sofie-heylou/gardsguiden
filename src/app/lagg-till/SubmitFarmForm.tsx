@@ -74,6 +74,7 @@ export default function SubmitFarmForm() {
   const [products,      setProducts]      = useState<string[]>([]);
   const [facebook,      setFacebook]      = useState("");
   const [instagram,     setInstagram]     = useState("");
+  const [season,        setSeason]        = useState("");
   const [onSiteSales,   setOnSiteSales]   = useState(false);
   const [tastingRoom,   setTastingRoom]   = useState(false);
   const [hasOpeningHours, setHasOpeningHours] = useState(false);
@@ -116,6 +117,12 @@ export default function SubmitFarmForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+    // Farms without any online presence never pass the public visibility
+    // gate (see getFilteredFarms) — approving one would publish nothing.
+    if (!website.trim() && !facebook.trim() && !instagram.trim()) {
+      setError("Ange minst en webbplats, Facebook- eller Instagram-sida så att besökare kan hitta gården.");
+      return;
+    }
     setSaving(true);
     try {
       const res = await fetch("/api/farms/submit", {
@@ -124,7 +131,7 @@ export default function SubmitFarmForm() {
         body: JSON.stringify({
           name, description, address, kommun, lan,
           website, phone, email, products,
-          facebook, instagram,
+          facebook, instagram, season,
           onSiteSales, tastingRoom,
           openingHours: hasOpeningHours ? [
             { key: "monday",    sv: "måndag"  },
@@ -248,11 +255,17 @@ export default function SubmitFarmForm() {
         </div>
       </section>
 
-      {/* ── Kontakt ────────────────────────────────────────────────────────── */}
+      {/* ── Hitta er online ────────────────────────────────────────────────── */}
       <section className="bg-white rounded-xl border border-stone-100 shadow-sm p-5 space-y-4">
-        <h2 className="text-xs font-semibold uppercase tracking-wide text-stone-400">
-          Kontaktuppgifter för gården
-        </h2>
+        <div className="space-y-1">
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+            Hitta er online<span className="text-red-400 ml-0.5">*</span>
+          </h2>
+          <p className="text-[11px] text-stone-400 leading-relaxed">
+            Ange minst en — webbplats, Facebook eller Instagram — så att
+            besökare kan hitta mer om gården.
+          </p>
+        </div>
 
         <Field label="Webbplats">
           <input
@@ -263,6 +276,33 @@ export default function SubmitFarmForm() {
             className={inputCls}
           />
         </Field>
+
+        <Field label="Facebook">
+          <input
+            type="url"
+            value={facebook}
+            onChange={(e) => setFacebook(e.target.value)}
+            placeholder="https://facebook.com/din-gard"
+            className={inputCls}
+          />
+        </Field>
+
+        <Field label="Instagram">
+          <input
+            type="url"
+            value={instagram}
+            onChange={(e) => setInstagram(e.target.value)}
+            placeholder="https://instagram.com/din-gard"
+            className={inputCls}
+          />
+        </Field>
+      </section>
+
+      {/* ── Kontakt ────────────────────────────────────────────────────────── */}
+      <section className="bg-white rounded-xl border border-stone-100 shadow-sm p-5 space-y-4">
+        <h2 className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+          Kontaktuppgifter för gården
+        </h2>
 
         <div className="grid grid-cols-2 gap-4">
           <Field label="Telefon">
@@ -284,33 +324,6 @@ export default function SubmitFarmForm() {
             />
           </Field>
         </div>
-      </section>
-
-      {/* ── Sociala medier ─────────────────────────────────────────────────── */}
-      <section className="bg-white rounded-xl border border-stone-100 shadow-sm p-5 space-y-4">
-        <h2 className="text-xs font-semibold uppercase tracking-wide text-stone-400">
-          Sociala medier
-        </h2>
-
-        <Field label="Facebook">
-          <input
-            type="url"
-            value={facebook}
-            onChange={(e) => setFacebook(e.target.value)}
-            placeholder="https://facebook.com/din-gard"
-            className={inputCls}
-          />
-        </Field>
-
-        <Field label="Instagram">
-          <input
-            type="url"
-            value={instagram}
-            onChange={(e) => setInstagram(e.target.value)}
-            placeholder="https://instagram.com/din-gard"
-            className={inputCls}
-          />
-        </Field>
       </section>
 
       {/* ── Produkter ──────────────────────────────────────────────────────── */}
@@ -389,6 +402,16 @@ export default function SubmitFarmForm() {
             ))}
           </div>
         )}
+
+        <Field label="Säsong (valfritt)">
+          <input
+            type="text"
+            value={season}
+            onChange={(e) => setSeason(e.target.value)}
+            placeholder="t.ex. Öppet maj–september"
+            className={inputCls}
+          />
+        </Field>
       </section>
 
       {/* ── Egenskaper ─────────────────────────────────────────────────────── */}
@@ -446,7 +469,7 @@ export default function SubmitFarmForm() {
 
       <button
         type="submit"
-        disabled={saving || !name || !address || !lan || !submittedEmail}
+        disabled={saving}
         className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-stone-800 text-white text-sm font-semibold hover:bg-stone-700 active:bg-stone-900 transition-colors disabled:opacity-50"
       >
         {saving ? <Loader2 size={15} className="animate-spin" /> : "Skicka in gård"}

@@ -116,14 +116,16 @@ function insertApprovedFarm(
   })();
 }
 
-/** A farm is only reachable once it has a county slug we recognise plus the
- *  address and website that getFarmById requires — a website is optional at
- *  submission time, so an approved farm can legitimately have no public page
- *  yet.  Linking to one would 404 in the very email announcing it. */
+/** A farm is only reachable once it has a county slug we recognise plus what
+ *  getFarmById requires: an address and at least one online presence
+ *  (website, Facebook or Instagram).  Linking to a farm that fails the gate
+ *  would 404 in the very email announcing it. */
 function publicFarmUrl(submission: SubmissionRow, farmId: string): string | null {
   const lan = submission.lan as Farm["lan"] | null;
   if (!lan || !COUNTY_TO_SLUG[lan]) return null;
-  if (!submission.address?.trim() || !submission.website?.trim()) return null;
+  const online = [submission.website, submission.facebook, submission.instagram]
+    .some((v) => v?.trim());
+  if (!submission.address?.trim() || !online) return null;
   return `${SITE_URL}${farmPath({ id: farmId, lan })}`;
 }
 

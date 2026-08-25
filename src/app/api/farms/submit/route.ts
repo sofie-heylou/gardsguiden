@@ -52,6 +52,17 @@ export async function POST(req: NextRequest) {
   if (lan && !VALID_LAN.includes(lan as string)) {
     return NextResponse.json({ error: "Ogiltigt län" }, { status: 400 });
   }
+  // Farms without any online presence never pass the public visibility gate
+  // (getFilteredFarms requires website OR facebook OR instagram) — reject up
+  // front instead of approving a farm that can never be shown.
+  const hasOnlinePresence = [website, facebook, instagram]
+    .some((v) => typeof v === "string" && v.trim());
+  if (!hasOnlinePresence) {
+    return NextResponse.json(
+      { error: "Ange minst en webbplats, Facebook- eller Instagram-sida" },
+      { status: 400 }
+    );
+  }
   if (typeof description === "string" && description.length > 2000) {
     return NextResponse.json({ error: "Beskrivningen är för lång (max 2000 tecken)" }, { status: 400 });
   }
@@ -129,6 +140,7 @@ export async function POST(req: NextRequest) {
         row("Adress",     typeof address === "string" ? address.trim() : null) +
         row("Kommun",     typeof kommun  === "string" ? kommun.trim()  : null) +
         row("Län",        typeof lan     === "string" ? lan.trim()     : null) +
+        row("Säsong",     typeof season  === "string" ? season.trim()  : null) +
         row("Produkter",  productList)
       )}
       ${submissionModerationButtons(submissionId)}
