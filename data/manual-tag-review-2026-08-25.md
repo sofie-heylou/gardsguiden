@@ -42,17 +42,21 @@ Specialfall:
 - **Bergs Gård Gårdsbutik / Bergs Gård MTB Arena / Bergs Gård Veras Café** — trippel på samma sajt; MTB-arenan och caféet är knappast egna gårdsbutiker (alla tre fick kött-tagg av webbpasset)
 - **Resta gård** + **Resta gårdsbutik** (Enköping) — dubblett, samma sajt (båda har nu samma taggar)
 
-## Trasiga/felaktiga webblänkar (länkfix-lista)
+## Trasiga/felaktiga webblänkar — ÅTGÄRDADE 2026-08-25
 
-- **Attanäs Gård** (Karlskrona) — domänen KAPAD, visar casino-spam ("Shakebet"); länken bör tas bort omgående
-- **Hulte eko** (Gotland) — länk till katalogspam (swenavi.org)
-- **Flädie Gårdsbutik** (Lomma) — länk till katalogsajt (gardsbutiktoppen.se), onåbar
-- **Yxsjöns Humlegård** (Härryda) — länken går till en Airbnb-annons
-- **Krogstorps gård** (Gnesta), **Wappersta Gård** (Trosa) — parkerade domäner
-- **Kronobergs Gårdsbutik** (Växjö) — platshållarsida
+Fixade (webblänken borttagen/utbytt; Facebook-sida satt som fallback så gården förblir synlig, plus produkttaggar från källorna):
+- **Attanäs Gård** (Karlskrona) — domänen kapad (casino-spam, bägge varianterna verifierade); länk borttagen, FB satt, taggar kött/grönsaker/fisk (nötkött, potatis, gris, ål per Visit Karlskrona)
+- **Hulte eko** (Gotland) — katalogspamlänk borttagen, FB "Hulte eko Grönsaker" satt, tagg grönsaker (ekologiska rotfrukter)
+- **Flädie Gårdsbutik** (Lomma) — katalogsajtlänk borttagen, FB satt, taggar frukt/grönsaker
+- **Yxsjöns Humlegård** (Härryda) — Airbnb-länk borttagen (deras egen domän är död, DNS saknas), FB satt (numeriskt sid-id via sidspegel — värt en okulär koll), tagg ägg
+- **Krogstorps gård** (Gnesta) — parkerad domän borttagen, FB satt, tagg grönsaker
+- **Wappersta Gård** (Trosa) — parkerad domän utbytt mot deras riktiga sajt wapperstagardolantliv.se, taggar kött/ägg/grönsaker
+
+Lämnade orörda (gårdens egen domän, bara tunn/platshållare — inte fel länk):
+- **Kronobergs Gårdsbutik** (Växjö) — platshållarsida med kontaktuppgifter
 - **Lya Gård 101** (Halmstad) — tom iframe-sida
-- **Glästäde gård** (Gotland) — sajten är en Facebook-spegel
-- **Åskebro Gård Butik&Café** (Hallstahammar) — onåbar
+- **Glästäde gård** (Gotland) — Facebook-spegel på egen domän
+- **Åskebro Gård Butik&Café** (Hallstahammar) — onåbar vid granskningen (kan vara tillfälligt)
 
 ## Kvar utan tagg (Övrigt är korrekt eller inget underlag)
 

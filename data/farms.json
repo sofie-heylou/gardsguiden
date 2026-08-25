@@ -35,7 +35,10 @@
     "phone": "073-425 71 72",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött",
+      "grönsaker",
+      "fisk"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -43,7 +46,8 @@
     "isArchipelago": false,
     "openingHours": "måndag: 11:00–18:00, tisdag: 11:00–18:00, onsdag: 11:00–18:00, torsdag: 11:00–18:00, fredag: 11:00–18:00, lördag: 11:00–18:00, söndag: 11:00–18:00",
     "season": "",
-    "source": "google-places:gårdsbutik"
+    "source": "google-places:gårdsbutik",
+    "facebook": "https://www.facebook.com/attanasgard/"
   },
   {
     "id": "birgittas-caf-lanthandel",
@@ -1485,11 +1489,12 @@
     "lan": "Gotland",
     "lat": null,
     "lng": null,
-    "website": "https://swenavi.org/details/hulte-eko-ChIJu5c",
+    "website": "",
     "phone": "0498-48 00 31",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "grönsaker"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -1497,7 +1502,8 @@
     "isArchipelago": false,
     "openingHours": "måndag: 08:00–20:00, tisdag: 08:00–20:00, onsdag: 08:00–20:00, torsdag: 08:00–20:00, fredag: 08:00–20:00, lördag: 08:00–20:00, söndag: 08:00–20:00",
     "season": "",
-    "source": "google-places:gårdsbutik"
+    "source": "google-places:gårdsbutik",
+    "facebook": "https://www.facebook.com/asagasa72/"
   },
   {
     "id": "kaffestugan-vid-bottarve-museigard",
@@ -5280,11 +5286,13 @@
     "lan": "Skåne",
     "lat": 55.72937659999999,
     "lng": 13.0667301,
-    "website": "https://gardsbutiktoppen.se/05942165/G%C3%A5rdsbutik_Fl%C3%A4die_6",
+    "website": "",
     "phone": "",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "frukt",
+      "grönsaker"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -5292,7 +5300,8 @@
     "isArchipelago": false,
     "openingHours": "",
     "season": "",
-    "source": "google-places:gårdsförsäljning"
+    "source": "google-places:gårdsförsäljning",
+    "facebook": "https://www.facebook.com/253755174742036"
   },
   {
     "id": "friden-gardskrog",
@@ -8952,11 +8961,12 @@
     "lan": "Södermanland",
     "lat": 58.9945397,
     "lng": 17.1332622,
-    "website": "http://www.krogstorp.se/",
+    "website": "",
     "phone": "",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "grönsaker"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -8964,7 +8974,8 @@
     "isArchipelago": true,
     "openingHours": "",
     "season": "",
-    "source": "google-places:gårdsförsäljning"
+    "source": "google-places:gårdsförsäljning",
+    "facebook": "https://www.facebook.com/KrogstorpsGard/"
   },
   {
     "id": "kungsbergs-gard-ab",
@@ -9370,11 +9381,14 @@
     "lan": "Södermanland",
     "lat": 58.9506124,
     "lng": 17.4282079,
-    "website": "http://wappersta.se/",
+    "website": "https://wapperstagardolantliv.se/",
     "phone": "",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött",
+      "ägg",
+      "grönsaker"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -13967,11 +13981,12 @@
     "lan": "Västra Götaland",
     "lat": 57.6420268,
     "lng": 12.1708606,
-    "website": "https://www.airbnb.se/rooms/1090628940853935529",
+    "website": "",
     "phone": "",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "ägg"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -13979,7 +13994,8 @@
     "isArchipelago": false,
     "openingHours": "",
     "season": "",
-    "source": "google-places:gårdsbutik"
+    "source": "google-places:gårdsbutik",
+    "facebook": "https://www.facebook.com/1489772447712818"
   },
   {
     "id": "st-bryggeri-ab",
