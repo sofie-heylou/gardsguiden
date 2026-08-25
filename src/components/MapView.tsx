@@ -191,6 +191,25 @@ export default function MapView() {
       return next;
     });
   }, [county]);
+
+  // Fly to the filtered counties' farms whenever the county selection changes
+  const prevCountyKey = useRef("");
+  useEffect(() => {
+    const key = [...county].sort().join("|");
+    if (key === prevCountyKey.current) return;
+    prevCountyKey.current = key;
+    if (county.size === 0) return;
+    const pts = allFarms.filter((f) => county.has(f.lan) && f.lat && f.lng);
+    if (pts.length === 0) return;
+    let minLng = Infinity, minLat = Infinity, maxLng = -Infinity, maxLat = -Infinity;
+    for (const f of pts) {
+      if (f.lng < minLng) minLng = f.lng;
+      if (f.lng > maxLng) maxLng = f.lng;
+      if (f.lat < minLat) minLat = f.lat;
+      if (f.lat > maxLat) maxLat = f.lat;
+    }
+    mapRef.current?.fitBounds([[minLng, minLat], [maxLng, maxLat]], { padding: 60, duration: 1000, maxZoom: 10 });
+  }, [county, allFarms]);
   const toggleCategory = useCallback((s: string) => {
     if (!category.has(s)) track("filter_applied", { filter_type: "product", filter_value: s });
     setCategory((prev) => {
@@ -200,10 +219,49 @@ export default function MapView() {
     });
   }, [category]);
   const clearFilters = useCallback(() => {
+    if (county.size > 0) {
+      mapRef.current?.flyTo({ center: [SWEDEN.longitude, SWEDEN.latitude], zoom: SWEDEN.zoom, duration: 1000 });
+    }
     setCounty(new Set()); setCategory(new Set());
-  }, []);
+  }, [county]);
+
+  // Per-chip counts, respecting the *other* filter dimensions so a chip
+  // shows what picking it would actually leave on the map.
+  const matchesRadius = useCallback(
+    (f: Farm) => !nearMeActive || !pos || haversineKm(pos.lat, pos.lng, f.lat, f.lng) <= radius,
+    [nearMeActive, pos, radius]
+  );
+  const countyCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const f of allFarms) {
+      if (category.size > 0 && ![...category].some((s) => farmMatchesCategory(f.products, s))) continue;
+      if (!matchesRadius(f)) continue;
+      counts[f.lan] = (counts[f.lan] ?? 0) + 1;
+    }
+    return counts;
+  }, [allFarms, category, matchesRadius]);
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const cat of CATEGORIES) {
+      let n = 0;
+      for (const f of allFarms) {
+        if (county.size > 0 && !county.has(f.lan)) continue;
+        if (!matchesRadius(f)) continue;
+        if (farmMatchesCategory(f.products, cat.slug)) n++;
+      }
+      counts[cat.slug] = n;
+    }
+    return counts;
+  }, [allFarms, county, matchesRadius]);
 
   const activeFilterCount = county.size + category.size;
+
+  const resetEverything = useCallback(() => {
+    setCounty(new Set());
+    setCategory(new Set());
+    setNearMeActive(false);
+    mapRef.current?.flyTo({ center: [SWEDEN.longitude, SWEDEN.latitude], zoom: SWEDEN.zoom, duration: 1000 });
+  }, []);
 
   const circleData = useMemo(
     () => (nearMeActive && pos ? geoCircle(pos.lat, pos.lng, radius) : null),
@@ -376,28 +434,48 @@ export default function MapView() {
           <div className="space-y-2">
             <p className="text-xs font-medium text-stone-500 uppercase tracking-wide">Län</p>
             <div className="flex flex-wrap gap-1.5">
-              {COUNTY_NAMES.map((c) => (
-                <button key={c} onClick={() => toggleCounty(c)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                    county.has(c) ? "bg-stone-800 text-white" : "bg-white text-stone-500 border border-stone-200 hover:border-stone-400"
-                  }`}>
-                  {c}
-                </button>
-              ))}
+              {COUNTY_NAMES.map((c) => {
+                const count = countyCounts[c] ?? 0;
+                const isActive = county.has(c);
+                const isDead = count === 0 && !isActive;
+                return (
+                  <button key={c} onClick={() => toggleCounty(c)} disabled={isDead}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                      isActive
+                        ? "bg-stone-800 text-white"
+                        : isDead
+                          ? "bg-stone-50 text-stone-300 border border-stone-100 cursor-not-allowed"
+                          : "bg-white text-stone-500 border border-stone-200 hover:border-stone-400"
+                    }`}>
+                    {c}{" "}
+                    <span className={`text-[10px] ${isActive ? "text-stone-400" : "text-stone-300"}`}>{count}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
           <div className="space-y-2">
             <p className="text-xs font-medium text-stone-500 uppercase tracking-wide">Produktkategori</p>
             <div className="flex flex-wrap gap-1.5">
-              {CATEGORIES.map((cat) => (
-                <button key={cat.slug} onClick={() => toggleCategory(cat.slug)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                    category.has(cat.slug) ? "bg-stone-800 text-white" : "bg-white text-stone-500 border border-stone-200 hover:border-stone-400"
-                  }`}>
-                  {cat.label}
-                </button>
-              ))}
+              {CATEGORIES.map((cat) => {
+                const count = categoryCounts[cat.slug] ?? 0;
+                const isActive = category.has(cat.slug);
+                const isDead = count === 0 && !isActive;
+                return (
+                  <button key={cat.slug} onClick={() => toggleCategory(cat.slug)} disabled={isDead}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                      isActive
+                        ? "bg-stone-800 text-white"
+                        : isDead
+                          ? "bg-stone-50 text-stone-300 border border-stone-100 cursor-not-allowed"
+                          : "bg-white text-stone-500 border border-stone-200 hover:border-stone-400"
+                    }`}>
+                    {cat.label}{" "}
+                    <span className={`text-[10px] ${isActive ? "text-stone-400" : "text-stone-300"}`}>{count}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -414,6 +492,23 @@ export default function MapView() {
                 Klar
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Empty state — filters or radius match nothing */}
+      {allFarms.length > 0 && farms.length === 0 && (
+        <div className="absolute inset-x-6 top-1/2 -translate-y-1/2 flex justify-center pointer-events-none">
+          <div className="pointer-events-auto bg-white border border-stone-200 rounded-2xl shadow-lg px-5 py-4 text-center max-w-xs">
+            <p className="text-sm text-stone-700 mb-2.5">
+              {nearMeActive && activeFilterCount === 0
+                ? `Inga gårdar inom ${radius} km`
+                : "Inga gårdar matchar filtren"}
+            </p>
+            <button onClick={resetEverything}
+              className="text-xs font-semibold text-white bg-stone-800 px-4 py-1.5 rounded-full hover:bg-stone-700 transition-colors">
+              Rensa filter
+            </button>
           </div>
         </div>
       )}

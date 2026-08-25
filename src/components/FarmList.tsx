@@ -92,6 +92,33 @@ export default function FarmList({ initialFarms, initialCounty }: Props) {
     });
   }, [farms, query, county, category]);
 
+  // Per-chip counts, respecting the *other* filter dimensions so a chip
+  // shows what picking it would actually leave in the list.
+  const countyCounts = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const counts = new Map<string, number>();
+    for (const f of farms) {
+      if (category.size > 0 && ![...category].some((s) => farmMatchesCategory(f.products, s))) continue;
+      if (q && !f.name.toLowerCase().includes(q) && !f.products.some((p) => p.toLowerCase().includes(q))) continue;
+      counts.set(f.lan, (counts.get(f.lan) ?? 0) + 1);
+    }
+    return counts;
+  }, [farms, query, category]);
+  const categoryCounts = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const counts = new Map<string, number>();
+    for (const cat of CATEGORIES) {
+      let n = 0;
+      for (const f of farms) {
+        if (county.size > 0 && !county.has(f.lan)) continue;
+        if (q && !f.name.toLowerCase().includes(q) && !f.products.some((p) => p.toLowerCase().includes(q))) continue;
+        if (farmMatchesCategory(f.products, cat.slug)) n++;
+      }
+      counts.set(cat.slug, n);
+    }
+    return counts;
+  }, [farms, query, county]);
+
   const sorted = useMemo(() => {
     const list = [...filtered];
     if (sortBy === "distance" && pos) {
@@ -132,36 +159,54 @@ export default function FarmList({ initialFarms, initialCounty }: Props) {
 
         {/* County chips */}
         <div className="flex gap-1.5 overflow-x-auto pb-0.5 no-scrollbar">
-          {COUNTY_NAMES.map((c) => (
-            <button
-              key={c}
-              onClick={() => toggleCounty(c)}
-              className={`shrink-0 px-3 py-1 rounded-full text-[11px] font-medium transition-colors ${
-                county.has(c)
-                  ? "bg-stone-800 text-white"
-                  : "bg-white text-stone-500 border border-stone-200 hover:border-stone-400"
-              }`}
-            >
-              {c}
-            </button>
-          ))}
+          {COUNTY_NAMES.map((c) => {
+            const count = countyCounts.get(c) ?? 0;
+            const isActive = county.has(c);
+            const isDead = count === 0 && !isActive;
+            return (
+              <button
+                key={c}
+                onClick={() => toggleCounty(c)}
+                disabled={isDead}
+                className={`shrink-0 px-3 py-1 rounded-full text-[11px] font-medium transition-colors ${
+                  isActive
+                    ? "bg-stone-800 text-white"
+                    : isDead
+                      ? "bg-stone-50 text-stone-300 border border-stone-100 cursor-not-allowed"
+                      : "bg-white text-stone-500 border border-stone-200 hover:border-stone-400"
+                }`}
+              >
+                {c}{" "}
+                <span className={`text-[10px] ${isActive ? "text-stone-400" : "text-stone-300"}`}>{count}</span>
+              </button>
+            );
+          })}
         </div>
 
         {/* Category chips */}
         <div className="flex gap-1.5 overflow-x-auto pb-0.5 no-scrollbar">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat.slug}
-              onClick={() => toggleCategory(cat.slug)}
-              className={`shrink-0 px-3 py-1 rounded-full text-[11px] font-medium transition-colors ${
-                category.has(cat.slug)
-                  ? "bg-stone-800 text-white"
-                  : "bg-white text-stone-500 border border-stone-200 hover:border-stone-400"
-              }`}
-            >
-              {cat.label}
-            </button>
-          ))}
+          {CATEGORIES.map((cat) => {
+            const count = categoryCounts.get(cat.slug) ?? 0;
+            const isActive = category.has(cat.slug);
+            const isDead = count === 0 && !isActive;
+            return (
+              <button
+                key={cat.slug}
+                onClick={() => toggleCategory(cat.slug)}
+                disabled={isDead}
+                className={`shrink-0 px-3 py-1 rounded-full text-[11px] font-medium transition-colors ${
+                  isActive
+                    ? "bg-stone-800 text-white"
+                    : isDead
+                      ? "bg-stone-50 text-stone-300 border border-stone-100 cursor-not-allowed"
+                      : "bg-white text-stone-500 border border-stone-200 hover:border-stone-400"
+                }`}
+              >
+                {cat.label}{" "}
+                <span className={`text-[10px] ${isActive ? "text-stone-400" : "text-stone-300"}`}>{count}</span>
+              </button>
+            );
+          })}
         </div>
 
         {/* Bottom row */}
@@ -178,7 +223,7 @@ export default function FarmList({ initialFarms, initialCounty }: Props) {
               ? <Loader2 size={11} className="animate-spin" />
               : <LocateFixed size={11} />
             }
-            Nära mig
+            Närmast först
           </button>
 
           <div className="flex-1 flex items-center gap-2 min-w-0">
