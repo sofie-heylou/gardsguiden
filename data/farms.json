@@ -59,7 +59,8 @@
     "phone": "070-856 25 12",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "bakat"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -456,7 +457,9 @@
     "phone": "0456-319 65",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "bär",
+      "grönsaker"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -622,7 +625,9 @@
     "phone": "",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "grönsaker",
+      "bär"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -907,7 +912,8 @@
     "phone": "070-993 62 64",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "ägg"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -1239,7 +1245,9 @@
     "phone": "070-426 06 34",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "grönsaker",
+      "mjöl"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -1554,7 +1562,8 @@
     "phone": "0498-523 75",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "fisk"
     ],
     "onSiteSales": false,
     "tastingRoom": false,
@@ -1577,7 +1586,9 @@
     "phone": "070-548 09 21",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "ägg",
+      "kött"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -1600,7 +1611,8 @@
     "phone": "0498-29 69 00",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "grönsaker"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -1624,7 +1636,8 @@
     "phone": "073-940 02 36",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "grönsaker"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -1787,7 +1800,8 @@
     "phone": "0498-48 71 60",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -1977,7 +1991,8 @@
     "phone": "073-759 89 58",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -2704,7 +2719,10 @@
     "phone": "",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "bakat",
+      "grönsaker",
+      "öl"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -2752,7 +2770,11 @@
     "phone": "",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "grönsaker",
+      "ägg",
+      "kött",
+      "bakat"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -2963,7 +2985,8 @@
     "phone": "070-376 71 81",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött"
     ],
     "onSiteSales": true,
     "tastingRoom": true,
@@ -3412,7 +3435,8 @@
     "phone": "079-100 55 54",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -3703,7 +3727,8 @@
     "phone": "073-696 26 95",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -3892,7 +3917,8 @@
     "phone": "070-654 37 81",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött"
     ],
     "onSiteSales": false,
     "tastingRoom": false,
@@ -3962,7 +3988,9 @@
     "phone": "",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "grönsaker",
+      "ägg"
     ],
     "onSiteSales": true,
     "tastingRoom": true,
@@ -4009,7 +4037,8 @@
     "phone": "0480-47 80 83",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -4643,7 +4672,11 @@
     "phone": "070-842 34 90",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "grönsaker",
+      "frukt",
+      "bär",
+      "självplock"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -4666,7 +4699,11 @@
     "phone": "070-201 59 79",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött",
+      "ägg",
+      "grönsaker",
+      "frukt"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -5056,7 +5093,11 @@
     "phone": "070-818 32 20",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött",
+      "ägg",
+      "honung",
+      "grönsaker"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -5080,7 +5121,8 @@
     "phone": "0415-33 01 00",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -6163,7 +6205,8 @@
     "phone": "070-547 47 64",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "grönsaker"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -6633,7 +6676,9 @@
     "phone": "042-22 11 29",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "grönsaker",
+      "frukt"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -6656,7 +6701,11 @@
     "phone": "046-14 09 53",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "grönsaker",
+      "frukt",
+      "ost",
+      "kött"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -6847,7 +6896,10 @@
     "phone": "070-856 96 37",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "ägg",
+      "honung",
+      "öl"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -6964,7 +7016,8 @@
     "phone": "070-412 46 11",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -7364,7 +7417,9 @@
     "phone": "040-42 32 50",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött",
+      "mejeri"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -7456,7 +7511,11 @@
     "phone": "076-233 26 20",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött",
+      "mjöl",
+      "grönsaker",
+      "ägg"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -7479,7 +7538,9 @@
     "phone": "073-040 25 64",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "grönsaker",
+      "ägg"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -7919,7 +7980,8 @@
     "phone": "070-371 36 00",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -8040,7 +8102,12 @@
     "phone": "0171-46 62 80",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött",
+      "mejeri",
+      "mjölk",
+      "mjöl",
+      "grönsaker"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -8986,7 +9053,8 @@
     "phone": "070-825 03 81",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -9106,7 +9174,8 @@
     "phone": "070-718 00 31",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -9155,7 +9224,9 @@
     "phone": "0157-74 04 48",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "must",
+      "frukt"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -9206,7 +9277,8 @@
     "phone": "070-221 61 46",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -9426,7 +9498,8 @@
     "phone": "070-683 36 03",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -9648,7 +9721,8 @@
     "phone": "",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "grönsaker"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -9672,7 +9746,12 @@
     "phone": "072-221 13 01",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött",
+      "mejeri",
+      "mjölk",
+      "mjöl",
+      "grönsaker"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -9720,7 +9799,8 @@
     "phone": "070-590 93 57",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "grönsaker"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -9769,7 +9849,8 @@
     "phone": "073-344 96 77",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -9916,7 +9997,10 @@
     "phone": "",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "ägg",
+      "kött",
+      "bakat"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -10088,7 +10172,10 @@
     "phone": "073-995 42 94",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "ägg",
+      "grönsaker",
+      "kött"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -10112,7 +10199,8 @@
     "phone": "070-368 30 51",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -10330,7 +10418,8 @@
     "phone": "070-735 63 96",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -10685,7 +10774,8 @@
     "phone": "070-331 43 10",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -10915,7 +11005,9 @@
     "phone": "",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "mejeri",
+      "mjölk"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -11060,7 +11152,10 @@
     "phone": "070-863 09 16",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött",
+      "must",
+      "cider"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -11348,7 +11443,11 @@
     "phone": "0301-433 56",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "grönsaker",
+      "mjölk",
+      "ägg",
+      "fisk"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -11487,7 +11586,10 @@
     "phone": "073-158 89 22",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "honung",
+      "ägg",
+      "mjöl"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -11510,7 +11612,9 @@
     "phone": "076-589 00 26",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött",
+      "ägg"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -11649,7 +11753,8 @@
     "phone": "070-215 54 03",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -12215,7 +12320,8 @@
     "phone": "0325-719 18",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -12238,7 +12344,9 @@
     "phone": "070-863 54 06",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött",
+      "honung"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -12639,7 +12747,8 @@
     "phone": "070-979 34 77",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "mejeri"
     ],
     "onSiteSales": true,
     "tastingRoom": true,
@@ -13273,7 +13382,8 @@
     "phone": "070-743 71 70",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "bär"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -13413,7 +13523,8 @@
     "phone": "076-813 81 01",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -14118,7 +14229,8 @@
     "phone": "070-251 23 07",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -14258,7 +14370,8 @@
     "phone": "011-533 30",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "grönsaker"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -14451,7 +14564,8 @@
     "phone": "",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -14687,7 +14801,9 @@
     "phone": "070-256 67 47",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött",
+      "ägg"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -14710,7 +14826,9 @@
     "phone": "072-369 25 26",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött",
+      "mejeri"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -14779,7 +14897,8 @@
     "phone": "076-022 50 75",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "bakat"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -14828,7 +14947,9 @@
     "phone": "070-254 47 72",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "ost",
+      "mjöl"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -14851,7 +14972,8 @@
     "phone": "",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -14996,7 +15118,8 @@
     "phone": "070-048 56 51",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "grönsaker"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -15378,7 +15501,10 @@
     "phone": "070-679 57 00",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött",
+      "ägg",
+      "must"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -15447,7 +15573,8 @@
     "phone": "0125-320 20",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "mejeri"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -15542,7 +15669,8 @@
     "phone": "0125-100 85",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "kött"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
