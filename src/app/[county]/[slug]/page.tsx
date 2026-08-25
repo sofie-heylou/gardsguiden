@@ -16,6 +16,7 @@ import OpenStatusBadge from "../../../components/OpenStatusBadge";
 import FarmStickyBar from "../../../components/FarmStickyBar";
 import FlagFarmButton from "../../../components/FlagFarmButton";
 import SuggestChangeForm from "../../../components/SuggestChangeForm";
+import UpgradeProfileCallout from "../../../components/UpgradeProfileCallout";
 import { SITE_URL } from "../../../lib/site";
 import type { Farm } from "../../../types/farm";
 
@@ -285,6 +286,12 @@ export default async function FarmDetailPage({ params }: Props) {
               farmCounty={farm.lan}
               phone={farm.phone}
               mapsUrl={mapsUrl}
+            />
+
+            <UpgradeProfileCallout
+              farmId={farm.id}
+              farmName={farm.name}
+              farmCounty={farm.lan}
             />
 
             <SuggestChangeForm farmId={farm.id} farmName={farm.name} />
