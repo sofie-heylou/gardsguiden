@@ -21,18 +21,34 @@ const SEED = process.argv.includes("--seed");
 const DB_PATH = process.env.DB_PATH || path.join(process.cwd(), "data", "gardsguiden.db");
 
 // Order matters only for readability. `not` guards false positives
-// ("Wägga Fisk" contains "ägg"). Tags are raw product strings, the same
-// vocabulary src/lib/categories.ts maps to filter chips.
+// ("Wägga Fisk" contains "ägg", "Kvarnnibble" contains "kvarn"). Tags are raw
+// product strings, the same vocabulary src/lib/categories.ts maps to chips.
 const RULES = [
   { tag: "bär", re: /jordgubb|hallon|blåbär|smultron|vinbär|bärodling/i },
   { tag: "frukt", re: /äpple|äppel|musteri|fruktodling|körsbär|plommon|päron/i },
   { tag: "must", re: /musteri/i },
   { tag: "ägg", re: /ägg|hönseri/i, not: /wägga|vägg/i },
   { tag: "honung", re: /honung|biodl|bigård/i },
+  { tag: "självplock", re: /självplock|self ?pick|plocka själv/i },
+  { tag: "vin", re: /vingård|vineri|winery/i },
+  { tag: "öl", re: /bryggeri|brygghus/i },
+  { tag: "sprit", re: /destilleri|bränneri/i },
+  { tag: "cider", re: /cideri|cideri|cider/i },
+  { tag: "grönsaker", re: /handelsträdgård|plantskola|plantshop|grönsak|potatis|tomat|sparris|svampodling|chili/i },
+  { tag: "kött", re: /slakteri|chark|köttlåda|kött|lammgård|fårgård|hjorthägn|hjortgård|viltgård|strutsgård|angus|highland/i },
+  { tag: "fisk", re: /fiskrökeri|ålrökeri|laxrökeri|fiskodling|\bfisk /i },
+  { tag: "mejeri", re: /mejeri|ysteri|gårdsglass|getost|hantverksost/i },
+  { tag: "bakat", re: /bageri|bagarstuga|stenugns|surdeg/i },
+  { tag: "mjöl", re: /kvarn(?![a-zåäö])/i, not: /överstekvarn/i },
 ];
 
 // farm_categories slugs per raw tag, mirroring src/lib/categories.ts.
-const TAG_TO_SLUG = { "bär": "frukt-bar", frukt: "frukt-bar", must: "drycker", "ägg": "agg", honung: "honung" };
+const TAG_TO_SLUG = {
+  "bär": "frukt-bar", frukt: "frukt-bar", must: "drycker", "ägg": "agg", honung: "honung",
+  "självplock": "sjalvplock", vin: "drycker", "öl": "drycker", sprit: "drycker", cider: "drycker",
+  "grönsaker": "gronsaker", "kött": "kott-chark", fisk: "kott-chark",
+  mejeri: "mejeriprodukter", bakat: "brod-bageri", "mjöl": "brod-bageri",
+};
 
 const db = new Database(DB_PATH);
 db.pragma("busy_timeout = 10000"); // the app may hold the same WAL
