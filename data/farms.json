@@ -522,7 +522,9 @@
     "phone": "070-825 40 66",
     "email": "",
     "products": [
-      "vin"
+      "vin",
+      "frukt",
+      "must"
     ],
     "onSiteSales": false,
     "tastingRoom": true,
@@ -964,7 +966,8 @@
     "phone": "0457-361 42",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "ägg"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -1011,7 +1014,9 @@
     "phone": "073-346 63 46",
     "email": "",
     "products": [
-      "vin"
+      "vin",
+      "frukt",
+      "must"
     ],
     "onSiteSales": false,
     "tastingRoom": true,
@@ -1242,7 +1247,8 @@
     "phone": "",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "ägg"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -1403,7 +1409,9 @@
     "phone": "0498-23 00 00",
     "email": "",
     "products": [
-      "vin"
+      "vin",
+      "frukt",
+      "must"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -1637,7 +1645,9 @@
     "phone": "073-981 87 54",
     "email": "",
     "products": [
-      "vin"
+      "vin",
+      "frukt",
+      "must"
     ],
     "onSiteSales": false,
     "tastingRoom": true,
@@ -2681,7 +2691,8 @@
     "phone": "070-671 97 22",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "ägg"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -2819,7 +2830,8 @@
     "phone": "035-17 55 90",
     "email": "",
     "products": [
-      "grönsaker"
+      "grönsaker",
+      "honung"
     ],
     "onSiteSales": false,
     "tastingRoom": false,
@@ -3005,7 +3017,8 @@
     "phone": "076-779 15 15",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "ägg"
     ],
     "onSiteSales": false,
     "tastingRoom": false,
@@ -3606,7 +3619,8 @@
     "phone": "070-634 88 61",
     "email": "",
     "products": [
-      "grönsaker"
+      "grönsaker",
+      "frukt"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -3652,7 +3666,8 @@
     "phone": "036-330 05 00",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "frukt"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -3745,7 +3760,9 @@
     "phone": "076-686 18 64",
     "email": "",
     "products": [
-      "vin"
+      "vin",
+      "frukt",
+      "must"
     ],
     "onSiteSales": false,
     "tastingRoom": true,
@@ -4114,7 +4131,9 @@
     "email": "",
     "products": [
       "vin",
-      "sprit"
+      "sprit",
+      "frukt",
+      "must"
     ],
     "onSiteSales": false,
     "tastingRoom": true,
@@ -4206,7 +4225,8 @@
     "phone": "0470-611 74",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "ägg"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -5269,7 +5289,8 @@
     "phone": "070-513 32 11",
     "email": "",
     "products": [
-      "grönsaker"
+      "grönsaker",
+      "frukt"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -5362,7 +5383,8 @@
     "phone": "072-152 82 00",
     "email": "",
     "products": [
-      "grönsaker"
+      "grönsaker",
+      "bär"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -5548,7 +5570,8 @@
     "phone": "040-675 05 04",
     "email": "",
     "products": [
-      "grönsaker"
+      "grönsaker",
+      "bär"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -5757,7 +5780,9 @@
     "phone": "0414-719 00",
     "email": "",
     "products": [
-      "vin"
+      "vin",
+      "frukt",
+      "must"
     ],
     "onSiteSales": false,
     "tastingRoom": true,
@@ -5781,7 +5806,9 @@
     "email": "",
     "products": [
       "vin",
-      "grönsaker"
+      "grönsaker",
+      "frukt",
+      "must"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -5896,7 +5923,9 @@
     "phone": "042-651 00",
     "email": "",
     "products": [
-      "vin"
+      "vin",
+      "frukt",
+      "must"
     ],
     "onSiteSales": false,
     "tastingRoom": true,
@@ -5919,7 +5948,9 @@
     "phone": "070-291 93 40",
     "email": "",
     "products": [
-      "vin"
+      "vin",
+      "frukt",
+      "must"
     ],
     "onSiteSales": false,
     "tastingRoom": true,
@@ -6197,7 +6228,9 @@
     "phone": "073-027 16 67",
     "email": "",
     "products": [
-      "vin"
+      "vin",
+      "frukt",
+      "must"
     ],
     "onSiteSales": false,
     "tastingRoom": true,
@@ -6891,7 +6924,9 @@
     "email": "",
     "products": [
       "vin",
-      "grönsaker"
+      "grönsaker",
+      "frukt",
+      "must"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -7517,7 +7552,9 @@
     "phone": "073-639 02 23",
     "email": "",
     "products": [
-      "vin"
+      "vin",
+      "frukt",
+      "must"
     ],
     "onSiteSales": false,
     "tastingRoom": true,
@@ -7686,7 +7723,9 @@
     "phone": "073-321 08 15",
     "email": "",
     "products": [
-      "vin"
+      "vin",
+      "frukt",
+      "must"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -7710,7 +7749,9 @@
     "phone": "",
     "email": "",
     "products": [
-      "vin"
+      "vin",
+      "frukt",
+      "must"
     ],
     "onSiteSales": false,
     "tastingRoom": true,
@@ -7904,7 +7945,9 @@
     "email": "",
     "products": [
       "vin",
-      "grönsaker"
+      "grönsaker",
+      "frukt",
+      "must"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -7928,7 +7971,9 @@
     "phone": "073-319 74 07",
     "email": "",
     "products": [
-      "vin"
+      "vin",
+      "frukt",
+      "must"
     ],
     "onSiteSales": false,
     "tastingRoom": true,
@@ -8072,7 +8117,9 @@
     "phone": "070-638 74 82",
     "email": "",
     "products": [
-      "vin"
+      "vin",
+      "frukt",
+      "must"
     ],
     "onSiteSales": false,
     "tastingRoom": true,
@@ -8096,7 +8143,9 @@
     "phone": "070-070 06 84",
     "email": "",
     "products": [
-      "vin"
+      "vin",
+      "frukt",
+      "must"
     ],
     "onSiteSales": false,
     "tastingRoom": true,
@@ -8144,7 +8193,9 @@
     "phone": "070-857 12 00",
     "email": "",
     "products": [
-      "vin"
+      "vin",
+      "frukt",
+      "must"
     ],
     "onSiteSales": false,
     "tastingRoom": true,
@@ -8336,7 +8387,9 @@
     "phone": "070-150 78 54",
     "email": "",
     "products": [
-      "vin"
+      "vin",
+      "frukt",
+      "must"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -8624,7 +8677,9 @@
     "phone": "076-941 57 10",
     "email": "",
     "products": [
-      "vin"
+      "vin",
+      "frukt",
+      "must"
     ],
     "onSiteSales": false,
     "tastingRoom": true,
@@ -9155,7 +9210,9 @@
     "phone": "070-635 65 18",
     "email": "",
     "products": [
-      "vin"
+      "vin",
+      "frukt",
+      "must"
     ],
     "onSiteSales": false,
     "tastingRoom": false,
@@ -9325,7 +9382,9 @@
     "phone": "073-360 45 65",
     "email": "",
     "products": [
-      "vin"
+      "vin",
+      "frukt",
+      "must"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -9661,7 +9720,9 @@
     "phone": "073-982 88 37",
     "email": "",
     "products": [
-      "vin"
+      "vin",
+      "frukt",
+      "must"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -10232,7 +10293,8 @@
     "phone": "073-500 31 04",
     "email": "",
     "products": [
-      "grönsaker"
+      "grönsaker",
+      "bär"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -10810,7 +10872,8 @@
     "phone": "0300-54 40 19",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "ägg"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -11943,7 +12006,8 @@
     "phone": "",
     "email": "",
     "products": [
-      "grönsaker"
+      "grönsaker",
+      "bär"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -12221,7 +12285,9 @@
     "phone": "076-141 29 01",
     "email": "",
     "products": [
-      "vin"
+      "vin",
+      "frukt",
+      "must"
     ],
     "onSiteSales": true,
     "tastingRoom": true,
@@ -12917,7 +12983,8 @@
     "phone": "070-683 06 01",
     "email": "",
     "products": [
-      "grönsaker"
+      "grönsaker",
+      "bär"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -13287,7 +13354,8 @@
     "phone": "070-597 41 78",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "ägg"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -13866,7 +13934,8 @@
     "phone": "",
     "email": "",
     "products": [
-      "vin"
+      "vin",
+      "frukt"
     ],
     "onSiteSales": false,
     "tastingRoom": true,
@@ -14028,7 +14097,9 @@
     "phone": "0141-402 04",
     "email": "",
     "products": [
-      "vin"
+      "vin",
+      "frukt",
+      "must"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -14120,7 +14191,9 @@
     "phone": "070-542 16 32",
     "email": "",
     "products": [
-      "vin"
+      "vin",
+      "frukt",
+      "must"
     ],
     "onSiteSales": false,
     "tastingRoom": true,
@@ -14284,7 +14357,8 @@
     "phone": "070-329 33 70",
     "email": "",
     "products": [
-      "grönsaker"
+      "grönsaker",
+      "bär"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -14353,7 +14427,8 @@
     "phone": "0141-23 19 00",
     "email": "",
     "products": [
-      "grönsaker"
+      "grönsaker",
+      "bär"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -14632,7 +14707,9 @@
     "phone": "073-063 36 09",
     "email": "",
     "products": [
-      "vin"
+      "vin",
+      "frukt",
+      "must"
     ],
     "onSiteSales": false,
     "tastingRoom": true,
@@ -14794,7 +14871,8 @@
     "phone": "070-301 28 02",
     "email": "",
     "products": [
-      "grönsaker"
+      "grönsaker",
+      "bär"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -14913,7 +14991,9 @@
     "email": "",
     "products": [
       "vin",
-      "honung"
+      "honung",
+      "frukt",
+      "must"
     ],
     "onSiteSales": true,
     "tastingRoom": true,
@@ -15261,7 +15341,8 @@
     "phone": "",
     "email": "",
     "products": [
-      "grönsaker"
+      "grönsaker",
+      "bär"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
@@ -15308,7 +15389,8 @@
     "phone": "076-775 55 58",
     "email": "",
     "products": [
-      "annat"
+      "annat",
+      "ägg"
     ],
     "onSiteSales": true,
     "tastingRoom": false,
