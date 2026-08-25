@@ -21,11 +21,11 @@
 
 ## Stage 1 — Never let a filter lie (small, no structural change)
 
-- [ ] Show counts on chips ("Skåne 127 · Ägg 0") and grey out zero-result choices; county counts are already computed for the strip.
-- [ ] Fly the map to the results when a county filter is applied.
-- [ ] Map empty state: "Inga gårdar matchar — Rensa filter" card (the list already has one).
-- [ ] Retag the obvious mismatches so Ägg and Frukt & bär stop being dead (strawberry/apple/musteri farms are findable by name and product text).
-- [ ] Rename the list's "Nära mig" to "Närmast först" so the same words stop meaning different things.
+- [x] Show counts on chips ("Skåne 127 · Ägg 0") and grey out zero-result choices. *Done 2026-08-25: counts respect the other active filter dimensions on both surfaces.*
+- [x] Fly the map to the results when a county filter is applied. *Done 2026-08-25; clearing filters flies back to the Sweden overview. Note: could not be fully end-to-end verified in the sandboxed browser (map events are throttled there), but it uses the same imperative-camera + onMove pattern as the existing near-me/cluster flyTo paths.*
+- [x] Map empty state: "Inga gårdar matchar — Rensa filter" card. *Done 2026-08-25, with a radius-specific message in near-me mode.*
+- [x] Retag the obvious mismatches. *Done 2026-08-25 for seed + local DB via `scripts/retag-products.js` (additive, rerunnable, dry-run by default): 52 farms — Ägg 0→8, Frukt & bär 1→44. **Prod DB not yet updated** — run the script over railway ssh with DB_PATH after a snapshot, or reuse it whenever prod is next touched.*
+- [x] Rename the list's "Nära mig" to "Närmast först". *Done 2026-08-25.*
 
 ## Stage 2 — Filters that survive (medium)
 
