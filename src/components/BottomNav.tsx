@@ -1,10 +1,16 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ChevronRight } from "lucide-react";
 import { track } from "../lib/analytics";
 
 export default function BottomNav() {
+  // The homepage carries this CTA inside the PopularAreas sheet instead, and
+  // the map needs every vertical pixel it can get there.
+  const pathname = usePathname();
+  if (pathname === "/") return null;
+
   return (
     <nav className="h-14 shrink-0 bg-white border-t border-stone-200 flex items-center justify-between gap-3 px-4">
       <p className="text-xs text-stone-500 leading-snug">

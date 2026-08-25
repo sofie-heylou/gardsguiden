@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 import { getAllFarms } from "../lib/farms";
 import { CATEGORIES, farmMatchesCategory } from "../lib/categories";
 import { COUNTIES } from "../lib/counties";
@@ -55,7 +56,11 @@ export default function PopularAreas() {
     .sort((a, b) => b.count - a.count);
 
   return (
-    <section className="border-t border-stone-200 px-4 py-8" style={{ background: "#FAFAF8" }}>
+    <section
+      className="relative z-10 -mt-4 rounded-t-2xl border-t border-stone-200 px-4 pb-8 pt-2.5"
+      style={{ background: "#FAFAF8", boxShadow: "0 -6px 20px rgba(0,0,0,0.07)" }}
+    >
+      <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-stone-300" aria-hidden="true" />
       <div className="max-w-3xl mx-auto flex flex-col gap-5">
 
         <div className="flex items-end justify-between gap-4">
@@ -114,6 +119,20 @@ export default function PopularAreas() {
         >
           Se alla {farms.length} gårdar
         </Link>
+
+        <div className="bg-amber-50 border border-amber-100 rounded-xl px-4 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex flex-col gap-0.5">
+            <p className="font-display text-lg text-stone-900">Driver du en gård?</p>
+            <p className="text-sm text-stone-500">Nå tusentals besökare som letar lokalt.</p>
+          </div>
+          <Link
+            href="/lagg-till"
+            className="shrink-0 inline-flex items-center justify-center gap-1 px-4 py-2 rounded-full bg-stone-800 text-white text-sm font-semibold hover:bg-stone-700 active:bg-stone-900 transition-colors"
+          >
+            Lägg till din gård
+            <ChevronRight size={14} />
+          </Link>
+        </div>
       </div>
     </section>
   );

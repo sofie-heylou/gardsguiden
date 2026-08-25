@@ -8,7 +8,9 @@ export const revalidate = 3600;
 export default function MapPage() {
   return (
     <div className="h-full overflow-y-auto">
-      <div className="h-full">
+      {/* Leave room for the PopularAreas peek: the map eats scroll gestures,
+          so the section must be visible above the fold to be discoverable. */}
+      <div className="h-[calc(100%-5.5rem)]">
         <MapLoader />
       </div>
       <PopularAreas />
