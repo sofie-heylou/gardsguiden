@@ -42,9 +42,9 @@
 
 ## Stage 4 — Filters that match reality (larger, data work)
 
-- [ ] Retag the "annat" bucket (303 farms) using names, websites and the scraper's classification pass — category coverage from 54% to >95%.
-- [ ] Add Självplock as a category; consider splitting Drycker (vin 69 / öl 64) if volumes justify it.
-- [ ] "Öppet nu" filter — only after unifying the two competing opening-hours parsers (`FarmList.tsx`'s local `getTodayHours` vs `src/lib/openingHours.ts`), with copy admitting partial data ("visar gårdar med kända öppettider") since ~1/3 of farms lack hours.
+- [x] Retag the "annat" bucket using names and websites. *Done 2026-08-25 in two additive passes: extended name rules (`retag-products.js`, 32 farms) and a new website pass (`retag-from-websites.js` — fetches each untagged farm's own site, word-boundary keywords with per-word occurrence thresholds; 115 farms). Coverage went 54% → 76%, not the hoped >95%: the 161 farms still untagged have no website or no conclusive signal, so the rest is a manual-review job (a natural fit for the existing review-script workflow, someday).*
+- [x] Add Självplock as a category. *Done 2026-08-25 (slug `sjalvplock`, 29 farms in the seed after retag). Drycker split: **decided against for now** — 10 chips is already a lot on mobile, splitting would break existing `kat=drycker` links, and no GSC evidence yet says drink-type queries need it. Revisit with search data.*
+- [x] "Öppet nu" filter. *Done 2026-08-25: the two parsers are unified into `src/lib/openingHours.ts` (tolerant of "Öppet dygnet runt", dot-separated times, missing days; FarmList's private copy deleted), and both surfaces got the chip with a live open-count plus the honesty line "Visar bara gårdar med kända öppettider — N gårdar saknar tider och är dolda". URL param `oppet=1`.*
 
 ## How we'll know it worked
 
