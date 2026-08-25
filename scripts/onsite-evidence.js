@@ -49,8 +49,11 @@ const STRONG = [
   // having retailers of your own means you make something to retail.
   /mjölkautomat|äggautomat|gårdsautomat|äggbod|mjölkbod/,
   /våra återförsäljare|hitta återförsäljare/,
-  // Musteries pressing visitors' apples are producing on site.
-  /legopressning|vi pressar (?:dina|era)/,
+  // Musteries pressing visitors' apples are producing on site — including
+  // pure pressing services with nothing of their own for sale. Sofie's call
+  // 2026-08-25: a mustning service is a lovely thing more apple-tree owners
+  // should use, and it belongs in the catalog.
+  /legopressning|vi pressar (?:dina|era)|musta(?:r|s|de)? (?:dina|era|din|er)|vi tar emot (?:äpplen|päron|frukt)|lämna in dina (?:äpplen|päron)|boka mustning|\bmustning\b/,
   // Swedish farms with English-language sites (Thora Vingård: "locally grown
   // vinified & bottled") deserve the same reading.
   /we (?:grow|raise|brew|bake|produce|harvest)|our (?:vineyard|farm|herd|bees|orchard)|locally grown/,
