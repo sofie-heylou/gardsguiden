@@ -9,8 +9,10 @@ import type { BBox, Feature, Polygon } from "geojson";
 import { LocateFixed, SlidersHorizontal, X, Loader2, AlertTriangle, ArrowRight, ShoppingBag, GlassWater } from "lucide-react";
 import Link from "next/link";
 import type { Farm } from "../types/farm";
-import { CATEGORIES, farmMatchesCategory } from "../lib/categories";
-import { farmPath, COUNTY_NAMES, COUNTIES, COUNTY_TO_SLUG } from "../lib/counties";
+import { CATEGORIES } from "../lib/categories";
+import { farmPath, COUNTY_NAMES, COUNTIES } from "../lib/counties";
+import { farmMatchesFilters, countByCounty, countByCategory, parseFilterParams, writeFilterParams } from "../lib/farmFilters";
+import type { FilterState } from "../lib/farmFilters";
 import { useGeolocation } from "../hooks/useGeolocation";
 import { haversineKm } from "../lib/geo";
 import { track } from "../lib/analytics";
@@ -90,6 +92,7 @@ export default function MapView() {
   const [bounds, setBounds] = useState<BBox>([-180, -85, 180, 85]);
   const [zoom, setZoom] = useState(SWEDEN.zoom);
   const [selected, setSelected] = useState<Farm | null>(null);
+  const [mapLoaded, setMapLoaded] = useState(false);
 
   // Filters
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -108,6 +111,13 @@ export default function MapView() {
       .then((data: Farm[]) => setAllFarms(data));
   }, []);
 
+  // Restore filters from the URL on mount (?lan=skane,halland&kat=drycker).
+  useEffect(() => {
+    const fromUrl = parseFilterParams(window.location.search);
+    if (fromUrl.counties.size > 0) setCounty(fromUrl.counties);
+    if (fromUrl.categories.size > 0) setCategory(fromUrl.categories);
+  }, []);
+
   // Activate near me once position arrives
   useEffect(() => {
     if (wantsNearMe && geoStatus === "granted" && pos) {
@@ -118,14 +128,24 @@ export default function MapView() {
     }
   }, [wantsNearMe, geoStatus, pos, radius]);
 
-  const farms = useMemo(() => {
-    return allFarms.filter((f) => {
-      if (county.size > 0 && !county.has(f.lan)) return false;
-      if (category.size > 0 && ![...category].some((s) => farmMatchesCategory(f.products, s))) return false;
-      if (nearMeActive && pos && haversineKm(pos.lat, pos.lng, f.lat, f.lng) > radius) return false;
-      return true;
-    });
-  }, [allFarms, county, category, nearMeActive, pos, radius]);
+  const filters = useMemo<FilterState>(
+    () => ({ counties: county, categories: category, query: "" }),
+    [county, category]
+  );
+  const matchesRadius = useCallback(
+    (f: Farm) => !nearMeActive || !pos || haversineKm(pos.lat, pos.lng, f.lat, f.lng) <= radius,
+    [nearMeActive, pos, radius]
+  );
+
+  const urlDirty = useRef(false);
+  useEffect(() => {
+    if (urlDirty.current) writeFilterParams(filters);
+  }, [filters]);
+
+  const farms = useMemo(
+    () => allFarms.filter((f) => farmMatchesFilters(f, filters) && matchesRadius(f)),
+    [allFarms, filters, matchesRadius]
+  );
 
   useEffect(() => {
     if (selected && !farms.find((f) => f.id === selected.id)) setSelected(null);
@@ -155,6 +175,7 @@ export default function MapView() {
   }, [updateViewport]);
 
   const onLoad = useCallback(() => {
+    setMapLoaded(true);
     if (mapRef.current) updateViewport(mapRef.current);
   }, [updateViewport]);
 
@@ -184,23 +205,39 @@ export default function MapView() {
   );
 
   const toggleCounty = useCallback((c: string) => {
-    if (!county.has(c)) track("filter_applied", { filter_type: "county", filter_value: c });
-    setCounty((prev) => {
-      const next = new Set(prev);
-      next.has(c) ? next.delete(c) : next.add(c);
-      return next;
-    });
+    const next = new Set(county);
+    if (next.has(c)) next.delete(c);
+    else { next.add(c); track("filter_applied", { filter_type: "county", filter_value: c }); }
+    setCounty(next);
+    urlDirty.current = true;
+  }, [county]);
+  const toggleCategory = useCallback((s: string) => {
+    const next = new Set(category);
+    if (next.has(s)) next.delete(s);
+    else { next.add(s); track("filter_applied", { filter_type: "product", filter_value: s }); }
+    setCategory(next);
+    urlDirty.current = true;
+  }, [category]);
+  const clearFilters = useCallback(() => {
+    if (county.size > 0) {
+      mapRef.current?.flyTo({ center: [SWEDEN.longitude, SWEDEN.latitude], zoom: SWEDEN.zoom, duration: 1000 });
+    }
+    setCounty(new Set()); setCategory(new Set());
+    urlDirty.current = true;
   }, [county]);
 
-  // Fly to the filtered counties' farms whenever the county selection changes
+  // Fly to the filtered counties' farms when the county selection changes.
+  // Waits for both the map and the farm data, so a deep link like
+  // /?lan=skane flies once everything is ready.
   const prevCountyKey = useRef("");
   useEffect(() => {
+    if (county.size === 0) { prevCountyKey.current = ""; return; }
+    if (!mapLoaded || allFarms.length === 0) return;
     const key = [...county].sort().join("|");
     if (key === prevCountyKey.current) return;
-    prevCountyKey.current = key;
-    if (county.size === 0) return;
     const pts = allFarms.filter((f) => county.has(f.lan) && f.lat && f.lng);
     if (pts.length === 0) return;
+    prevCountyKey.current = key;
     let minLng = Infinity, minLat = Infinity, maxLng = -Infinity, maxLat = -Infinity;
     for (const f of pts) {
       if (f.lng < minLng) minLng = f.lng;
@@ -209,50 +246,10 @@ export default function MapView() {
       if (f.lat > maxLat) maxLat = f.lat;
     }
     mapRef.current?.fitBounds([[minLng, minLat], [maxLng, maxLat]], { padding: 60, duration: 1000, maxZoom: 10 });
-  }, [county, allFarms]);
-  const toggleCategory = useCallback((s: string) => {
-    if (!category.has(s)) track("filter_applied", { filter_type: "product", filter_value: s });
-    setCategory((prev) => {
-      const next = new Set(prev);
-      next.has(s) ? next.delete(s) : next.add(s);
-      return next;
-    });
-  }, [category]);
-  const clearFilters = useCallback(() => {
-    if (county.size > 0) {
-      mapRef.current?.flyTo({ center: [SWEDEN.longitude, SWEDEN.latitude], zoom: SWEDEN.zoom, duration: 1000 });
-    }
-    setCounty(new Set()); setCategory(new Set());
-  }, [county]);
+  }, [county, allFarms, mapLoaded]);
 
-  // Per-chip counts, respecting the *other* filter dimensions so a chip
-  // shows what picking it would actually leave on the map.
-  const matchesRadius = useCallback(
-    (f: Farm) => !nearMeActive || !pos || haversineKm(pos.lat, pos.lng, f.lat, f.lng) <= radius,
-    [nearMeActive, pos, radius]
-  );
-  const countyCounts = useMemo(() => {
-    const counts: Record<string, number> = {};
-    for (const f of allFarms) {
-      if (category.size > 0 && ![...category].some((s) => farmMatchesCategory(f.products, s))) continue;
-      if (!matchesRadius(f)) continue;
-      counts[f.lan] = (counts[f.lan] ?? 0) + 1;
-    }
-    return counts;
-  }, [allFarms, category, matchesRadius]);
-  const categoryCounts = useMemo(() => {
-    const counts: Record<string, number> = {};
-    for (const cat of CATEGORIES) {
-      let n = 0;
-      for (const f of allFarms) {
-        if (county.size > 0 && !county.has(f.lan)) continue;
-        if (!matchesRadius(f)) continue;
-        if (farmMatchesCategory(f.products, cat.slug)) n++;
-      }
-      counts[cat.slug] = n;
-    }
-    return counts;
-  }, [allFarms, county, matchesRadius]);
+  const countyCounts = useMemo(() => countByCounty(allFarms, filters, matchesRadius), [allFarms, filters, matchesRadius]);
+  const categoryCounts = useMemo(() => countByCategory(allFarms, filters, matchesRadius), [allFarms, filters, matchesRadius]);
 
   const activeFilterCount = county.size + category.size;
 
@@ -261,6 +258,7 @@ export default function MapView() {
     setCategory(new Set());
     setNearMeActive(false);
     mapRef.current?.flyTo({ center: [SWEDEN.longitude, SWEDEN.latitude], zoom: SWEDEN.zoom, duration: 1000 });
+    urlDirty.current = true;
   }, []);
 
   const circleData = useMemo(

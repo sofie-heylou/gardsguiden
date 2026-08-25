@@ -29,9 +29,9 @@
 
 ## Stage 2 — Filters that survive (medium)
 
-- [ ] Filter state in query parameters on both map and list (`/?lan=skane&kat=drycker`) — reload, back button and shared links work for free; Karta/Lista hand state to each other. Parameters only; paths untouched.
-- [ ] Extract one shared filter module used by both surfaces (today `MapView.tsx` and `FarmList.tsx` duplicate the predicate).
-- [ ] Fire the same analytics events from the list as from the map.
+- [x] Filter state in query parameters on both map and list (`/?lan=skane&kat=drycker`, list also `q=`) — reload, back-from-detail and shared links restore filters; the Karta/Lista tabs carry active params across the switch. *Done 2026-08-25. Written via `history.replaceState` only after the visitor touches a filter, so county pages stay param-free until interaction and filter fiddling never spams history. Unknown slugs in shared links degrade silently to "no filter".*
+- [x] Extract one shared filter module used by both surfaces. *Done 2026-08-25: `src/lib/farmFilters.ts` owns the filter model, predicate, per-chip counts and the URL codec; `MapView` adds only its radius predicate on top.*
+- [x] Fire the same analytics events from the list as from the map. *Done 2026-08-25: `filter_applied` (county/product) and `near_me_activated` now fire from the list too.*
 
 ## Stage 3 — Filters where the visitors are (medium)
 

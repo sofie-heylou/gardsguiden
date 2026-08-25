@@ -1,16 +1,19 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import Link from "next/link";
 import {
   Search, X, ShoppingBag, GlassWater, Clock,
   MapPin, LocateFixed, Loader2,
 } from "lucide-react";
-import { CATEGORIES, farmMatchesCategory } from "../lib/categories";
+import { CATEGORIES } from "../lib/categories";
 import { farmPath, COUNTY_NAMES } from "../lib/counties";
 import type { Farm } from "../types/farm";
 import { useGeolocation } from "../hooks/useGeolocation";
 import { haversineKm } from "../lib/geo";
+import { farmMatchesFilters, countByCounty, countByCategory, parseFilterParams, writeFilterParams } from "../lib/farmFilters";
+import type { FilterState } from "../lib/farmFilters";
+import { track } from "../lib/analytics";
 
 type SortKey = "name" | "lan" | "distance";
 
@@ -57,67 +60,71 @@ export default function FarmList({ initialFarms, initialCounty }: Props) {
       .then((data: Farm[]) => { setFarms(data); setLoading(false); });
   }, [initialFarms]);
 
+  // Restore filters from the URL on mount. Each dimension only overrides when
+  // its param is present, so /gardar/skane-lan keeps its initialCounty when a
+  // shared link carries only ?kat=.
+  useEffect(() => {
+    const fromUrl = parseFilterParams(window.location.search);
+    if (fromUrl.counties.size > 0) setCounty(fromUrl.counties);
+    if (fromUrl.categories.size > 0) setCategory(fromUrl.categories);
+    if (fromUrl.query) setQuery(fromUrl.query);
+  }, []);
+
   const [wantsNearMe, setWantsNearMe] = useState(false);
   useEffect(() => {
-    if (wantsNearMe && geoStatus === "granted") setSortBy("distance");
+    if (wantsNearMe && geoStatus === "granted") {
+      setSortBy("distance");
+      track("near_me_activated", { surface: "list" });
+    }
   }, [wantsNearMe, geoStatus]);
 
   const handleNearMe = useCallback(() => {
     if (sortBy === "distance") { setSortBy("name"); setWantsNearMe(false); return; }
-    if (pos) { setSortBy("distance"); }
+    if (pos) { setSortBy("distance"); track("near_me_activated", { surface: "list" }); }
     else { setWantsNearMe(true); requestLocation(); }
   }, [sortBy, pos, requestLocation]);
 
-  const toggleCounty = useCallback((c: string) => setCounty((prev) => {
-    const next = new Set(prev);
-    next.has(c) ? next.delete(c) : next.add(c);
-    return next;
-  }), []);
-  const toggleCategory = useCallback((s: string) => setCategory((prev) => {
-    const next = new Set(prev);
-    next.has(s) ? next.delete(s) : next.add(s);
-    return next;
-  }), []);
+  const toggleCounty = useCallback((c: string) => {
+    const next = new Set(county);
+    if (next.has(c)) next.delete(c);
+    else { next.add(c); track("filter_applied", { filter_type: "county", filter_value: c }); }
+    setCounty(next);
+    urlDirty.current = true;
+  }, [county]);
+  const toggleCategory = useCallback((s: string) => {
+    const next = new Set(category);
+    if (next.has(s)) next.delete(s);
+    else { next.add(s); track("filter_applied", { filter_type: "product", filter_value: s }); }
+    setCategory(next);
+    urlDirty.current = true;
+  }, [category]);
+  const setQueryAndUrl = useCallback((q: string) => {
+    setQuery(q);
+    urlDirty.current = true;
+  }, []);
   const clearAll = useCallback(() => {
     setQuery(""); setCounty(new Set()); setCategory(new Set()); setSortBy("name"); setWantsNearMe(false);
+    urlDirty.current = true;
   }, []);
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return farms.filter((f) => {
-      if (county.size > 0 && !county.has(f.lan)) return false;
-      if (category.size > 0 && ![...category].some((s) => farmMatchesCategory(f.products, s))) return false;
-      if (q && !f.name.toLowerCase().includes(q) && !f.products.some((p) => p.toLowerCase().includes(q))) return false;
-      return true;
-    });
-  }, [farms, query, county, category]);
+  const filters = useMemo<FilterState>(
+    () => ({ counties: county, categories: category, query }),
+    [county, category, query]
+  );
 
-  // Per-chip counts, respecting the *other* filter dimensions so a chip
-  // shows what picking it would actually leave in the list.
-  const countyCounts = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    const counts = new Map<string, number>();
-    for (const f of farms) {
-      if (category.size > 0 && ![...category].some((s) => farmMatchesCategory(f.products, s))) continue;
-      if (q && !f.name.toLowerCase().includes(q) && !f.products.some((p) => p.toLowerCase().includes(q))) continue;
-      counts.set(f.lan, (counts.get(f.lan) ?? 0) + 1);
-    }
-    return counts;
-  }, [farms, query, category]);
-  const categoryCounts = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    const counts = new Map<string, number>();
-    for (const cat of CATEGORIES) {
-      let n = 0;
-      for (const f of farms) {
-        if (county.size > 0 && !county.has(f.lan)) continue;
-        if (q && !f.name.toLowerCase().includes(q) && !f.products.some((p) => p.toLowerCase().includes(q))) continue;
-        if (farmMatchesCategory(f.products, cat.slug)) n++;
-      }
-      counts.set(cat.slug, n);
-    }
-    return counts;
-  }, [farms, query, county]);
+  // Mirror filters onto the URL, but only after the visitor has touched them —
+  // never on mount, so /gardar/skane-lan stays param-free until interaction.
+  // Writing from an effect (not the handlers) keeps rapid multi-toggles from
+  // racing each other with stale state.
+  const urlDirty = useRef(false);
+  useEffect(() => {
+    if (urlDirty.current) writeFilterParams(filters);
+  }, [filters]);
+
+  const filtered = useMemo(() => farms.filter((f) => farmMatchesFilters(f, filters)), [farms, filters]);
+
+  const countyCounts = useMemo(() => countByCounty(farms, filters), [farms, filters]);
+  const categoryCounts = useMemo(() => countByCategory(farms, filters), [farms, filters]);
 
   const sorted = useMemo(() => {
     const list = [...filtered];
@@ -146,12 +153,12 @@ export default function FarmList({ initialFarms, initialCounty }: Props) {
           <input
             type="search"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => setQueryAndUrl(e.target.value)}
             placeholder="Sök gård eller produkt…"
             className="w-full pl-8 pr-8 py-2 rounded-full bg-stone-100 text-[13px] text-stone-800 placeholder:text-stone-400 outline-none focus:ring-1 focus:ring-stone-400"
           />
           {query && (
-            <button onClick={() => setQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600" aria-label="Rensa sökning">
+            <button onClick={() => setQueryAndUrl("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600" aria-label="Rensa sökning">
               <X size={13} />
             </button>
           )}
@@ -160,7 +167,7 @@ export default function FarmList({ initialFarms, initialCounty }: Props) {
         {/* County chips */}
         <div className="flex gap-1.5 overflow-x-auto pb-0.5 no-scrollbar">
           {COUNTY_NAMES.map((c) => {
-            const count = countyCounts.get(c) ?? 0;
+            const count = countyCounts[c] ?? 0;
             const isActive = county.has(c);
             const isDead = count === 0 && !isActive;
             return (
@@ -186,7 +193,7 @@ export default function FarmList({ initialFarms, initialCounty }: Props) {
         {/* Category chips */}
         <div className="flex gap-1.5 overflow-x-auto pb-0.5 no-scrollbar">
           {CATEGORIES.map((cat) => {
-            const count = categoryCounts.get(cat.slug) ?? 0;
+            const count = categoryCounts[cat.slug] ?? 0;
             const isActive = category.has(cat.slug);
             const isDead = count === 0 && !isActive;
             return (
