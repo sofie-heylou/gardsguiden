@@ -56,6 +56,12 @@ export const CATEGORIES: Category[] = [
     products: ["öl", "vin", "sprit", "cider", "mjöd", "must"],
   },
   {
+    slug: "sjalvplock",
+    label: "Självplock",
+    emoji: "🧺",
+    products: ["självplock"],
+  },
+  {
     slug: "ovrigt",
     label: "Övrigt",
     emoji: "📦",

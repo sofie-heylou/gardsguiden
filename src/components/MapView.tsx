@@ -11,7 +11,7 @@ import Link from "next/link";
 import type { Farm } from "../types/farm";
 import { CATEGORIES } from "../lib/categories";
 import { farmPath, COUNTY_NAMES } from "../lib/counties";
-import { farmMatchesFilters, countByCounty, countByCategory, parseFilterParams, writeFilterParams } from "../lib/farmFilters";
+import { farmMatchesFilters, countByCounty, countByCategory, openNowCounts, parseFilterParams, writeFilterParams } from "../lib/farmFilters";
 import type { FilterState } from "../lib/farmFilters";
 import { useGeolocation } from "../hooks/useGeolocation";
 import { haversineKm } from "../lib/geo";
@@ -99,6 +99,7 @@ export default function MapView() {
   const [county, setCounty] = useState<Set<string>>(new Set());
   const [category, setCategory] = useState<Set<string>>(new Set());
   const [query, setQuery] = useState("");
+  const [openNow, setOpenNow] = useState(false);
 
   // Near me
   const { pos, status: geoStatus, request: requestLocation } = useGeolocation();
@@ -118,6 +119,7 @@ export default function MapView() {
     if (fromUrl.counties.size > 0) setCounty(fromUrl.counties);
     if (fromUrl.categories.size > 0) setCategory(fromUrl.categories);
     if (fromUrl.query) setQuery(fromUrl.query);
+    if (fromUrl.openNow) setOpenNow(true);
   }, []);
 
   // Activate near me once position arrives
@@ -131,8 +133,8 @@ export default function MapView() {
   }, [wantsNearMe, geoStatus, pos, radius]);
 
   const filters = useMemo<FilterState>(
-    () => ({ counties: county, categories: category, query }),
-    [county, category, query]
+    () => ({ counties: county, categories: category, query, openNow }),
+    [county, category, query, openNow]
   );
   const matchesRadius = useCallback(
     (f: Farm) => !nearMeActive || !pos || haversineKm(pos.lat, pos.lng, f.lat, f.lng) <= radius,
@@ -224,11 +226,18 @@ export default function MapView() {
     setQuery(q);
     urlDirty.current = true;
   }, []);
+  const toggleOpenNow = useCallback(() => {
+    setOpenNow((prev) => {
+      if (!prev) track("filter_applied", { filter_type: "open_now", filter_value: "1" });
+      return !prev;
+    });
+    urlDirty.current = true;
+  }, []);
   const clearFilters = useCallback(() => {
     if (county.size > 0) {
       mapRef.current?.flyTo({ center: [SWEDEN.longitude, SWEDEN.latitude], zoom: SWEDEN.zoom, duration: 1000 });
     }
-    setCounty(new Set()); setCategory(new Set()); setQuery("");
+    setCounty(new Set()); setCategory(new Set()); setQuery(""); setOpenNow(false);
     urlDirty.current = true;
   }, [county]);
 
@@ -256,13 +265,15 @@ export default function MapView() {
 
   const countyCounts = useMemo(() => countByCounty(allFarms, filters, matchesRadius), [allFarms, filters, matchesRadius]);
   const categoryCounts = useMemo(() => countByCategory(allFarms, filters, matchesRadius), [allFarms, filters, matchesRadius]);
+  const openCounts = useMemo(() => openNowCounts(allFarms, filters, matchesRadius), [allFarms, filters, matchesRadius]);
 
-  const activeFilterCount = county.size + category.size + (query.trim() ? 1 : 0);
+  const activeFilterCount = county.size + category.size + (query.trim() ? 1 : 0) + (openNow ? 1 : 0);
 
   const resetEverything = useCallback(() => {
     setCounty(new Set());
     setCategory(new Set());
     setQuery("");
+    setOpenNow(false);
     setNearMeActive(false);
     mapRef.current?.flyTo({ center: [SWEDEN.longitude, SWEDEN.latitude], zoom: SWEDEN.zoom, duration: 1000 });
     urlDirty.current = true;
@@ -486,6 +497,25 @@ export default function MapView() {
                 );
               })}
             </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <button onClick={toggleOpenNow} disabled={openCounts.open === 0 && !openNow}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                openNow
+                  ? "bg-stone-800 text-white"
+                  : openCounts.open === 0
+                    ? "bg-stone-50 text-stone-300 border border-stone-100 cursor-not-allowed"
+                    : "bg-white text-stone-500 border border-stone-200 hover:border-stone-400"
+              }`}>
+              Öppet nu{" "}
+              <span className={`text-[10px] ${openNow ? "text-stone-400" : "text-stone-300"}`}>{openCounts.open}</span>
+            </button>
+            {openNow && openCounts.unknown > 0 && (
+              <p className="text-[10px] text-stone-400 leading-snug">
+                Visar bara gårdar med kända öppettider — {openCounts.unknown} gårdar saknar tider och är dolda.
+              </p>
+            )}
           </div>
 
           <div className="flex items-center justify-between pt-1 border-t border-amber-100">

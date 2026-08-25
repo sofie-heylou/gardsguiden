@@ -1,21 +1,25 @@
 import type { Farm } from "../types/farm";
 import { CATEGORIES, farmMatchesCategory } from "./categories";
 import { COUNTY_TO_SLUG, SLUG_TO_COUNTY } from "./counties";
+import { isOpenNow } from "./openingHours";
 
 /**
  * The one filter model both surfaces (MapView, FarmList) share: counties are
  * display names ("Skåne"), categories are slugs ("drycker"), query is free
- * text. Near-me/radius is deliberately not part of this — it depends on the
- * visitor's position and doesn't belong in a shareable URL.
+ * text, openNow keeps only farms verifiably open right now (farms without
+ * usable hours data are excluded — surfaces must say so). Near-me/radius is
+ * deliberately not part of this — it depends on the visitor's position and
+ * doesn't belong in a shareable URL.
  */
 export interface FilterState {
   counties: Set<string>;
   categories: Set<string>;
   query: string;
+  openNow?: boolean;
 }
 
 export function emptyFilters(): FilterState {
-  return { counties: new Set(), categories: new Set(), query: "" };
+  return { counties: new Set(), categories: new Set(), query: "", openNow: false };
 }
 
 function matchesQuery(farm: Farm, q: string): boolean {
@@ -30,7 +34,29 @@ export function farmMatchesFilters(farm: Farm, f: FilterState): boolean {
   if (f.categories.size > 0 && ![...f.categories].some((s) => farmMatchesCategory(farm.products, s))) return false;
   const q = f.query.trim().toLowerCase();
   if (q && !matchesQuery(farm, q)) return false;
+  if (f.openNow && isOpenNow(farm.openingHours) !== true) return false;
   return true;
+}
+
+/** How many of the farms that match every OTHER dimension are open right now
+ *  (chip count for the Öppet nu toggle), plus how many of those lack hours
+ *  data entirely (for the honesty hint). */
+export function openNowCounts(
+  farms: Farm[],
+  f: FilterState,
+  extra?: (farm: Farm) => boolean
+): { open: number; unknown: number } {
+  const rest: FilterState = { ...f, openNow: false };
+  let open = 0, unknown = 0;
+  const now = new Date();
+  for (const farm of farms) {
+    if (!farmMatchesFilters(farm, rest)) continue;
+    if (extra && !extra(farm)) continue;
+    const status = isOpenNow(farm.openingHours, now);
+    if (status === true) open++;
+    else if (status === null) unknown++;
+  }
+  return { open, unknown };
 }
 
 /**
@@ -85,6 +111,7 @@ export function parseFilterParams(search: string): FilterState {
     if (CATEGORY_SLUGS.has(slug)) f.categories.add(slug);
   }
   f.query = params.get("q") ?? "";
+  f.openNow = params.get("oppet") === "1";
   return f;
 }
 
@@ -95,6 +122,7 @@ export function buildFilterParams(f: FilterState): string {
   }
   if (f.categories.size > 0) params.set("kat", [...f.categories].sort().join(","));
   if (f.query.trim()) params.set("q", f.query.trim());
+  if (f.openNow) params.set("oppet", "1");
   return params.toString();
 }
 

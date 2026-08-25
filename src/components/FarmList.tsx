@@ -11,8 +11,9 @@ import { farmPath, COUNTY_NAMES } from "../lib/counties";
 import type { Farm } from "../types/farm";
 import { useGeolocation } from "../hooks/useGeolocation";
 import { haversineKm } from "../lib/geo";
-import { farmMatchesFilters, countByCounty, countByCategory, parseFilterParams, writeFilterParams } from "../lib/farmFilters";
+import { farmMatchesFilters, countByCounty, countByCategory, openNowCounts, parseFilterParams, writeFilterParams } from "../lib/farmFilters";
 import type { FilterState } from "../lib/farmFilters";
+import { getTodayHours } from "../lib/openingHours";
 import { track } from "../lib/analytics";
 
 type SortKey = "name" | "lan" | "distance";
@@ -23,20 +24,6 @@ function formatDistance(km: number): string {
   return `${Math.round(km)} km`;
 }
 
-// Parse openingHours to extract today's hours only.
-// Handles the Google Places format: "måndag: 09:00–17:00, tisdag: …"
-const DAYS_SV = ["söndag", "måndag", "tisdag", "onsdag", "torsdag", "fredag", "lördag"];
-
-function getTodayHours(openingHours: string): { open: boolean; label: string } | null {
-  if (!openingHours) return null;
-  const today = DAYS_SV[new Date().getDay()];
-  const re = new RegExp(`${today}:\\s*(stängt|[\\d]{1,2}[:.][\\d]{2}\\s*[–\\-]\\s*[\\d]{1,2}[:.][\\d]{2})`, "i");
-  const m = openingHours.match(re);
-  if (!m) return null;
-  const val = m[1].trim().toLowerCase();
-  if (val === "stängt") return { open: false, label: "Stängt idag" };
-  return { open: true, label: val.replace(".", ":") };
-}
 
 interface Props {
   initialFarms?: Farm[];
@@ -57,6 +44,7 @@ export default function FarmList({ initialFarms, initialCounty, lockedCounty, em
     new Set(lockedCounty ? [lockedCounty] : initialCounty ? [initialCounty] : [])
   );
   const [category, setCategory] = useState<Set<string>>(new Set());
+  const [openNow, setOpenNow] = useState(false);
   const [sortBy, setSortBy] = useState<SortKey>("name");
 
   const { pos, status: geoStatus, request: requestLocation } = useGeolocation();
@@ -76,6 +64,7 @@ export default function FarmList({ initialFarms, initialCounty, lockedCounty, em
     if (!lockedCounty && fromUrl.counties.size > 0) setCounty(fromUrl.counties);
     if (fromUrl.categories.size > 0) setCategory(fromUrl.categories);
     if (fromUrl.query) setQuery(fromUrl.query);
+    if (fromUrl.openNow) setOpenNow(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -111,16 +100,23 @@ export default function FarmList({ initialFarms, initialCounty, lockedCounty, em
     setQuery(q);
     urlDirty.current = true;
   }, []);
+  const toggleOpenNow = useCallback(() => {
+    setOpenNow((prev) => {
+      if (!prev) track("filter_applied", { filter_type: "open_now", filter_value: "1" });
+      return !prev;
+    });
+    urlDirty.current = true;
+  }, []);
   const clearAll = useCallback(() => {
     setQuery("");
     setCounty(new Set(lockedCounty ? [lockedCounty] : []));
-    setCategory(new Set()); setSortBy("name"); setWantsNearMe(false);
+    setCategory(new Set()); setOpenNow(false); setSortBy("name"); setWantsNearMe(false);
     urlDirty.current = true;
   }, [lockedCounty]);
 
   const filters = useMemo<FilterState>(
-    () => ({ counties: county, categories: category, query }),
-    [county, category, query]
+    () => ({ counties: county, categories: category, query, openNow }),
+    [county, category, query, openNow]
   );
 
   // Mirror filters onto the URL, but only after the visitor has touched them —
@@ -137,6 +133,7 @@ export default function FarmList({ initialFarms, initialCounty, lockedCounty, em
 
   const countyCounts = useMemo(() => countByCounty(farms, filters), [farms, filters]);
   const categoryCounts = useMemo(() => countByCategory(farms, filters), [farms, filters]);
+  const openCounts = useMemo(() => openNowCounts(farms, filters), [farms, filters]);
 
   const sorted = useMemo(() => {
     const list = [...filtered];
@@ -152,7 +149,7 @@ export default function FarmList({ initialFarms, initialCounty, lockedCounty, em
 
   const nearMeActive = sortBy === "distance";
   const activeFilters =
-    (lockedCounty ? 0 : county.size) + category.size + (query ? 1 : 0) + (nearMeActive ? 1 : 0);
+    (lockedCounty ? 0 : county.size) + category.size + (query ? 1 : 0) + (openNow ? 1 : 0) + (nearMeActive ? 1 : 0);
 
   return (
     <div
@@ -251,6 +248,22 @@ export default function FarmList({ initialFarms, initialCounty, lockedCounty, em
             Närmast först
           </button>
 
+          <button
+            onClick={toggleOpenNow}
+            disabled={openCounts.open === 0 && !openNow}
+            className={`shrink-0 flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-medium transition-colors border ${
+              openNow
+                ? "bg-stone-800 text-white border-stone-800"
+                : openCounts.open === 0
+                  ? "bg-stone-50 text-stone-300 border-stone-100 cursor-not-allowed"
+                  : "bg-white text-stone-500 border-stone-200 hover:border-stone-400"
+            }`}
+          >
+            <Clock size={11} />
+            Öppet nu{" "}
+            <span className={`text-[10px] ${openNow ? "text-stone-400" : "text-stone-300"}`}>{openCounts.open}</span>
+          </button>
+
           <div className="flex-1 flex items-center gap-2 min-w-0">
             <span className="text-[11px] text-stone-400 truncate">
               {loading ? "Hämtar…" : `${sorted.length} av ${farms.length}`}
@@ -272,6 +285,12 @@ export default function FarmList({ initialFarms, initialCounty, lockedCounty, em
             {pos && <option value="distance">Avstånd</option>}
           </select>
         </div>
+
+        {openNow && openCounts.unknown > 0 && (
+          <p className="text-[10px] text-stone-400 leading-snug">
+            Visar bara gårdar med kända öppettider — {openCounts.unknown} gårdar saknar tider och är dolda.
+          </p>
+        )}
 
         {(geoStatus === "denied" || geoStatus === "unavailable") && wantsNearMe && (
           <div className="flex items-start gap-2 bg-red-50 text-red-600 text-[11px] rounded-lg px-3 py-2">
