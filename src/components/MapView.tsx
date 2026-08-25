@@ -1,56 +1,23 @@
 "use client";
 
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
-import Map, { Marker, Popup, NavigationControl, Source, Layer } from "react-map-gl/mapbox";
+import Map, { Marker, Popup, NavigationControl } from "react-map-gl/mapbox";
 import type { MapRef, ViewStateChangeEvent } from "react-map-gl/mapbox";
-import type { FillLayer } from "mapbox-gl";
 import Supercluster from "supercluster";
-import type { BBox, Feature, Polygon } from "geojson";
-import { LocateFixed, SlidersHorizontal, X, Loader2, AlertTriangle, ArrowRight, ShoppingBag, GlassWater, Search } from "lucide-react";
+import type { BBox } from "geojson";
+import { SlidersHorizontal, X, ArrowRight, ShoppingBag, GlassWater, Search } from "lucide-react";
 import Link from "next/link";
 import type { Farm } from "../types/farm";
 import { CATEGORIES } from "../lib/categories";
 import { farmPath, COUNTY_NAMES } from "../lib/counties";
 import { farmMatchesFilters, countByCounty, countByCategory, openNowCounts, parseFilterParams, writeFilterParams } from "../lib/farmFilters";
 import type { FilterState } from "../lib/farmFilters";
-import { useGeolocation } from "../hooks/useGeolocation";
-import { haversineKm } from "../lib/geo";
 import { track } from "../lib/analytics";
 
 const TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
 const SWEDEN = { latitude: 59.3, longitude: 16.5, zoom: 7 };
-const RADIUS_OPTIONS = [10, 25, 50, 100] as const;
 
 type FarmPoint = Supercluster.PointFeature<{ farm: Farm }>;
-
-
-/** Approximate a radius circle as a GeoJSON polygon (64-point). */
-function geoCircle(lat: number, lng: number, radiusKm: number): Feature<Polygon> {
-  const pts = 64;
-  const coords: [number, number][] = [];
-  for (let i = 0; i < pts; i++) {
-    const angle = (i / pts) * 2 * Math.PI;
-    const dLat = (radiusKm / 111) * Math.cos(angle);
-    const dLng = (radiusKm / (111 * Math.cos((lat * Math.PI) / 180))) * Math.sin(angle);
-    coords.push([lng + dLng, lat + dLat]);
-  }
-  coords.push(coords[0]!);
-  return { type: "Feature", properties: {}, geometry: { type: "Polygon", coordinates: [coords] } };
-}
-
-const circleLayer: FillLayer = {
-  id: "radius-fill",
-  type: "fill",
-  source: "radius-circle",
-  paint: { "fill-color": "#f59e0b", "fill-opacity": 0.08 },
-};
-
-const circleBorderLayer: FillLayer = {
-  id: "radius-border",
-  type: "fill",
-  source: "radius-circle",
-  paint: { "fill-color": "transparent", "fill-outline-color": "#f59e0b" },
-};
 
 function buildPoints(farms: Farm[]): FarmPoint[] {
   return farms.map((farm) => ({
@@ -76,12 +43,6 @@ export default function MapView() {
   const [query, setQuery] = useState("");
   const [openNow, setOpenNow] = useState(false);
 
-  // Near me
-  const { pos, status: geoStatus, request: requestLocation } = useGeolocation();
-  const [nearMeActive, setNearMeActive] = useState(false);
-  const [radius, setRadius] = useState<number>(25);
-  const [wantsNearMe, setWantsNearMe] = useState(false);
-
   useEffect(() => {
     fetch("/api/farms")
       .then((r) => r.json())
@@ -97,23 +58,9 @@ export default function MapView() {
     if (fromUrl.openNow) setOpenNow(true);
   }, []);
 
-  // Activate near me once position arrives
-  useEffect(() => {
-    if (wantsNearMe && geoStatus === "granted" && pos) {
-      setNearMeActive(true);
-      setWantsNearMe(false);
-      track("near_me_activated", { radius_km: radius });
-      mapRef.current?.flyTo({ center: [pos.lng, pos.lat], zoom: 10, duration: 1400 });
-    }
-  }, [wantsNearMe, geoStatus, pos, radius]);
-
   const filters = useMemo<FilterState>(
     () => ({ counties: county, categories: category, query, openNow }),
     [county, category, query, openNow]
-  );
-  const matchesRadius = useCallback(
-    (f: Farm) => !nearMeActive || !pos || haversineKm(pos.lat, pos.lng, f.lat, f.lng) <= radius,
-    [nearMeActive, pos, radius]
   );
 
   const urlDirty = useRef(false);
@@ -122,8 +69,8 @@ export default function MapView() {
   }, [filters]);
 
   const farms = useMemo(
-    () => allFarms.filter((f) => farmMatchesFilters(f, filters) && matchesRadius(f)),
-    [allFarms, filters, matchesRadius]
+    () => allFarms.filter((f) => farmMatchesFilters(f, filters)),
+    [allFarms, filters]
   );
 
   useEffect(() => {
@@ -157,23 +104,6 @@ export default function MapView() {
     setMapLoaded(true);
     if (mapRef.current) updateViewport(mapRef.current);
   }, [updateViewport]);
-
-  const handleLocate = useCallback(() => {
-    if (nearMeActive) {
-      // Toggle off → fly back to Sweden overview
-      setNearMeActive(false);
-      mapRef.current?.flyTo({ center: [SWEDEN.longitude, SWEDEN.latitude], zoom: SWEDEN.zoom, duration: 1000 });
-      return;
-    }
-    if (pos) {
-      setNearMeActive(true);
-      track("near_me_activated", { radius_km: radius });
-      mapRef.current?.flyTo({ center: [pos.lng, pos.lat], zoom: 10, duration: 1400 });
-    } else {
-      setWantsNearMe(true);
-      requestLocation();
-    }
-  }, [nearMeActive, pos, requestLocation]);
 
   const handleClusterClick = useCallback(
     (clusterId: number, lng: number, lat: number) => {
@@ -238,9 +168,9 @@ export default function MapView() {
     mapRef.current?.fitBounds([[minLng, minLat], [maxLng, maxLat]], { padding: 60, duration: 1000, maxZoom: 10 });
   }, [county, allFarms, mapLoaded]);
 
-  const countyCounts = useMemo(() => countByCounty(allFarms, filters, matchesRadius), [allFarms, filters, matchesRadius]);
-  const categoryCounts = useMemo(() => countByCategory(allFarms, filters, matchesRadius), [allFarms, filters, matchesRadius]);
-  const openCounts = useMemo(() => openNowCounts(allFarms, filters, matchesRadius), [allFarms, filters, matchesRadius]);
+  const countyCounts = useMemo(() => countByCounty(allFarms, filters), [allFarms, filters]);
+  const categoryCounts = useMemo(() => countByCategory(allFarms, filters), [allFarms, filters]);
+  const openCounts = useMemo(() => openNowCounts(allFarms, filters), [allFarms, filters]);
 
   const activeFilterCount = county.size + category.size + (query.trim() ? 1 : 0) + (openNow ? 1 : 0);
 
@@ -249,17 +179,9 @@ export default function MapView() {
     setCategory(new Set());
     setQuery("");
     setOpenNow(false);
-    setNearMeActive(false);
     mapRef.current?.flyTo({ center: [SWEDEN.longitude, SWEDEN.latitude], zoom: SWEDEN.zoom, duration: 1000 });
     urlDirty.current = true;
   }, []);
-
-  const circleData = useMemo(
-    () => (nearMeActive && pos ? geoCircle(pos.lat, pos.lng, radius) : null),
-    [nearMeActive, pos, radius]
-  );
-
-  const locating = geoStatus === "requesting" && wantsNearMe;
 
   return (
     <div className="h-full flex flex-col">
@@ -275,21 +197,6 @@ export default function MapView() {
         style={{ width: "100%", height: "100%" }}
       >
         <NavigationControl position="top-right" />
-
-        {/* Radius circle */}
-        {circleData && (
-          <Source id="radius-circle" type="geojson" data={circleData}>
-            <Layer {...circleLayer} />
-            <Layer {...circleBorderLayer} />
-          </Source>
-        )}
-
-        {/* User position dot */}
-        {pos && nearMeActive && (
-          <Marker longitude={pos.lng} latitude={pos.lat}>
-            <div className="w-4 h-4 rounded-full bg-amber-500 border-2 border-white shadow-md" />
-          </Marker>
-        )}
 
         {clusters.map((feature) => {
           const [lng, lat] = feature.geometry.coordinates;
@@ -506,11 +413,7 @@ export default function MapView() {
       {allFarms.length > 0 && farms.length === 0 && (
         <div className="absolute inset-x-6 top-1/2 -translate-y-1/2 flex justify-center pointer-events-none">
           <div className="pointer-events-auto bg-white border border-stone-200 rounded-2xl shadow-lg px-5 py-4 text-center max-w-xs">
-            <p className="text-sm text-stone-700 mb-2.5">
-              {nearMeActive && activeFilterCount === 0
-                ? `Inga gårdar inom ${radius} km`
-                : "Inga gårdar matchar filtren"}
-            </p>
+            <p className="text-sm text-stone-700 mb-2.5">Inga gårdar matchar filtren</p>
             <button onClick={resetEverything}
               className="text-xs font-semibold text-white bg-stone-800 px-4 py-1.5 rounded-full hover:bg-stone-700 transition-colors">
               Rensa filter
@@ -519,67 +422,6 @@ export default function MapView() {
         </div>
       )}
 
-      {/* Radius selector — visible only in near me mode */}
-      {nearMeActive && (
-        <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-white rounded-full shadow-lg border border-amber-100 px-2 py-1.5">
-          <span className="text-xs text-stone-500 pl-1 pr-2">Radie:</span>
-          {RADIUS_OPTIONS.map((r) => (
-            <button
-              key={r}
-              onClick={() => setRadius(r)}
-              className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
-                radius === r
-                  ? "bg-amber-400 text-stone-900"
-                  : "text-stone-600 hover:bg-amber-50"
-              }`}
-            >
-              {r} km
-            </button>
-          ))}
-          <button
-            onClick={() => { setNearMeActive(false); mapRef.current?.flyTo({ center: [SWEDEN.longitude, SWEDEN.latitude], zoom: SWEDEN.zoom, duration: 1000 }); }}
-            className="ml-1 text-stone-400 hover:text-stone-700 p-0.5"
-            aria-label="Stäng Nära mig"
-          >
-            <X size={14} />
-          </button>
-        </div>
-      )}
-
-      {/* Denied / unavailable message */}
-      {(geoStatus === "denied" || geoStatus === "unavailable") && wantsNearMe && (
-        <div className="absolute bottom-16 left-3 right-3 bg-white border border-red-200 rounded-xl shadow-lg px-4 py-3 flex items-start gap-2">
-          <AlertTriangle size={14} className="text-red-500 mt-0.5 shrink-0" />
-          <div className="flex-1">
-            <p className="text-xs text-red-700">
-              {geoStatus === "denied"
-                ? "Platstillstånd nekades. Aktivera platsen i webbläsarens inställningar och ladda om sidan."
-                : "Det gick inte att hämta din position. Kontrollera att GPS är aktiverat."}
-            </p>
-          </div>
-          <button onClick={() => setWantsNearMe(false)} className="text-stone-400 hover:text-stone-600">
-            <X size={14} />
-          </button>
-        </div>
-      )}
-
-      {/* Hitta mig / Stäng nära mig */}
-      <button
-        onClick={handleLocate}
-        disabled={locating}
-        className={`absolute bottom-4 right-4 flex items-center gap-1.5 text-sm font-medium px-3 py-2 rounded-full shadow-lg border transition-colors disabled:opacity-50 ${
-          nearMeActive
-            ? "bg-amber-500 text-stone-900 border-amber-600 hover:bg-amber-600"
-            : "bg-amber-400 text-stone-900 border-amber-500 hover:bg-amber-500 active:bg-amber-600"
-        }`}
-        aria-label={nearMeActive ? "Stäng Nära mig" : "Hitta mig"}
-      >
-        {locating
-          ? <Loader2 size={16} className="animate-spin" />
-          : <LocateFixed size={16} />
-        }
-        Nära mig
-      </button>
     </div>
     </div>
   );
