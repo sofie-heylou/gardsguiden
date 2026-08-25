@@ -35,14 +35,10 @@
 
 ## Stage 3 — Filters where the visitors are (medium)
 
-- [ ] County pages get FarmList's filter bar (search + category chips + sort), pre-locked to their county — this is ORGANIC-UX-PLAN chunk 2's filter item.
-- [ ] Search on the map, via the shared module.
-- [ ] County page's map link opens the big map already filtered to that county (query param).
-- [ ] **"Populära områden" section below the map**, replacing the county strip:
-  - Homepage becomes scrollable: map as full-height first screen, section beneath (the one structural layout change — today the shell is fixed `h-dvh overflow-hidden`).
-  - Six cards ranked by search demand (order above), each titled "Gårdsbutiker i {län}" so the link text matches the search phrase, with farm count and the area's 2–3 real top categories.
-  - Remaining seven counties as a compact link row — all 13 county pages keep a homepage link.
-  - Server-rendered in the page (not inside the client-only map component) so the links land in crawler-visible HTML. Same URLs as today.
+- [x] County pages get FarmList's filter bar, pre-locked to their county. *Done 2026-08-25: `FarmList` grew `lockedCounty` (no county chips, never writes ?lan=) and `embedded` (sticky bar, page scroll) modes; /[county] renders it under the editorial header. Filters share via `/skane?kat=kott-chark`. The brewery section and JSON-LD are untouched.*
+- [x] Search on the map, via the shared module. *Done 2026-08-25: search input in the filter panel, ?q= param, counts in the Filter badge.*
+- [x] County page's map link opens the big map filtered to that county. *Done 2026-08-25: a "Visa på karta" button (`/?lan=skane`), and the bottom Karta tab now derives the county from county-scoped paths (/skane, /skane/&lt;farm&gt;, /gardar/skane-lan) too.*
+- [x] **"Populära områden" section below the map.** *Done 2026-08-25: homepage scrolls (map = full-height first screen), server-rendered `PopularAreas` with six demand-ranked cards ("Gårdsbutiker i {län}" + count + top-2 real categories) and an Alla län row; county links verified present in crawler-visible HTML. The old strip's county links are removed from the map component; the featured-farm cards stay. Same URLs as before.*
 
 ## Stage 4 — Filters that match reality (larger, data work)
 

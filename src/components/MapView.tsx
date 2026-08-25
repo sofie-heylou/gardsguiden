@@ -6,11 +6,11 @@ import type { MapRef, ViewStateChangeEvent } from "react-map-gl/mapbox";
 import type { FillLayer } from "mapbox-gl";
 import Supercluster from "supercluster";
 import type { BBox, Feature, Polygon } from "geojson";
-import { LocateFixed, SlidersHorizontal, X, Loader2, AlertTriangle, ArrowRight, ShoppingBag, GlassWater } from "lucide-react";
+import { LocateFixed, SlidersHorizontal, X, Loader2, AlertTriangle, ArrowRight, ShoppingBag, GlassWater, Search } from "lucide-react";
 import Link from "next/link";
 import type { Farm } from "../types/farm";
 import { CATEGORIES } from "../lib/categories";
-import { farmPath, COUNTY_NAMES, COUNTIES } from "../lib/counties";
+import { farmPath, COUNTY_NAMES } from "../lib/counties";
 import { farmMatchesFilters, countByCounty, countByCategory, parseFilterParams, writeFilterParams } from "../lib/farmFilters";
 import type { FilterState } from "../lib/farmFilters";
 import { useGeolocation } from "../hooks/useGeolocation";
@@ -98,6 +98,7 @@ export default function MapView() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [county, setCounty] = useState<Set<string>>(new Set());
   const [category, setCategory] = useState<Set<string>>(new Set());
+  const [query, setQuery] = useState("");
 
   // Near me
   const { pos, status: geoStatus, request: requestLocation } = useGeolocation();
@@ -111,11 +112,12 @@ export default function MapView() {
       .then((data: Farm[]) => setAllFarms(data));
   }, []);
 
-  // Restore filters from the URL on mount (?lan=skane,halland&kat=drycker).
+  // Restore filters from the URL on mount (?lan=skane,halland&kat=drycker&q=…).
   useEffect(() => {
     const fromUrl = parseFilterParams(window.location.search);
     if (fromUrl.counties.size > 0) setCounty(fromUrl.counties);
     if (fromUrl.categories.size > 0) setCategory(fromUrl.categories);
+    if (fromUrl.query) setQuery(fromUrl.query);
   }, []);
 
   // Activate near me once position arrives
@@ -129,8 +131,8 @@ export default function MapView() {
   }, [wantsNearMe, geoStatus, pos, radius]);
 
   const filters = useMemo<FilterState>(
-    () => ({ counties: county, categories: category, query: "" }),
-    [county, category]
+    () => ({ counties: county, categories: category, query }),
+    [county, category, query]
   );
   const matchesRadius = useCallback(
     (f: Farm) => !nearMeActive || !pos || haversineKm(pos.lat, pos.lng, f.lat, f.lng) <= radius,
@@ -218,11 +220,15 @@ export default function MapView() {
     setCategory(next);
     urlDirty.current = true;
   }, [category]);
+  const setQueryAndUrl = useCallback((q: string) => {
+    setQuery(q);
+    urlDirty.current = true;
+  }, []);
   const clearFilters = useCallback(() => {
     if (county.size > 0) {
       mapRef.current?.flyTo({ center: [SWEDEN.longitude, SWEDEN.latitude], zoom: SWEDEN.zoom, duration: 1000 });
     }
-    setCounty(new Set()); setCategory(new Set());
+    setCounty(new Set()); setCategory(new Set()); setQuery("");
     urlDirty.current = true;
   }, [county]);
 
@@ -251,11 +257,12 @@ export default function MapView() {
   const countyCounts = useMemo(() => countByCounty(allFarms, filters, matchesRadius), [allFarms, filters, matchesRadius]);
   const categoryCounts = useMemo(() => countByCategory(allFarms, filters, matchesRadius), [allFarms, filters, matchesRadius]);
 
-  const activeFilterCount = county.size + category.size;
+  const activeFilterCount = county.size + category.size + (query.trim() ? 1 : 0);
 
   const resetEverything = useCallback(() => {
     setCounty(new Set());
     setCategory(new Set());
+    setQuery("");
     setNearMeActive(false);
     mapRef.current?.flyTo({ center: [SWEDEN.longitude, SWEDEN.latitude], zoom: SWEDEN.zoom, duration: 1000 });
     urlDirty.current = true;
@@ -273,18 +280,6 @@ export default function MapView() {
     if (county.size > 0) return `${farms.length} gårdar i ${[...county].join(" · ")}`;
     return `${allFarms.length} gårdar i Sverige`;
   }, [farms.length, allFarms.length, county, nearMeActive]);
-
-  const countyChips = useMemo(
-    () =>
-      COUNTIES.map((c) => ({
-        slug: c.slug,
-        name: c.name,
-        count: allFarms.filter((f) => f.lan === c.name).length,
-      }))
-        .filter((c) => c.count > 0)
-        .sort((a, b) => b.count - a.count),
-    [allFarms]
-  );
 
   const featuredFarms = useMemo(() => pickFeatured(farms), [farms]);
 
@@ -427,6 +422,22 @@ export default function MapView() {
             <button onClick={() => setFiltersOpen(false)} className="text-stone-400 hover:text-stone-700 p-1" aria-label="Stäng">
               <X size={18} />
             </button>
+          </div>
+
+          <div className="relative">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none" />
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQueryAndUrl(e.target.value)}
+              placeholder="Sök gård eller produkt…"
+              className="w-full pl-8 pr-8 py-2 rounded-full bg-stone-100 text-[13px] text-stone-800 placeholder:text-stone-400 outline-none focus:ring-1 focus:ring-stone-400"
+            />
+            {query && (
+              <button onClick={() => setQueryAndUrl("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600" aria-label="Rensa sökning">
+                <X size={13} />
+              </button>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -576,24 +587,12 @@ export default function MapView() {
 
     {/* Discovery strip */}
     <div className="shrink-0 bg-[#FAFAF8] border-t border-stone-200">
-      {/* County chips row / active filter label */}
-      <div
-        className="flex items-center gap-x-4 overflow-x-auto px-4 pt-2.5 pb-2"
-        style={{ scrollbarWidth: "none" }}
-      >
+      {/* Active filter label. The county links that used to live here moved
+          to the server-rendered PopularAreas section below the map. */}
+      <div className="flex items-center px-4 pt-2.5 pb-2">
         <span className="shrink-0 text-[10px] font-semibold text-stone-400 uppercase tracking-widest">
           {stripLabel}
         </span>
-        {county.size === 0 && !nearMeActive && countyChips.map(({ slug, name, count }) => (
-          <Link
-            key={slug}
-            href={`/${slug}`}
-            className="shrink-0 text-[11px] text-stone-500 hover:text-stone-900 transition-colors whitespace-nowrap"
-          >
-            {name}{" "}
-            <span className="text-stone-300 text-[10px]">{count}</span>
-          </Link>
-        ))}
       </div>
 
       {/* Divider */}
