@@ -103,11 +103,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="sv" className={lora.variable}>
       <body className="h-dvh flex flex-col overflow-hidden" style={{ background: "#FAFAF8", color: "#2c2c2c" }}>
         {/* Google Consent Mode v2 default — must run before GTM loads so GA4
-            sets no cookies until the visitor accepts (see CookieConsentBanner). */}
+            sets no cookies until the visitor accepts (see CookieConsentBanner).
+            A returning visitor's stored choice is read from cc_cookie here,
+            because the banner's own consent update runs after React hydration —
+            past GTM's wait_for_update window — and would lose every page view. */}
         <Script id="consent-default" strategy="beforeInteractive">{`
 window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
-gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied',wait_for_update:500});
+var ccAnalytics='denied';
+try{
+  var ccMatch=document.cookie.match(/(?:^|; )cc_cookie=([^;]*)/);
+  if(ccMatch&&JSON.parse(decodeURIComponent(ccMatch[1])).categories.indexOf('analytics')>-1)ccAnalytics='granted';
+}catch(e){}
+gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:ccAnalytics,wait_for_update:500});
 `}</Script>
         <script
           type="application/ld+json"

@@ -77,11 +77,12 @@ const CC_CONFIG: CookieConsent.CookieConsentConfig = {
 // so a returning visitor's "granted" is re-applied after the layout's default.
 function syncConsentMode(): void {
   window.dataLayer = window.dataLayer || [];
-  // gtag() pushes the [command, action, params] array — GTM's Consent API reads
-  // that array-like form, not a plain object.
-  const gtag = (...args: unknown[]) => {
-    window.dataLayer.push(args as unknown as Record<string, unknown>);
-  };
+  // GTM's Consent API only accepts an `arguments` object — a plain array pushed
+  // to the dataLayer is silently ignored, so this must be a regular function.
+  function gtag(..._args: unknown[]): void {
+    // eslint-disable-next-line prefer-rest-params
+    window.dataLayer.push(arguments as unknown as Record<string, unknown>);
+  }
   gtag("consent", "update", {
     analytics_storage: CookieConsent.acceptedCategory("analytics")
       ? "granted"
@@ -99,10 +100,22 @@ export default function CookieConsentBanner() {
       syncConsentMode();
       setShowTrigger(true);
     };
+    // When analytics goes from denied to granted mid-session (first consent, or
+    // enabling it in preferences), GTM won't re-evaluate already-blocked tags on
+    // its own — this event is an extra firing trigger on the Google tag, so the
+    // page the visitor accepted on still gets its page_view. Returning visitors
+    // are handled by the cc_cookie read in layout.tsx and never see this event.
+    const onAnalyticsGranted = () => {
+      onConsentChange();
+      if (CookieConsent.acceptedCategory("analytics")) {
+        window.dataLayer.push({ event: "analytics_consent_granted" });
+      }
+    };
     CookieConsent.run({
       ...CC_CONFIG,
+      onFirstConsent: onAnalyticsGranted,
       onConsent: onConsentChange,
-      onChange: onConsentChange,
+      onChange: onAnalyticsGranted,
     });
   }, []);
 
