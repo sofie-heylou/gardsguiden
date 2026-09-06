@@ -2,15 +2,23 @@
 /**
  * Build a lead list of musterier from musterier.se's county index pages.
  *
- * This deliberately takes ONLY three facts per musteri: name, town (ort) and
- * county. Not the descriptions, not the e-mail addresses, not the phone
- * numbers — those are musterier.se's own compiled directory (AB Rååpress & Co,
- * "alla rättigheter förbehålles"), the descriptions are written text, and the
- * contact details are personal data whose owners consented to publication on
- * *their* site, not ours. A name and a town are plain facts and all we need:
- * everything Gårdsguiden actually shows gets re-sourced from the musteri's own
- * website through the normal pipeline (Places lookup → verify-onsite →
- * categorizeProducts), exactly as SCRAPER-PLAN stages 3–4 require.
+ * This takes only plain facts about each musteri: name, town (ort), county and
+ * — with --details — the postal address. Not the descriptions, not the e-mail
+ * addresses, not the phone numbers. Those are musterier.se's own compiled
+ * directory (AB Rååpress & Co, "alla rättigheter förbehålles"), the
+ * descriptions are written text, and the contact details are personal data
+ * whose owners consented to publication on *their* site, not ours.
+ *
+ * The address was added on Sofie's call (2026-09-06) once the original plan hit
+ * a wall: everything else was to be re-sourced via Google Places, but its
+ * billing is disabled, and these musterier are small enough that many likely
+ * have no Google listing at all. Nominatim geocodes a street address, not a
+ * business name, so without their address there are no map pins. A business's
+ * postal address is as much a plain fact as its name; the line stays drawn at
+ * their written descriptions and at personal contact details.
+ *
+ * Everything else Gårdsguiden shows — website, products, verification — still
+ * comes from the musteri's own site, per SCRAPER-PLAN stages 3–4.
  *
  * So the output of this script is NOT catalog data. It is a to-do list of
  * places worth looking up, marked with whether we already have them.
@@ -38,6 +46,7 @@ const fs = require('fs');
 const path = require('path');
 const { loadFarms, COUNTY_TO_SLUG } = require('./review-lib');
 const { decodeEntities } = require('./verify-onsite');
+const { normalize, distinctiveTokens, ortSignals } = require('./name-match');
 
 const ROOT = path.join(__dirname, '..');
 const DEFAULT_OUT = path.join(ROOT, 'data/tmp', 'musterier-leads.json');
@@ -154,48 +163,21 @@ function parseListingPage(htmlText, knownCounties) {
   const heading = body.find(l => / hittar du här:$/.test(l));
   const name = heading ? heading.replace(/ hittar du här:$/, '').trim() : '';
 
-  const ortIndex = body.findIndex((l, k) => l === 'Ort' && body[k + 1] === ':');
+  // Values sit two lines after their label, separated by a bare ":".
+  const labelled = label => {
+    const i = body.findIndex((l, k) => l === label && body[k + 1] === ':');
+    return i === -1 ? '' : body[i + 2];
+  };
   return {
     name,
-    ort: ortIndex === -1 ? '' : body[ortIndex + 2],
+    ort: labelled('Ort'),
     lan: knownCounties.has(body[0]) ? body[0] : '',
+    postadress: labelled('Postadress'),
+    postnummer: labelled('Postnummer'),
   };
 }
 
 // ── Matching against the catalog ──────────────────────────────────────────────
-
-// Size and compass words: never what distinguishes two businesses, and never
-// what confirms a town either — "Västra Ämtervik" matching any address holding
-// "västra" is how Kulinarika got paired with a vineyard 300 km away.
-const MODIFIERS = ['lilla', 'stora', 'nya', 'gamla', 'vastra', 'ostra', 'norra', 'sodra'];
-
-// What the place is (musteri, vingård) plus filler nouns — shared by half the
-// catalog, so useless for telling one business from another.
-const CATEGORY_WORDS = [
-  'musteri', 'musteriet', 'musterier', 'appelmusteri', 'appelmusteriet',
-  'gard', 'gards', 'garden', 'gardsmusteri', 'appleri', 'lantgard',
-  'must', 'appel', 'apple', 'frukt', 'tradgard', 'butik', 'gardsbutik',
-  'vingard', 'bryggeri', 'mejeri', 'bigard', 'honung', 'honungsbin',
-  'mat', 'gron', 'grona', 'ekologiska', 'ekologisk',
-];
-
-const GENERIC = new Set([...CATEGORY_WORDS, ...MODIFIERS]);
-const ORT_STOP = new Set([...MODIFIERS, 'st']);
-
-// NFKD + combining-mark strip already folds å/ä→a and ö→o; an explicit map
-// would only be a second, permanently incomplete copy of the same rule.
-const normalize = s => s.toLowerCase()
-  .normalize('NFKD').replace(/[̀-ͯ]/g, '')
-  .replace(/\b(ab|hb|och|and|the|pa|i)\b/g, ' ')
-  .replace(/[^a-z0-9]+/g, ' ').trim().replace(/\s+/g, ' ');
-
-// The genitive -s is everywhere in these names and is never the difference
-// between two businesses: the catalog's "Äppelboden Musteri" and the site's
-// "Äppelbodens Musteri" are one place.
-const stem = t => (t.length > 4 && t.endsWith('s') ? t.slice(0, -1) : t);
-
-const distinctiveTokens = normalized =>
-  new Set(normalized.split(' ').map(stem).filter(t => t.length > 2 && !GENERIC.has(t)));
 
 /**
  * A lead counts as already-known only on a strong signal: identical normalized
@@ -217,14 +199,14 @@ function findExisting(lead, catalog, byName) {
   const identifying = [...distinctiveTokens(leadNorm)].filter(t => !ortWords.has(t));
   if (identifying.length === 0) return null;
 
-  const ortSignals = [...ortWords].filter(w => w.length > 2 && !ORT_STOP.has(w));
+  const signals = ortSignals(leadOrt);
 
   let fallback = null;
   for (const farm of catalog) {
     const shared = identifying.filter(t => farm.tokens.has(t));
     if (shared.length === 0) continue;
 
-    if (ortSignals.some(w => farm.placeNorm.includes(w))) {
+    if (signals.some(w => farm.placeNorm.includes(w))) {
       return { farm, confidence: 'name+town' };
     }
     if (!fallback && shared.length === identifying.length) {
@@ -466,4 +448,11 @@ async function main() {
   printSummary(report, args.out, mdPath);
 }
 
-main().catch(err => { console.error(err.message); process.exit(1); });
+if (require.main === module) {
+  main().catch(err => { console.error(err.message); process.exit(1); });
+}
+
+// The fetcher and the two page parsers are exported for enrich-leads.js, which
+// re-visits individual listing pages for the postal address. Same site, same
+// politeness rules, same empty-200 retry — worth sharing rather than copying.
+module.exports = { fetchText, visibleLines, parseListingPage, parseCountyPage, COVERED_COUNTIES };

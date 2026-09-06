@@ -17,6 +17,14 @@
  *   node scripts/scrape-places.js --terms gårdsbutik,självplock
  *   node scripts/scrape-places.js --out data/tmp/my-run.json
  *
+ * --queries <leads.json> switches from the county grid to targeted lookup:
+ * instead of "what is near this point", it asks "where is this named place",
+ * for a list we already believe exists (see musterier-leads.js). The result's
+ * own name must agree with the name asked for, or the lead is recorded as
+ * unresolved instead of imported as the wrong business. Same downstream path.
+ *   node scripts/scrape-places.js --queries data/tmp/musterier-leads-prod.json \
+ *     --out data/tmp/musteri-lookup.json --counties Blekinge
+ *
  * Interrupted runs resume: progress is saved after every county centre, and a
  * <out>-done-counties.json marker skips finished centres on the next start.
  *
@@ -28,6 +36,7 @@
 const fs = require('fs');
 const path = require('path');
 const { assess, SKIP_TYPES } = require('./farm-relevance');
+const { nameMatch } = require('./name-match');
 const {
   SEARCH_TERMS, COUNTY_POINTS, COUNTY_KEYWORDS, KOMMUN_LIST, DEFAULT_SCRAPE_OUT,
 } = require('./scrape-config');
@@ -55,11 +64,12 @@ const SLEEP_MS = 300;   // between API calls to avoid rate limits
 // ── CLI args ──────────────────────────────────────────────────────────────────
 
 function parseArgs(argv) {
-  const args = { out: DEFAULT_OUT, counties: null, terms: null };
+  const args = { out: DEFAULT_OUT, counties: null, terms: null, queries: null };
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--out') args.out = path.resolve(argv[++i]);
     else if (argv[i] === '--counties') args.counties = argv[++i].split(',').map(s => s.trim());
     else if (argv[i] === '--terms') args.terms = argv[++i].split(',').map(s => s.trim());
+    else if (argv[i] === '--queries') args.queries = path.resolve(argv[++i]);
     else { console.error(`Unknown argument: ${argv[i]}`); process.exit(1); }
   }
   return args;
@@ -91,24 +101,43 @@ async function apiGet(base, params) {
 // set. These are still name-based guesses — stage 3 replaces them with what
 // the farm's own website says.
 
+// A whole-word test that understands åäö. `\b` treats them as non-word
+// characters, which both breaks patterns starting with one and lets patterns
+// starting with an ASCII letter match inside a Swedish word.
+const SV_LETTER = 'a-zà-öø-ÿ';
+const SV = (stem, suffixes = '') => new RegExp(
+  `(?<![${SV_LETTER}])${stem}${suffixes ? `(?:${suffixes})?` : ''}(?![${SV_LETTER}])`
+);
+
 function categorizeProducts(text) {
   const t = (text || '').toLowerCase();
   const products = [];
   if (/vin\b|vingård|vingard|vineri/.test(t)) products.push('vin');
   if (/musteri|äppelmust|\bmust\b/.test(t)) products.push('must');
   if (/cider|cideri/.test(t)) products.push('cider');
-  if (/\böl\b|bryggeri/.test(t)) products.push('öl');
+  // \b is ASCII-only in JS, so å/ä/ö are not word characters and \böl\b can
+  // never match anything — the öl tag was unreachable through this path. SV()
+  // builds the boundary out of the Swedish alphabet instead.
+  if (SV('öl') .test(t) || /bryggeri/.test(t)) products.push('öl');
   if (/mjöd/.test(t)) products.push('mjöd');
   if (/sprit|destille|whisky|gin\b|vodka|aquavit/.test(t)) products.push('sprit');
-  if (/mejeri|ost\b|mjölk|yoghurt|smör|gårdsmejeri/.test(t)) products.push('mejeri');
-  if (/kött|lamm|nöt|gris|chark|korv|vilt|får/.test(t)) products.push('kött');
+  // Swedish makes bare substrings dangerous here: these patterns are anchored
+  // because unanchored ones matched inside ordinary words. Real misfires found
+  // while importing musterier — "man FÅR alltid must" tagged kött, "RÄKna med"
+  // tagged fisk, "lÄGGa" tagged ägg, "kOSTnad" tagged mejeri, "nÖTter" tagged
+  // kött, and "FRUKTansvärd" tagged frukt. Compounds are safer than stems.
+  if (/mejeri|ysteri|mjölk|yoghurt/.test(t) || SV('ost', 'ar|en|arna').test(t) || SV('smör').test(t)) products.push('mejeri');
+  if (/fårkött|lammkött|nötkött|nötkreatur|chark|charkuteri|viltkött|vildsvin/.test(t)
+      || SV('kött').test(t) || SV('lamm').test(t) || SV('gris', 'ar').test(t) || SV('korv', 'ar').test(t)) products.push('kött');
   if (/honung|bigård|bivax|biodling/.test(t)) products.push('honung');
   if (/grönsak|potatis|odling|trädgård|odlare|självplock|ekologisk|närodlat/.test(t)) products.push('grönsaker');
   if (/bröd|bakat|bakverk|bageri/.test(t)) products.push('bakat');
-  if (/fisk|lax|sill|räk/.test(t)) products.push('fisk');
-  if (/frukt|äpple|päron|plommon|fruktodling/.test(t)) products.push('frukt');
-  if (/bär|jordgubb|hallon|blåbär|bärodling/.test(t)) products.push('bär');
-  if (/ägg/.test(t)) products.push('ägg');
+  if (/fiskrökeri|rökt lax|räkor/.test(t)
+      || SV('fisk', 'en|ar|e').test(t) || SV('lax').test(t) || SV('sill').test(t)) products.push('fisk');
+  if (/fruktodling|äpplen|päron|plommon|körsbär/.test(t)
+      || SV('frukt', 'en').test(t) || SV('äpple', 'n|t').test(t)) products.push('frukt');
+  if (/bärodling|jordgubb|hallon|blåbär|vinbär|krusbär/.test(t) || SV('bär', 'en').test(t)) products.push('bär');
+  if (/äggproduktion|värphöns/.test(t) || SV('ägg', 'en|et').test(t)) products.push('ägg');
   if (products.length === 0) products.push('annat');
   return products;
 }
@@ -249,6 +278,115 @@ function saveProgress(outFile, seen) {
   fs.writeFileSync(outFile, JSON.stringify(sortedRows(seen), null, 2));
 }
 
+// ── Targeted lookup (--queries) ───────────────────────────────────────────────
+// The grid mode asks "what farms are near this point?". This mode asks "where
+// is THIS place?", for a list of names we already believe exist — today, the
+// musterier.se leads from musterier-leads.js.
+//
+// The difference that matters: a targeted query always returns *something*, and
+// Google is happy to answer "Norbys Gårdsmusteri, Uppsala" with an unrelated
+// business in Uppsala. So the result's own name has to agree with the name we
+// asked for (nameMatch), or the lead is recorded unresolved rather than
+// imported as the wrong farm. Everything downstream — relevance, the website
+// gate, product tagging — is the same code the grid mode feeds.
+
+function readLeads(file) {
+  const parsed = JSON.parse(fs.readFileSync(file, 'utf8'));
+  const rows = Array.isArray(parsed) ? parsed : parsed.leads || [];
+  return rows.filter(l => l.name && !l.existing);
+}
+
+async function lookupLead(lead, point) {
+  const query = [lead.name, lead.ort].filter(Boolean).join(', ');
+  const data = await textSearch(query, point.lat, point.lng, null);
+  if (!data) return { status: 'no-response' };
+  if (data.status === 'REQUEST_DENIED') {
+    console.error('  API key rejected:', data.error_message);
+    process.exit(1);
+  }
+  if (data.status === 'ZERO_RESULTS') return { status: 'zero-results' };
+  if (data.status !== 'OK') return { status: data.status };
+
+  for (const r of (data.results || []).slice(0, 5)) {
+    const how = nameMatch(lead.name, r.name || '', lead.ort);
+    if (!how) continue;
+    const pre = preFilter(r);
+    if (!pre.keep) return { status: 'prefilter-reject', reason: pre.reason, place: r };
+    return { status: 'matched', place: r, how };
+  }
+  const top = (data.results || [])[0];
+  return { status: 'name-mismatch', got: top ? top.name : '' };
+}
+
+async function runQueries(args) {
+  const leads = readLeads(args.queries);
+  const wanted = args.counties
+    ? leads.filter(l => args.counties.includes(l.lan))
+    : leads;
+  console.log(`${wanted.length} leads to look up (of ${leads.length} in ${path.basename(args.queries)})`);
+
+  const byCounty = new Map(COUNTY_POINTS.map(p => [p.name, p]));
+  const fallbackPoint = byCounty.get('Stockholm') || COUNTY_POINTS[0];
+
+  const seen = new Map();
+  const noWebsite = new Map();
+  const unresolved = [];
+  const outFile = args.out;
+  const noWebsiteFile = outFile.replace(/\.json$/, '-no-website.json');
+  const unresolvedFile = outFile.replace(/\.json$/, '-unresolved.json');
+
+  // Resume: a rerun should not pay again for leads already looked up.
+  const done = new Set();
+  if (fs.existsSync(outFile)) {
+    for (const f of JSON.parse(fs.readFileSync(outFile, 'utf8'))) {
+      seen.set(f.place_id, f);
+      if (f.leadName) done.add(f.leadName);
+    }
+    console.log(`[Resume] ${seen.size} already resolved`);
+  }
+
+  let n = 0;
+  for (const lead of wanted) {
+    n++;
+    if (done.has(lead.name)) continue;
+    await sleep(SLEEP_MS);
+
+    const point = byCounty.get(lead.lan) || fallbackPoint;
+    const res = await lookupLead(lead, point);
+
+    if (res.status !== 'matched') {
+      unresolved.push({ ...lead, status: res.status, got: res.got, reason: res.reason });
+      console.log(`  ${String(n).padStart(3)}. ${lead.name} — ${res.status}${res.got ? ` (got "${res.got}")` : ''}`);
+      continue;
+    }
+
+    await sleep(SLEEP_MS);
+    const det = await placeDetails(res.place.place_id);
+    const detail = det?.result || {};
+    const row = { ...buildRow(res.place, detail, 'musterier.se-lead', lead.lan), leadName: lead.name, leadOrt: lead.ort };
+
+    if (!detail.website) {
+      noWebsite.set(res.place.place_id, row);
+      console.log(`  ${String(n).padStart(3)}. ${lead.name} — no website`);
+    } else {
+      seen.set(res.place.place_id, row);
+      const kind = row.website ? 'site' : (row.facebook ? 'facebook' : 'instagram');
+      console.log(`  ${String(n).padStart(3)}. ${lead.name} → ${row.name} [${kind}]`);
+    }
+
+    saveProgress(outFile, seen);
+    saveProgress(noWebsiteFile, noWebsite);
+    fs.writeFileSync(unresolvedFile, JSON.stringify(unresolved, null, 2));
+  }
+
+  console.log('\n── Summary ──────────────────────────────────────────────────');
+  console.log(`Resolved with a website or social page : ${seen.size}`);
+  console.log(`Resolved but no contactable page       : ${noWebsite.size}`);
+  console.log(`Unresolved                             : ${unresolved.length}`);
+  console.log(`\nSaved to ${outFile}`);
+  if (unresolved.length) console.log(`Unresolved leads in ${path.basename(unresolvedFile)}`);
+}
+
 async function main() {
   if (!API_KEY) {
     console.error('ERROR: GOOGLE_PLACES_API_KEY not set in .env.local');
@@ -256,6 +394,12 @@ async function main() {
   }
 
   const args = parseArgs(process.argv.slice(2));
+
+  if (args.queries) {
+    fs.mkdirSync(path.dirname(args.out), { recursive: true });
+    return runQueries(args);
+  }
+
   const points = COUNTY_POINTS.filter(p => !args.counties || args.counties.includes(p.name));
   const terms  = SEARCH_TERMS.filter(t => !args.terms || args.terms.includes(t));
   if (!points.length) { console.error(`No county matches ${args.counties}`); process.exit(1); }
