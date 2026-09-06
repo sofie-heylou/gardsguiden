@@ -147,6 +147,11 @@ function initSchema(db: Database.Database): void {
   if (!columnExists(db, "farms", "user_flag_count")) {
     db.exec(`ALTER TABLE farms ADD COLUMN user_flag_count INTEGER NOT NULL DEFAULT 0`);
   }
+  // Takes in a visitor's own fruit and presses it — a service, not a product,
+  // so it belongs with the badges rather than in `products`.
+  if (!columnExists(db, "farms", "legomustning")) {
+    db.exec(`ALTER TABLE farms ADD COLUMN legomustning INTEGER NOT NULL DEFAULT 0`);
+  }
   if (!columnExists(db, "farm_submissions", "facebook")) {
     db.exec(`ALTER TABLE farm_submissions ADD COLUMN facebook TEXT`);
   }
@@ -204,7 +209,7 @@ function initSchema(db: Database.Database): void {
         const SYNC_COLS = [
           "id", "name", "description", "address", "kommun", "lan", "lat", "lng",
           "website", "facebook", "instagram", "phone", "email", "products", "onSiteSales", "tastingRoom",
-          "gardsförsäljningLicense", "isArchipelago", "openingHours", "season", "source",
+          "gardsförsäljningLicense", "isArchipelago", "legomustning", "openingHours", "season", "source",
         ] as const;
         const placeholders = SYNC_COLS.map(() => "?").join(", ");
         const insert = db.prepare(

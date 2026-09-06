@@ -25,6 +25,7 @@ interface FarmJson {
   tastingRoom: boolean;
   gardsförsäljningLicense: boolean;
   isArchipelago: boolean;
+  legomustning: boolean;
   openingHours: string;
   season: string;
   source: string;
@@ -61,6 +62,7 @@ db.exec(`
     tastingRoom INTEGER NOT NULL,
     gardsförsäljningLicense INTEGER NOT NULL,
     isArchipelago INTEGER NOT NULL,
+    legomustning INTEGER NOT NULL,
     openingHours TEXT,
     season TEXT,
     source TEXT
@@ -71,12 +73,12 @@ const insert = db.prepare(`
   INSERT INTO farms (
     id, name, description, address, kommun, lan, lat, lng,
     website, facebook, instagram, phone, email, products,
-    onSiteSales, tastingRoom, gardsförsäljningLicense, isArchipelago,
+    onSiteSales, tastingRoom, gardsförsäljningLicense, isArchipelago, legomustning,
     openingHours, season, source
   ) VALUES (
     @id, @name, @description, @address, @kommun, @lan, @lat, @lng,
     @website, @facebook, @instagram, @phone, @email, @products,
-    @onSiteSales, @tastingRoom, @gardsförsäljningLicense, @isArchipelago,
+    @onSiteSales, @tastingRoom, @gardsförsäljningLicense, @isArchipelago, @legomustning,
     @openingHours, @season, @source
   )
 `);
@@ -92,6 +94,7 @@ const insertMany = db.transaction((rows: FarmJson[]) => {
       tastingRoom: farm.tastingRoom ? 1 : 0,
       gardsförsäljningLicense: farm.gardsförsäljningLicense ? 1 : 0,
       isArchipelago: farm.isArchipelago ? 1 : 0,
+      legomustning: farm.legomustning ? 1 : 0,
     });
   }
 });

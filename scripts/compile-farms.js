@@ -130,6 +130,7 @@ function normalizeFarm(raw, index) {
     tastingRoom: !!raw.tastingRoom,
     gardsförsäljningLicense: !!raw.gardsförsäljningLicense,
     isArchipelago: !!raw.isArchipelago,
+    legomustning: !!raw.legomustning,
     openingHours: (raw.openingHours || '').trim(),
     season: (raw.season || '').trim(),
     source: raw.source || 'unknown',
@@ -166,6 +167,7 @@ function deduplicateFarms(farms) {
         tastingRoom: existing.tastingRoom || farm.tastingRoom,
         gardsförsäljningLicense: existing.gardsförsäljningLicense || farm.gardsförsäljningLicense,
         isArchipelago: existing.isArchipelago || farm.isArchipelago,
+        legomustning: existing.legomustning || farm.legomustning,
         season: existing.season || farm.season,
       });
     }

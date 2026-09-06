@@ -5,6 +5,7 @@ import {
   GlassWater,
   BadgeCheck,
   Sailboat,
+  Apple,
 } from "lucide-react";
 import { getFarmById, getAllFarms } from "../../../lib/farms";
 import { SLUG_TO_COUNTY, COUNTY_TO_SLUG, farmPath } from "../../../lib/counties";
@@ -173,6 +174,7 @@ export default async function FarmDetailPage({ params }: Props) {
     farm.onSiteSales            && { label: "Gårdsförsäljning",         icon: ShoppingBag },
     farm.gardsförsäljningLicense && { label: "Gårdsförsäljningslicens", icon: BadgeCheck  },
     farm.isArchipelago          && { label: "Skärgård",                 icon: Sailboat    },
+    farm.legomustning           && { label: "Mustar din frukt",         icon: Apple       },
   ].filter(Boolean) as { label: string; icon: React.ElementType }[];
 
   const visibleProducts = farm.products.filter((p) => p !== "annat");

@@ -19,6 +19,7 @@ interface FarmRow {
   tastingRoom: number;
   gardsförsäljningLicense: number;
   isArchipelago: number;
+  legomustning: number;
   openingHours: string;
   season: string;
   source: string;
@@ -40,6 +41,7 @@ function rowToFarm(row: FarmRow): Farm {
     tastingRoom: row.tastingRoom === 1,
     gardsförsäljningLicense: row.gardsförsäljningLicense === 1,
     isArchipelago: row.isArchipelago === 1,
+    legomustning: row.legomustning === 1,
     facebook: row.facebook ?? null,
     instagram: row.instagram ?? null,
   };

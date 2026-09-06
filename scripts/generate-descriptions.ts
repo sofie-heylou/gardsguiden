@@ -33,6 +33,7 @@ interface FarmRow {
   tastingRoom: number;
   gardsförsäljningLicense: number;
   isArchipelago: number;
+  legomustning: number;
   openingHours: string | null;
   season: string | null;
 }
@@ -56,6 +57,7 @@ function buildPrompt(farm: FarmRow): string {
     farm.tastingRoom          ? "provsmakning"                : "",
     farm.gardsförsäljningLicense ? "gårdsförsäljningslicens" : "",
     farm.isArchipelago        ? "skärgårdsläge"               : "",
+    farm.legomustning         ? "mustar kundens egen frukt"   : "",
   ].filter(Boolean);
 
   const lines = [
@@ -117,7 +119,7 @@ async function main() {
   const farms = db.prepare(`
     SELECT
       id, name, kommun, lan, products,
-      onSiteSales, tastingRoom, "gardsförsäljningLicense", isArchipelago,
+      onSiteSales, tastingRoom, "gardsförsäljningLicense", isArchipelago, legomustning,
       openingHours, season
     FROM farms
     WHERE (description IS NULL OR description = '')

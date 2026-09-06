@@ -1,0 +1,290 @@
+[
+  {
+    "id": "aftonmora-friesians-vingard",
+    "name": "Aftonmora Friesians & Vingård",
+    "products": [
+      "vin"
+    ],
+    "tastingRoom": 1
+  },
+  {
+    "id": "annebergs-gard",
+    "name": "Annebergs Gård",
+    "products": [
+      "vin"
+    ],
+    "tastingRoom": 1
+  },
+  {
+    "id": "annebergs-vingard",
+    "name": "Annebergs Vingård",
+    "products": [
+      "vin"
+    ],
+    "tastingRoom": 1
+  },
+  {
+    "id": "blacksta-vingard",
+    "name": "Blacksta Vingård",
+    "products": [
+      "vin"
+    ],
+    "tastingRoom": 1
+  },
+  {
+    "id": "cehlin-vingard",
+    "name": "Cehlin Vingård",
+    "products": [
+      "vin"
+    ],
+    "tastingRoom": 1
+  },
+  {
+    "id": "domain-sanana",
+    "name": "Domain Sånana",
+    "products": [
+      "vin"
+    ],
+    "tastingRoom": 1
+  },
+  {
+    "id": "ekesakra-vingard-osterlenvin",
+    "name": "Ekesåkra Vingård Österlenvin",
+    "products": [
+      "vin"
+    ],
+    "tastingRoom": 1
+  },
+  {
+    "id": "flyinge-vingard",
+    "name": "Flyinge Vingård",
+    "products": [
+      "vin"
+    ],
+    "tastingRoom": 1
+  },
+  {
+    "id": "hallakra-gard",
+    "name": "Hallåkra Gård",
+    "products": [
+      "vin"
+    ],
+    "tastingRoom": 1
+  },
+  {
+    "id": "hobjersgarden",
+    "name": "Hobjersgården",
+    "products": [
+      "vin"
+    ],
+    "tastingRoom": 1
+  },
+  {
+    "id": "hallakra-vingard",
+    "name": "Hällåkra Vingård",
+    "products": [
+      "vin"
+    ],
+    "tastingRoom": 1
+  },
+  {
+    "id": "hogberga-vinfabrik",
+    "name": "Högberga Vinfabrik",
+    "products": [
+      "vin"
+    ],
+    "tastingRoom": 1
+  },
+  {
+    "id": "kullabergs-vingard",
+    "name": "Kullabergs Vingård",
+    "products": [
+      "vin"
+    ],
+    "tastingRoom": 1
+  },
+  {
+    "id": "kopingsbergs-vingard",
+    "name": "Köpingsbergs vingård",
+    "products": [
+      "vin"
+    ],
+    "tastingRoom": 1
+  },
+  {
+    "id": "ljungbyholms-vingard",
+    "name": "Ljungbyholms Vingård",
+    "products": [
+      "vin"
+    ],
+    "tastingRoom": 1
+  },
+  {
+    "id": "lottenlund-estate-events-ab",
+    "name": "Lottenlund Estate Events AB",
+    "products": [
+      "vin"
+    ],
+    "tastingRoom": 1
+  },
+  {
+    "id": "luna-vingard-restaurang-i-lysekil-fd-luna-caf",
+    "name": "Luna Vingård & Restaurang i Lysekil (fd. Luna Café)",
+    "products": [
+      "vin"
+    ],
+    "tastingRoom": 1
+  },
+  {
+    "id": "langmyre-vineri-vineriet",
+    "name": "Långmyre Vineri - Vineriet",
+    "products": [
+      "vin"
+    ],
+    "tastingRoom": 1
+  },
+  {
+    "id": "langmyre-vineri-vingarden",
+    "name": "Långmyre Vineri - Vingården",
+    "products": [
+      "vin"
+    ],
+    "tastingRoom": 1
+  },
+  {
+    "id": "restaurang-logen",
+    "name": "Restaurang Logen",
+    "products": [
+      "vin"
+    ],
+    "tastingRoom": 1
+  },
+  {
+    "id": "restaurang-ang",
+    "name": "Restaurang ÄNG",
+    "products": [
+      "vin"
+    ],
+    "tastingRoom": 1
+  },
+  {
+    "id": "skafto-vingard",
+    "name": "Skaftö Vingård",
+    "products": [
+      "vin"
+    ],
+    "tastingRoom": 1
+  },
+  {
+    "id": "skepparps-vingard",
+    "name": "Skepparps Vingård",
+    "products": [
+      "vin"
+    ],
+    "tastingRoom": 1
+  },
+  {
+    "id": "stora-horns-vingard-2",
+    "name": "Stora horns vingård",
+    "products": [
+      "vin"
+    ],
+    "tastingRoom": 1
+  },
+  {
+    "id": "thora-vingard",
+    "name": "Thora Vingård",
+    "products": [
+      "vin"
+    ],
+    "tastingRoom": 1
+  },
+  {
+    "id": "thoragards-gardsbutik",
+    "name": "Thoragårds Gårdsbutik",
+    "products": [
+      "vin"
+    ],
+    "tastingRoom": 1
+  },
+  {
+    "id": "tosterups-gard-ab",
+    "name": "Tosterups Gård AB",
+    "products": [
+      "vin"
+    ],
+    "tastingRoom": 1
+  },
+  {
+    "id": "vejby-vingard",
+    "name": "Vejby Vingård",
+    "products": [
+      "vin"
+    ],
+    "tastingRoom": 1
+  },
+  {
+    "id": "vingarden-stora-borakra",
+    "name": "Vingården Stora Boråkra",
+    "products": [
+      "vin"
+    ],
+    "tastingRoom": 1
+  },
+  {
+    "id": "vingarden-tva-liljor-2",
+    "name": "Vingården Två Liljor",
+    "products": [
+      "vin"
+    ],
+    "tastingRoom": 1
+  },
+  {
+    "id": "vingarden-i-klagshamn",
+    "name": "Vingården i Klagshamn",
+    "products": [
+      "vin"
+    ],
+    "tastingRoom": 1
+  },
+  {
+    "id": "vinland",
+    "name": "Vinland",
+    "products": [
+      "vin"
+    ],
+    "tastingRoom": 1
+  },
+  {
+    "id": "wannborga-branneri-vingard",
+    "name": "Wannborga Bränneri & Vingård",
+    "products": [
+      "vin"
+    ],
+    "tastingRoom": 1
+  },
+  {
+    "id": "astad-vingard",
+    "name": "Ästad Vingård",
+    "products": [
+      "vin"
+    ],
+    "tastingRoom": 1
+  },
+  {
+    "id": "ahus-vingard",
+    "name": "Åhus Vingård",
+    "products": [
+      "vin"
+    ],
+    "tastingRoom": 1
+  },
+  {
+    "id": "osterlens-vingardspark-tygea",
+    "name": "Österlens Vingårdspark Tygeå",
+    "products": [
+      "vin"
+    ],
+    "tastingRoom": 1
+  }
+]

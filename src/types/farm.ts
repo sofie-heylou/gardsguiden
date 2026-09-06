@@ -15,6 +15,8 @@ export interface Farm {
   tastingRoom: boolean;
   gardsförsäljningLicense: boolean;
   isArchipelago: boolean;
+  /** Presses fruit the visitor brings in (legomustning). */
+  legomustning: boolean;
   openingHours: string;
   season: string;
   source: string;

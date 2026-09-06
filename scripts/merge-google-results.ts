@@ -24,6 +24,7 @@ interface Farm {
   tastingRoom: boolean;
   gardsförsäljningLicense: boolean;
   isArchipelago: boolean;
+  legomustning: boolean;
   openingHours: string;
   season: string;
   source: string;
@@ -85,6 +86,7 @@ function toFarm(g: Farm, id: string): Farm {
     tastingRoom:            g.tastingRoom ?? false,
     gardsförsäljningLicense: g.gardsförsäljningLicense ?? false,
     isArchipelago:          g.isArchipelago ?? false,
+    legomustning:           g.legomustning ?? false,
     openingHours: g.openingHours || "",
     season:       g.season || "",
     source:       g.source,
