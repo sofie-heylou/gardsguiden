@@ -306,5 +306,7 @@ if (require.main === module) {
 }
 
 // auditFarm powers the stage-4 intake gate in filter-google-results.ts;
-// fetchPage is exported for tooling that wants the same cache.
-module.exports = { auditFarm, fetchPage };
+// fetchPage is exported for tooling that wants the same cache. decodeEntities
+// goes with them so scrapers of Swedish pages share one entity table — a
+// second copy is a second chance to forget &aring; and hand back "Appelboden".
+module.exports = { auditFarm, fetchPage, decodeEntities };
