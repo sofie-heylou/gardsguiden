@@ -11,23 +11,27 @@ desktop in the in-app browser; no new console errors.
 ## Stage 1 — fixes to today's form (branch `lagg-till-stage1`)
 
 1. **`src/lib/links.ts` + `src/lib/links.test.ts`** — `normalizeWebsite`,
-   `normalizeInstagram`, `normalizeFacebook`, `classifyLink` exactly as spec
-   §6.2. Add `"test": "tsx --test \"src/**/*.test.ts\""` to `package.json`.
-2. **`src/lib/submitProducts.ts`** — `SUBMIT_PRODUCTS` (grouped, spec §4.1
-   step 3) and `SUBMIT_PRODUCT_VALUES` (flat, derived).
-3. **`src/app/api/farms/submit/route.ts`** — normalise the three links (400
-   "Ogiltig länk: …" on a non-empty value that cannot be normalised; the
-   "at least one link" check runs on the normalised values); keep only known
-   product values; everything else unchanged.
+   `normalizeInstagram`, `normalizeFacebook`, `normalizeLinks`, `hasAnyLink`
+   as spec §6.2 (`classifyLink` comes with the tip form in stage 3). Add
+   `"test": "tsx --test \"src/**/*.test.ts\""` to `package.json`.
+2. **`src/lib/submitProducts.ts`** — `SUBMIT_PRODUCT_LIST` derived from
+   `CATEGORIES`, `knownProducts()`.
+3. **`src/app/api/farms/submit/route.ts`** — length caps first (`MAX_LINK`),
+   then normalise the three links (400 with the field's `LINK_ERRORS` text);
+   the "at least one link" check runs on the normalised values
+   (`NO_LINK_ERROR`); keep only known product values, each once.
 4. **`src/app/lagg-till/SubmitFarmForm.tsx`** — link boxes `type="text"`
    (website `inputMode="url"`) with the new placeholders/help; normalise
    before send and show the per-field message when a value cannot be
    normalised; the "add a link" error rendered inside the "Hitta er online"
    section with `scrollIntoView({ block: "center" })` and focus on the website
    box; description `maxLength=1000` + counter; product chips from
-   `SUBMIT_PRODUCT_VALUES` (adds Självplock).
-5. **`src/app/lagg-till/page.tsx`** — `pb-28`.
-6. **`src/lib/ui.ts`** — `text-base sm:text-sm` in both input classes.
+   `SUBMIT_PRODUCT_LIST` (adds Självplock).
+5. **`src/lib/bottomNav.ts`** — `hasBottomNav` / `bottomEdgeFree`; `BottomNav`
+   and `CookieConsentBanner` read it, so the pill drops to `bottom-3` on
+   `/lagg-till` instead of covering the Send button.
+6. **`src/lib/ui.ts`** — `text-base sm:text-sm` and the `aria-invalid:` red
+   border in both input classes.
 7. Verify: unit tests; curl the endpoint (bad link → 400, `@handle` → stored
    as the Instagram URL, unknown product dropped); browser: type `ljungbacken.se`
    and `@x` and submit path reaches the server; error placement; counter;

@@ -4,7 +4,9 @@ import { generateId, isValidEmail } from "../../../../lib/utils";
 import { sendEmail, emailHtml, table, row, ADMIN_EMAIL } from "../../../../lib/email";
 import { visitorHash } from "../../../../lib/visitor";
 import { requestAlertSlot, ALERT_CAP_NOTICE } from "../../../../lib/alertBudget";
-import { MAX_EMAIL } from "../../../../lib/limits";
+import { MAX_DESCRIPTION, MAX_EMAIL, MAX_LINK } from "../../../../lib/limits";
+import { LINK_ERRORS, NO_LINK_ERROR, hasAnyLink, normalizeLinks } from "../../../../lib/links";
+import { knownProducts } from "../../../../lib/submitProducts";
 import { submissionModerationButtons } from "../../../../lib/moderationEmail";
 
 export const dynamic = "force-dynamic";
@@ -52,26 +54,31 @@ export async function POST(req: NextRequest) {
   if (lan && !VALID_LAN.includes(lan as string)) {
     return NextResponse.json({ error: "Ogiltigt län" }, { status: 400 });
   }
+  if (typeof description === "string" && description.length > MAX_DESCRIPTION) {
+    return NextResponse.json({ error: `Beskrivningen är för lång (max ${MAX_DESCRIPTION} tecken)` }, { status: 400 });
+  }
+  // Length first: the link normalisers run on whatever arrives, so they must
+  // never see more than a form field's worth.
+  const tooLong = [address, kommun, phone, openingHours, season, website, facebook, instagram]
+    .some((v) => typeof v === "string" && v.length > MAX_LINK);
+  if (tooLong) {
+    return NextResponse.json({ error: `Ett av fälten är för långt (max ${MAX_LINK} tecken)` }, { status: 400 });
+  }
+  // The form tidies links before sending ("ljungbacken.se", "@handle"); doing
+  // it again here means a hand-made request cannot store anything the form
+  // would have refused, and the presence check below sees the tidied values.
+  const links = normalizeLinks({ website, instagram, facebook });
+  if (!links.ok) {
+    return NextResponse.json({ error: LINK_ERRORS[links.field] }, { status: 400 });
+  }
   // Farms without any online presence never pass the public visibility gate
   // (getFilteredFarms requires website OR facebook OR instagram) — reject up
   // front instead of approving a farm that can never be shown.
-  const hasOnlinePresence = [website, facebook, instagram]
-    .some((v) => typeof v === "string" && v.trim());
-  if (!hasOnlinePresence) {
-    return NextResponse.json(
-      { error: "Ange minst en webbplats, Facebook- eller Instagram-sida" },
-      { status: 400 }
-    );
-  }
-  if (typeof description === "string" && description.length > 2000) {
-    return NextResponse.json({ error: "Beskrivningen är för lång (max 2000 tecken)" }, { status: 400 });
-  }
-  const tooLong = [address, kommun, phone, website, openingHours, season, facebook, instagram]
-    .some((v) => typeof v === "string" && v.length > 500);
-  if (tooLong) {
-    return NextResponse.json({ error: "Ett av fälten är för långt (max 500 tecken)" }, { status: 400 });
+  if (!hasAnyLink(links.values)) {
+    return NextResponse.json({ error: NO_LINK_ERROR }, { status: 400 });
   }
 
+  const acceptedProducts = knownProducts(products);
   const db = getDb();
   const submissionId = generateId();
 
@@ -107,23 +114,21 @@ export async function POST(req: NextRequest) {
     typeof address     === "string" ? address.trim()     : null,
     typeof kommun      === "string" ? kommun.trim()      : null,
     typeof lan         === "string" ? lan.trim()         : null,
-    typeof website     === "string" ? website.trim()     : null,
+    links.values.website || null,
     typeof phone       === "string" ? phone.trim()       : null,
     typeof email       === "string" ? email.trim()       : null,
-    Array.isArray(products) ? JSON.stringify(products)   : null,
+    JSON.stringify(acceptedProducts),
     typeof openingHours === "string" ? openingHours.trim() : null,
     typeof season      === "string" ? season.trim()      : null,
     onSiteSales  ? 1 : 0,
     tastingRoom  ? 1 : 0,
-    typeof facebook    === "string" && facebook.trim()   ? facebook.trim()    : null,
-    typeof instagram   === "string" && instagram.trim()  ? instagram.trim()   : null,
+    links.values.facebook  || null,
+    links.values.instagram || null,
     (submittedEmail as string).trim(),
     visitor,
     isFiniteCoord(lat, 90) ? (lat as number) : null,
     isFiniteCoord(lng, 180) ? (lng as number) : null,
   );
-
-  const productList = Array.isArray(products) ? (products as string[]).join(", ") : null;
 
   const decision = requestAlertSlot();
   if (decision === "suppress") return NextResponse.json({ ok: true });
@@ -136,12 +141,12 @@ export async function POST(req: NextRequest) {
       ${table(
         row("Gårdsnamn",  (name as string).trim()) +
         row("Inlämnad av", (submittedEmail as string).trim()) +
-        row("Webbplats",  typeof website === "string" ? website.trim() : null) +
+        row("Webbplats",  links.values.website || null) +
         row("Adress",     typeof address === "string" ? address.trim() : null) +
         row("Kommun",     typeof kommun  === "string" ? kommun.trim()  : null) +
         row("Län",        typeof lan     === "string" ? lan.trim()     : null) +
         row("Säsong",     typeof season  === "string" ? season.trim()  : null) +
-        row("Produkter",  productList)
+        row("Produkter",  acceptedProducts.join(", "))
       )}
       ${submissionModerationButtons(submissionId)}
       ${decision === "send-last" ? ALERT_CAP_NOTICE : ""}

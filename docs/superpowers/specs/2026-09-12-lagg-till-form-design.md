@@ -68,8 +68,11 @@ utan konto." Under the title: "Gratis · Inget konto behövs".
 `?tips=1` in the URL selects the tip side. Switching modes keeps each mode's
 draft. The switch is a `role="tablist"` with two `role="tab"` buttons.
 
-**Bottom padding:** the page content ends with `pb-28` so the last button is
-never under the fixed "Hantera kakor" pill (`bottom-16`, ~28 px tall).
+**Cookie pill:** the fixed "Hantera kakor" pill sits at `bottom-16` to clear
+the BottomNav bar (or the homepage sheet). On routes with a free bottom edge —
+today only `/lagg-till` — it drops to `bottom-3` (`bottomEdgeFree` in
+`src/lib/bottomNav.ts`), so it never covers the Send button. The page keeps its
+ordinary `pb-12`.
 
 ### 4.1 Owner path — five steps
 
@@ -130,8 +133,9 @@ with small group labels:
 | Drycker | Öl (`öl`), Vin (`vin`), Cider (`cider`), Must (`must`), Mjöd (`mjöd`), Sprit (`sprit`) |
 | Annat | Annat (`annat`) |
 
-The list lives in one exported constant (`SUBMIT_PRODUCTS`) used by both the
-form and the endpoint's validation.
+The accepted values are derived from `CATEGORIES` (`src/lib/submitProducts.ts`),
+so the chips, the endpoint's whitelist and the category filters cannot drift;
+the grouping above is presentation only and lives in the wizard's step 3.
 
 Two switch rows (`role="switch"`, `min-h-11`): "Gårdsförsäljning — ni säljer
 på plats" (`onSiteSales`), "Provsmakning erbjuds" (`tastingRoom`).
@@ -158,7 +162,8 @@ Sub-text: "Det här är texten besökare läser på gårdens sida. Två–fyra m
 räcker gott." Textarea, `maxLength=1000`, 6 rows, live counter "142 / 1 000
 tecken" (`aria-live="polite"`). Tips box: "Tips: vad ni odlar eller föder upp ·
 vad man kan köpa · vad som gör er gård speciell · om man kan fika, plocka själv
-eller träffa djuren." Nästa always allowed.
+eller träffa djuren." Nästa always allowed. The endpoint uses the same
+`MAX_DESCRIPTION` (1,000) — `limits.ts` exists so client and server agree.
 
 **Step 5 · Granska & skicka — "Så här kommer gården att visas"**
 
@@ -263,12 +268,14 @@ och lägger till gården om den passar." with links "Tipsa om en till gård" and
 Server rules (in order): parse JSON → `role` must be `"owner"` or `"visitor"`
 (missing = `"owner"`) → name required, ≤ 200 → owner: `submittedEmail` required
 and valid; visitor: optional but valid if present → `lan` must be in
-`COUNTY_NAMES` when present → links: each non-empty value must normalise, else
-400 "Ogiltig länk: {field}"; owner: at least one link after normalisation
-(400 "Ange minst en webbplats, Facebook- eller Instagram-sida"); visitor: no
-minimum → `products`: keep only values in `SUBMIT_PRODUCTS` → `description` ≤
-2000, `message` ≤ 1000, other text ≤ 500 → per-visitor cap: 3 rows in the last
-hour across both roles (429, same text as today) → INSERT.
+`COUNTY_NAMES` when present → `description` ≤ `MAX_DESCRIPTION` (1000),
+`message` ≤ 1000, every other text field incl. the three raw links ≤ `MAX_LINK`
+(500) — checked *before* normalising, so the normalisers never see more than a
+form field's worth → links: each non-empty value must normalise, else 400 with
+that field's `LINK_ERRORS` text (the same words the form shows); owner: at
+least one link after normalisation (400 `NO_LINK_ERROR`); visitor: no minimum →
+`products`: keep only known values, each once → per-visitor cap: 3 rows in the
+last hour across both roles (429, same text as today) → INSERT.
 
 Responses: `{ ok: true }`; errors `{ error }` with 400/429 as today.
 
@@ -289,9 +296,11 @@ src/app/lagg-till/
     ProgressBar.tsx
     fields.tsx                 Field, Switch, Chip, ErrorText, StepButtons
     useDraft.ts
-src/lib/links.ts               normalizeWebsite/Instagram/Facebook, classifyLink  (+ links.test.ts)
+src/lib/links.ts               normalizeWebsite/Instagram/Facebook, normalizeLinks, hasAnyLink;
+                               classifyLink arrives with the tip form (stage 3)   (+ links.test.ts)
 src/lib/openingHours.ts        + formatOpeningHours(hours)                         (+ openingHours.test.ts)
-src/lib/submitProducts.ts      SUBMIT_PRODUCTS (grouped) + SUBMIT_PRODUCT_VALUES
+src/lib/submitProducts.ts      SUBMIT_PRODUCT_LIST derived from CATEGORIES, knownProducts()
+src/lib/bottomNav.ts           hasBottomNav / bottomEdgeFree, read by BottomNav and the cookie pill
 scripts/submission-stats.js    baseline / follow-up numbers (node + better-sqlite3, runs over railway ssh)
 ```
 
@@ -380,7 +389,6 @@ and the old form are deleted in stage 4.
 - `src/app/musterier/page.tsx`: "Lägg till det." → `/lagg-till?tips=1`.
 - `src/lib/ui.ts`: `text-sm` → `text-base sm:text-sm` in both input classes
   (stops iOS zoom-on-focus on every public form).
-- `src/app/lagg-till/page.tsx`: `pb-28`.
 - Header/BottomNav/AddFarmCallout labels stay "Lägg till din gård".
 
 ## 7. Measurement

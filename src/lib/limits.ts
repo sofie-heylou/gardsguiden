@@ -7,6 +7,10 @@
  */
 
 export const MAX_EMAIL = 200;
+/** A farm blurb; two to four sentences is the guidance, so this is generous. */
+export const MAX_DESCRIPTION = 1000;
+/** A web address, Instagram name or Facebook page — checked before normalising. */
+export const MAX_LINK = 500;
 export const MAX_SUGGESTION_MESSAGE = 2000;
 export const MAX_CONTACT_MESSAGE = 5000;
 export const MAX_NAME = 200;

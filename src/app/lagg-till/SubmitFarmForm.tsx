@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { Loader2, Check } from "lucide-react";
 import nextDynamic from "next/dynamic";
@@ -16,37 +16,18 @@ const AddressAutofill = nextDynamic(
 import type { AddressAutofillRetrieveResponse } from "@mapbox/search-js-core";
 import { COUNTY_NAMES } from "../../lib/counties";
 import { inputCls } from "../../lib/ui";
-import { MAX_EMAIL } from "../../lib/limits";
-
-
-const ALL_PRODUCTS = [
-  { value: "kött",      label: "Kött" },
-  { value: "fisk",      label: "Fisk" },
-  { value: "mejeri",    label: "Mejeri" },
-  { value: "ost",       label: "Ost" },
-  { value: "mjölk",     label: "Mjölk" },
-  { value: "ägg",       label: "Ägg" },
-  { value: "grönsaker", label: "Grönsaker" },
-  { value: "frukt",     label: "Frukt" },
-  { value: "bär",       label: "Bär" },
-  { value: "honung",    label: "Honung" },
-  { value: "bröd",      label: "Bröd" },
-  { value: "bakat",     label: "Bakat" },
-  { value: "mjöl",      label: "Mjöl" },
-  { value: "öl",        label: "Öl" },
-  { value: "vin",       label: "Vin" },
-  { value: "cider",     label: "Cider" },
-  { value: "must",      label: "Must" },
-  { value: "mjöd",      label: "Mjöd" },
-  { value: "sprit",     label: "Sprit" },
-  { value: "annat",     label: "Annat" },
-];
+import { MAX_DESCRIPTION, MAX_EMAIL, MAX_LINK } from "../../lib/limits";
+import {
+  LINK_ERRORS, LINK_LABELS, NO_LINK_ERROR, hasAnyLink, normalizeLinks, type LinkField,
+} from "../../lib/links";
+import { SUBMIT_PRODUCT_LIST } from "../../lib/submitProducts";
 
 const TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
 
-function Field({ label, required, children }: {
+function Field({ label, required, hint, children }: {
   label: string;
   required?: boolean;
+  hint?: string;
   children: React.ReactNode;
 }) {
   return (
@@ -55,6 +36,7 @@ function Field({ label, required, children }: {
         {label}{required && <span className="text-red-400 ml-0.5">*</span>}
       </label>
       {children}
+      {hint && <p className="text-[11px] text-stone-400">{hint}</p>}
     </div>
   );
 }
@@ -86,6 +68,26 @@ export default function SubmitFarmForm() {
   const [saving,  setSaving]  = useState(false);
   const [sent,    setSent]    = useState(false);
   const [error,   setError]   = useState("");
+  // Link problems are shown inside the "Hitta er online" section, next to the
+  // boxes they are about, rather than at the bottom of a long page.  "none"
+  // means no box had a value at all.
+  const [linkError, setLinkError] = useState<LinkField | "none" | null>(null);
+  const onlineSection = useRef<HTMLElement>(null);
+  const linkInputs = useRef<Record<LinkField, HTMLInputElement | null>>({
+    website: null, instagram: null, facebook: null,
+  });
+
+  function showLinkError(field: LinkField | "none") {
+    setLinkError(field);
+    onlineSection.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    linkInputs.current[field === "none" ? "website" : field]?.focus({ preventScroll: true });
+  }
+
+  const linkFields: { field: LinkField; value: string; set: (v: string) => void; placeholder: string; hint: string }[] = [
+    { field: "website",   value: website,   set: setWebsite,   placeholder: "ljungbacken.se",           hint: "Utan https:// går bra." },
+    { field: "facebook",  value: facebook,  set: setFacebook,  placeholder: "facebook.com/ljungbacken", hint: "Sidans namn eller länk." },
+    { field: "instagram", value: instagram, set: setInstagram, placeholder: "@ljungbackensgard",        hint: "Bara namnet räcker." },
+  ];
 
   function handleAutofill(res: AddressAutofillRetrieveResponse) {
     const feature = res.features[0];
@@ -117,10 +119,16 @@ export default function SubmitFarmForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+    setLinkError(null);
+    const links = normalizeLinks({ website, instagram, facebook });
+    if (!links.ok) {
+      showLinkError(links.field);
+      return;
+    }
     // Farms without any online presence never pass the public visibility
     // gate (see getFilteredFarms) — approving one would publish nothing.
-    if (!website.trim() && !facebook.trim() && !instagram.trim()) {
-      setError("Ange minst en webbplats, Facebook- eller Instagram-sida så att besökare kan hitta gården.");
+    if (!hasAnyLink(links.values)) {
+      showLinkError("none");
       return;
     }
     setSaving(true);
@@ -130,8 +138,11 @@ export default function SubmitFarmForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name, description, address, kommun, lan,
-          website, phone, email, products,
-          facebook, instagram, season,
+          website: links.values.website,
+          phone, email, products,
+          facebook: links.values.facebook,
+          instagram: links.values.instagram,
+          season,
           onSiteSales, tastingRoom,
           openingHours: hasOpeningHours ? [
             { key: "monday",    sv: "måndag"  },
@@ -206,9 +217,13 @@ export default function SubmitFarmForm() {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={3}
+            maxLength={MAX_DESCRIPTION}
             placeholder="Berätta kort om gården…"
             className={inputCls + " resize-none"}
           />
+          <p className="text-[11px] text-stone-400 text-right" aria-live="polite">
+            {description.length}/{MAX_DESCRIPTION}
+          </p>
         </Field>
 
         <Field label="Adress" required>
@@ -256,7 +271,7 @@ export default function SubmitFarmForm() {
       </section>
 
       {/* ── Hitta er online ────────────────────────────────────────────────── */}
-      <section className="bg-white rounded-xl border border-stone-100 shadow-sm p-5 space-y-4">
+      <section ref={onlineSection} className="bg-white rounded-xl border border-stone-100 shadow-sm p-5 space-y-4">
         <div className="space-y-1">
           <h2 className="text-xs font-semibold uppercase tracking-wide text-stone-400">
             Hitta er online<span className="text-red-400 ml-0.5">*</span>
@@ -265,37 +280,28 @@ export default function SubmitFarmForm() {
             Ange minst en — webbplats, Facebook eller Instagram — så att
             besökare kan hitta mer om gården.
           </p>
+          {linkError && (
+            <p role="alert" className="text-sm text-red-600 pt-1">
+              {linkError === "none" ? NO_LINK_ERROR : LINK_ERRORS[linkError]}
+            </p>
+          )}
         </div>
 
-        <Field label="Webbplats">
-          <input
-            type="url"
-            value={website}
-            onChange={(e) => setWebsite(e.target.value)}
-            placeholder="https://din-gard.se"
-            className={inputCls}
-          />
-        </Field>
-
-        <Field label="Facebook">
-          <input
-            type="url"
-            value={facebook}
-            onChange={(e) => setFacebook(e.target.value)}
-            placeholder="https://facebook.com/din-gard"
-            className={inputCls}
-          />
-        </Field>
-
-        <Field label="Instagram">
-          <input
-            type="url"
-            value={instagram}
-            onChange={(e) => setInstagram(e.target.value)}
-            placeholder="https://instagram.com/din-gard"
-            className={inputCls}
-          />
-        </Field>
+        {linkFields.map(({ field, value, set, placeholder, hint }) => (
+          <Field key={field} label={LINK_LABELS[field]} hint={hint}>
+            <input
+              ref={(el) => { linkInputs.current[field] = el; }}
+              type="text"
+              inputMode={field === "website" ? "url" : undefined}
+              maxLength={MAX_LINK}
+              value={value}
+              onChange={(e) => { set(e.target.value); setLinkError(null); }}
+              placeholder={placeholder}
+              aria-invalid={linkError === field || undefined}
+              className={inputCls}
+            />
+          </Field>
+        ))}
       </section>
 
       {/* ── Kontakt ────────────────────────────────────────────────────────── */}
@@ -332,7 +338,7 @@ export default function SubmitFarmForm() {
           Produkter
         </h2>
         <div className="flex flex-wrap gap-2">
-          {ALL_PRODUCTS.map(({ value, label }) => {
+          {SUBMIT_PRODUCT_LIST.map(({ value, label }) => {
             const active = products.includes(value);
             return (
               <button

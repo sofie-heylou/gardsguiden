@@ -4,13 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronRight } from "lucide-react";
 import { track } from "../lib/analytics";
+import { hasBottomNav } from "../lib/bottomNav";
 
 export default function BottomNav() {
-  // The homepage carries this CTA inside the PopularAreas sheet instead, and
-  // the map needs every vertical pixel it can get there.  On /lagg-till the
-  // visitor is already where the CTA points, so the bar only repeats itself.
   const pathname = usePathname();
-  if (pathname === "/" || pathname === "/lagg-till") return null;
+  if (!hasBottomNav(pathname)) return null;
 
   return (
     <nav className="h-14 shrink-0 bg-white border-t border-stone-200 flex items-center justify-between gap-3 px-4">

@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import * as CookieConsent from "vanilla-cookieconsent";
+import { bottomEdgeFree } from "../lib/bottomNav";
 import "vanilla-cookieconsent/dist/cookieconsent.css";
 
 /**
@@ -94,6 +96,7 @@ export default function CookieConsentBanner() {
   // The floating "Hantera kakor" trigger only appears once an initial choice has
   // been made — before that, the consent modal itself is on screen.
   const [showTrigger, setShowTrigger] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     const onConsentChange = () => {
@@ -121,16 +124,19 @@ export default function CookieConsentBanner() {
 
   if (!showTrigger) return null;
 
-  // Bottom-left, clear of the fixed BottomNav and Mapbox's bottom-right controls.
+  // Bottom-left, clear of Mapbox's bottom-right controls, and above the
+  // BottomNav bar or the homepage sheet where there is one — on a route with a
+  // free bottom edge it would otherwise float over the last lines of the page.
   // Call the API directly rather than relying on `data-cc` auto-binding — the
   // library only wires up data-cc elements present when run() executes, and this
   // button mounts afterwards.
+  const offset = bottomEdgeFree(pathname) ? "bottom-3" : "bottom-16";
   return (
     <button
       type="button"
       onClick={() => CookieConsent.showPreferences()}
       aria-label="Hantera kakor"
-      className="fixed bottom-16 left-3 z-40 rounded-full border border-stone-200 bg-white/90 px-3 py-1.5 text-[11px] text-stone-500 shadow-sm backdrop-blur transition-colors hover:text-stone-900"
+      className={`fixed ${offset} left-3 z-40 rounded-full border border-stone-200 bg-white/90 px-3 py-1.5 text-[11px] text-stone-500 shadow-sm backdrop-blur transition-colors hover:text-stone-900`}
     >
       Hantera kakor
     </button>
