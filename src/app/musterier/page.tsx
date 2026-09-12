@@ -88,7 +88,7 @@ function Intro({ count }: { count: number }) {
         ) : (
           <>
             Inga musterier ännu — vet du ett?{" "}
-            <AddFarmLink surface="musterier_empty" className="underline underline-offset-2">Lägg till det.</AddFarmLink>
+            <AddFarmLink surface="musterier_empty" tips className="underline underline-offset-2">Lägg till det.</AddFarmLink>
           </>
         )}
       </p>

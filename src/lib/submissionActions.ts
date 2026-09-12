@@ -13,7 +13,7 @@ import { sendEmail, emailHtml, btn, escapeHtml, ADMIN_EMAIL } from "./email";
 import { slugify } from "./utils";
 import { COUNTY_TO_SLUG, farmPath } from "./counties";
 import type { Farm } from "../types/farm";
-import { notFound, type ActionFailure } from "./actionResult";
+import { isTip, notFound, type ActionFailure } from "./actionResult";
 import { geocodeAddress } from "./geocode";
 import { SITE_URL } from "./site";
 
@@ -21,6 +21,7 @@ export interface PendingSubmission {
   id: string;
   name: string;
   submitted_email: string;
+  role: "owner" | "visitor";
 }
 
 interface SubmissionRow extends PendingSubmission {
@@ -61,7 +62,7 @@ function newFarmId(db: Database, name: string): string {
  *  confirmation page before anything is changed. */
 export function getPendingSubmission(id: string): PendingSubmission | null {
   const row = getDb().prepare(`
-    SELECT id, name, submitted_email
+    SELECT id, name, submitted_email, role
     FROM farm_submissions WHERE id = ? AND status = 'pending'
   `).get(id) as PendingSubmission | undefined;
   return row ?? null;
@@ -164,12 +165,13 @@ export async function approveSubmission(id: string): Promise<ApproveResult> {
   const submission = db.prepare(`
     SELECT id, name, description, address, kommun, lan,
            website, phone, email, products, opening_hours, season,
-           on_site_sales, tasting_room, submitted_email,
+           on_site_sales, tasting_room, submitted_email, role,
            facebook, instagram, lat, lng
     FROM farm_submissions WHERE id = ? AND status = 'pending'
   `).get(id) as SubmissionRow | undefined;
 
   if (!submission) return notFound();
+  if (submission.role === "visitor") return isTip();
 
   // Prefer what the address autofill captured; fall back to geocoding so a
   // hand-typed address still yields a farm with a working map.
@@ -188,6 +190,7 @@ export async function approveSubmission(id: string): Promise<ApproveResult> {
 export function rejectSubmission(id: string, notes?: string | null): RejectResult {
   const submission = getPendingSubmission(id);
   if (!submission) return notFound();
+  if (submission.role === "visitor") return isTip();
 
   getDb().prepare(`
     UPDATE farm_submissions

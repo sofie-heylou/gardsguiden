@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
+  classifyLink,
   hasAnyLink,
   normalizeFacebook,
   normalizeInstagram,
@@ -90,4 +91,13 @@ test("long runs of slashes are handled in linear time", () => {
   normalizeWebsite(junk);
   normalizeFacebook("facebook.com/" + junk);
   assert.ok(Date.now() - started < 200, "trailing-slash stripping must not backtrack");
+});
+
+test("classifyLink: sorts a single box into the right field", () => {
+  assert.deepEqual(classifyLink("@x"), { field: "instagram", url: "https://instagram.com/x" });
+  assert.deepEqual(classifyLink("https://www.instagram.com/x/"), { field: "instagram", url: "https://instagram.com/x" });
+  assert.deepEqual(classifyLink("facebook.com/x"), { field: "facebook", url: "https://www.facebook.com/x" });
+  assert.deepEqual(classifyLink("x.se"), { field: "website", url: "https://x.se" });
+  assert.equal(classifyLink("Ljungbackens gård"), null);
+  assert.equal(classifyLink(""), null);
 });

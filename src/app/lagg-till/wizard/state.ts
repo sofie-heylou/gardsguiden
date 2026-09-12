@@ -3,7 +3,7 @@
  *  components render, this file decides. */
 
 import { DAY_KEYS, emptyWeek, type DayKey, type WeekHours } from "../../../lib/openingHours";
-import { LINK_ERRORS, LINK_FIELDS, NO_LINK_ERROR, hasAnyLink, normalizeLinks } from "../../../lib/links";
+import { LINK_ERRORS, LINK_FIELDS, NO_LINK_ERROR, classifyLink, hasAnyLink, normalizeLinks } from "../../../lib/links";
 import { isValidEmail } from "../../../lib/utils";
 import type { AddFarmErrorKind } from "../../../lib/analytics";
 
@@ -137,4 +137,32 @@ export function errorKind(key: string): AddFarmErrorKind {
 export function hasContent(v: FormValues): boolean {
   const texts = [v.name, v.address, v.website, v.instagram, v.facebook, v.phone, v.email, v.season, v.description, v.submittedEmail];
   return texts.some((t) => t.trim()) || v.products.length > 0 || v.hoursMode !== "" || v.onSiteSales || v.tastingRoom;
+}
+
+// ── The tip form ─────────────────────────────────────────────────────────────
+// A visitor tipping us off about a farm: name and place are enough, the rest
+// helps us find it.  Tips are leads for the normal intake, never published
+// as they are, so nothing here has to be complete.
+
+export interface TipValues {
+  name: string;
+  place: string;
+  link: string;
+  message: string;
+  email: string;
+}
+
+export function initialTipValues(): TipValues {
+  return { name: "", place: "", link: "", message: "", email: "" };
+}
+
+export function validateTip(v: TipValues): StepErrors {
+  const errors: StepErrors = {};
+  if (!v.name.trim()) errors.name = "Skriv gårdens namn.";
+  if (!v.place.trim()) errors.place = "Skriv ort eller adress.";
+  if (v.link.trim() && !classifyLink(v.link)) {
+    errors.link = "Skriv en länk eller ett Instagram-namn, t.ex. ljungbacken.se eller @ljungbacken.";
+  }
+  if (v.email.trim() && !isValidEmail(v.email.trim())) errors.email = "Det ser inte ut som en e-postadress.";
+  return errors;
 }

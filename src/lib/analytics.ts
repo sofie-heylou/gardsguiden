@@ -19,7 +19,8 @@ export type AddFarmEvent =
   | "add_farm_start"          // first keystroke or tap in the form
   | "add_farm_step"           // a step of the step-by-step form was shown
   | "add_farm_error"          // a check stopped the visitor; `kind` says why
-  | "add_farm_submitted"      // sent successfully
+  | "add_farm_submitted"      // an owner's farm sent successfully
+  | "add_farm_tip_submitted"  // a visitor's tip sent successfully
   | "add_farm_draft_restored"; // came back and continued a saved draft
 
 export type AddFarmSurface =

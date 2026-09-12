@@ -130,3 +130,17 @@ export function normalizeLinks(values: Record<LinkField, unknown>): NormalizedLi
 export function hasAnyLink(values: LinkValues): boolean {
   return LINK_FIELDS.some((field) => Boolean(values[field]));
 }
+
+/** For the single "hemsida, Instagram eller Facebook" box on the tip form:
+ *  works out which of the three it is.  Null for an empty or unreadable value. */
+export function classifyLink(raw: string): { field: LinkField; url: string } | null {
+  const value = raw.trim();
+  if (!value) return null;
+  const bare = stripScheme(value);
+  const field: LinkField =
+    value.startsWith("@") || /^instagram\.com\//i.test(bare) ? "instagram"
+    : /^(?:m\.)?(?:facebook|fb)\.com\//i.test(bare) ? "facebook"
+    : "website";
+  const url = NORMALIZERS[field](value);
+  return url ? { field, url } : null;
+}

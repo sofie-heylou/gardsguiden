@@ -8,7 +8,7 @@ Definition of done for every stage: `npm test`, `npx tsc --noEmit` and
 `next build` clean; the browser walkthrough for that stage done at 375 px and
 desktop in the in-app browser; no new console errors.
 
-## Stage 1 — fixes to today's form (branch `lagg-till-stage1`)
+## Stage 1 — fixes to today's form (branch `lagg-till-stage1`) — merged f46c19d 2026-09-12
 
 1. **`src/lib/links.ts` + `src/lib/links.test.ts`** — `normalizeWebsite`,
    `normalizeInstagram`, `normalizeFacebook`, `normalizeLinks`, `hasAnyLink`
@@ -37,7 +37,7 @@ desktop in the in-app browser; no new console errors.
    and `@x` and submit path reaches the server; error placement; counter;
    Send button clear of the cookie pill at the bottom of the page.
 
-## Stage 2 — owner wizard behind `SUBMIT_FORM_V2` (branch `lagg-till-stage2`)
+## Stage 2 — owner wizard behind `SUBMIT_FORM_V2` (branch `lagg-till-stage2`) — merged a871c2b, flag on in Railway 2026-09-12
 
 0. **Baseline** — `scripts/submission-stats.js` (spec §7). Run against prod
    2026-09-12 (last 180 days): 6 submissions (W13: 2, W14: 2, W33: 1, W34: 1);
@@ -66,7 +66,7 @@ desktop in the in-app browser; no new console errors.
     thank-you links; keyboard-only run; autofill path checked in a normal
     browser; flag off → old form renders unchanged.
 
-## Stage 3 — tip path (branch `lagg-till-stage3`)
+## Stage 3 — tip path (branch `lagg-till-stage3`) — done 2026-09-12
 
 1. `wizard/TipForm.tsx` + `TipValues` in `state.ts`; the mode switch shows
    both tabs; `?tips=1` support; thank-you "Tipsa om en gård →" switches mode.

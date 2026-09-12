@@ -11,6 +11,8 @@ export const MAX_EMAIL = 200;
 export const MAX_DESCRIPTION = 1000;
 /** A web address, Instagram name or Facebook page — checked before normalising. */
 export const MAX_LINK = 500;
+/** "Något mer vi bör veta?" on the tip form. */
+export const MAX_TIP_MESSAGE = 1000;
 export const MAX_SUGGESTION_MESSAGE = 2000;
 export const MAX_CONTACT_MESSAGE = 5000;
 export const MAX_NAME = 200;

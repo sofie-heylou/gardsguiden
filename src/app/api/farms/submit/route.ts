@@ -4,12 +4,18 @@ import { generateId, isValidEmail } from "../../../../lib/utils";
 import { sendEmail, emailHtml, table, row, linkRow, ADMIN_EMAIL } from "../../../../lib/email";
 import { visitorHash } from "../../../../lib/visitor";
 import { requestAlertSlot, ALERT_CAP_NOTICE } from "../../../../lib/alertBudget";
-import { MAX_DESCRIPTION, MAX_EMAIL, MAX_LINK } from "../../../../lib/limits";
-import { LINK_ERRORS, NO_LINK_ERROR, hasAnyLink, normalizeLinks } from "../../../../lib/links";
-import { knownProducts } from "../../../../lib/submitProducts";
+import { MAX_DESCRIPTION, MAX_EMAIL, MAX_LINK, MAX_NAME, MAX_TIP_MESSAGE } from "../../../../lib/limits";
+import { LINK_ERRORS, NO_LINK_ERROR, hasAnyLink, normalizeLinks, type LinkValues } from "../../../../lib/links";
 import { submissionModerationButtons } from "../../../../lib/moderationEmail";
+import { knownProducts } from "../../../../lib/submitProducts";
+import { COUNTY_NAMES } from "../../../../lib/counties";
 
 export const dynamic = "force-dynamic";
+
+/** Two kinds of sender.  An owner adds their own farm and can be approved
+ *  straight into the catalogue; a visitor's tip is a lead for the normal
+ *  intake, so it needs less and is never approved as-is. */
+type Role = "owner" | "visitor";
 
 /** A body field is unknown until proven a string; blank means null, which is
  *  also what an empty link stores. */
@@ -23,12 +29,170 @@ function excerpt(t: string | null): string | null {
 
 /** Coordinates arrive from the client, so they are validated as numbers in
  *  range rather than trusted. */
-function isFiniteCoord(v: unknown, max: number): boolean {
-  return typeof v === "number" && Number.isFinite(v) && Math.abs(v) <= max;
+function coord(v: unknown, max: number): number | null {
+  return typeof v === "number" && Number.isFinite(v) && Math.abs(v) <= max ? v : null;
 }
 
-import { COUNTY_NAMES } from "../../../../lib/counties";
-const VALID_LAN: readonly string[] = COUNTY_NAMES;
+interface Submission {
+  role: Role;
+  name: string;
+  description: string | null;
+  address: string | null;
+  kommun: string | null;
+  lan: string | null;
+  phone: string | null;
+  email: string | null;
+  links: LinkValues;
+  products: string[];
+  openingHours: string | null;
+  season: string | null;
+  onSiteSales: boolean;
+  tastingRoom: boolean;
+  message: string | null;
+  submittedEmail: string;
+  lat: number | null;
+  lng: number | null;
+}
+
+type Parsed = { ok: true; submission: Submission } | { ok: false; error: string; status?: number };
+
+function fail(error: string, status?: number): Parsed {
+  return { ok: false, error, status };
+}
+
+/** Every rule in one place: what each role must give, and the caps that keep
+ *  a hand-made request from storing more than a form field's worth. */
+function parseSubmission(body: Record<string, unknown>): Parsed {
+  const role: Role | null = body.role === "visitor" ? "visitor" : body.role === undefined || body.role === "owner" ? "owner" : null;
+  if (!role) return fail("Ogiltig förfrågan");
+
+  const name = text(body.name);
+  if (!name) return fail("Ange gårdens namn");
+  if (name.length > MAX_NAME) return fail("Gårdsnamnet är för långt");
+
+  const submittedEmail = text(body.submittedEmail) ?? "";
+  const emailRequired = role === "owner";
+  if ((emailRequired || submittedEmail) && (!isValidEmail(submittedEmail) || submittedEmail.length > MAX_EMAIL)) {
+    return fail("Ange en giltig e-postadress");
+  }
+
+  const lan = text(body.lan);
+  if (lan && !(COUNTY_NAMES as readonly string[]).includes(lan)) return fail("Ogiltigt län");
+
+  const description = text(body.description);
+  if (description && description.length > MAX_DESCRIPTION) return fail(`Beskrivningen är för lång (max ${MAX_DESCRIPTION} tecken)`);
+  const message = text(body.message);
+  if (message && message.length > MAX_TIP_MESSAGE) return fail(`Meddelandet är för långt (max ${MAX_TIP_MESSAGE} tecken)`);
+
+  // Length first: the link normalisers run on whatever arrives.
+  const capped = [body.address, body.kommun, body.phone, body.openingHours, body.season, body.website, body.facebook, body.instagram];
+  if (capped.some((v) => typeof v === "string" && v.length > MAX_LINK)) {
+    return fail(`Ett av fälten är för långt (max ${MAX_LINK} tecken)`);
+  }
+
+  const links = normalizeLinks({ website: body.website, instagram: body.instagram, facebook: body.facebook });
+  if (!links.ok) return fail(LINK_ERRORS[links.field]);
+  // Farms without any online presence never pass the public visibility gate
+  // (getFilteredFarms requires website OR facebook OR instagram).  A tip can
+  // do without: it is looked up before anything is published.
+  if (role === "owner" && !hasAnyLink(links.values)) return fail(NO_LINK_ERROR);
+
+  const address = text(body.address);
+  if (role === "visitor" && !address) return fail("Ange var gården ligger");
+
+  return {
+    ok: true,
+    submission: {
+      role, name, description, address, submittedEmail, message,
+      kommun: text(body.kommun),
+      lan,
+      phone: text(body.phone),
+      email: text(body.email),
+      links: links.values,
+      products: knownProducts(body.products),
+      openingHours: text(body.openingHours),
+      season: text(body.season),
+      onSiteSales: Boolean(body.onSiteSales),
+      tastingRoom: Boolean(body.tastingRoom),
+      lat: coord(body.lat, 90),
+      lng: coord(body.lng, 180),
+    },
+  };
+}
+
+function insertSubmission(s: Submission, visitor: string): string {
+  const id = generateId();
+  getDb().prepare(`
+    INSERT INTO farm_submissions
+      (id, name, description, address, kommun, lan, website, phone, email,
+       products, opening_hours, season, on_site_sales, tasting_room,
+       facebook, instagram, submitted_email, visitor_hash, lat, lng, role, message)
+    VALUES
+      (?, ?, ?, ?, ?, ?, ?, ?, ?,
+       ?, ?, ?, ?, ?,
+       ?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(
+    id, s.name, s.description, s.address, s.kommun, s.lan, s.links.website || null, s.phone, s.email,
+    JSON.stringify(s.products), s.openingHours, s.season, s.onSiteSales ? 1 : 0, s.tastingRoom ? 1 : 0,
+    s.links.facebook || null, s.links.instagram || null, s.submittedEmail, visitor, s.lat, s.lng, s.role, s.message,
+  );
+  return id;
+}
+
+function linkRows(links: LinkValues): string {
+  return (
+    (links.website   ? linkRow("Webbplats", links.website)   : "") +
+    (links.instagram ? linkRow("Instagram", links.instagram) : "") +
+    (links.facebook  ? linkRow("Facebook",  links.facebook)  : "")
+  );
+}
+
+function ownerEmail(s: Submission, id: string, capNotice: string) {
+  return {
+    subject: `Ny gård inskickad: ${s.name}`,
+    html: emailHtml(`
+      <p style="margin:0 0 16px;font-size:15px;font-weight:600;color:#1c1917;">Ny gård inskickad</p>
+      ${table(
+        row("Gårdsnamn", s.name) +
+        row("Inlämnad av", s.submittedEmail) +
+        linkRows(s.links) +
+        row("Adress", s.address) +
+        row("Kommun", s.kommun) +
+        row("Län", s.lan) +
+        row("Telefon", s.phone) +
+        row("E-post", s.email) +
+        row("Produkter", s.products.join(", ")) +
+        row("Gårdsförsäljning", s.onSiteSales ? "Ja" : "Nej") +
+        row("Provsmakning", s.tastingRoom ? "Ja" : "Nej") +
+        row("Öppettider", s.openingHours) +
+        row("Säsong", s.season) +
+        row("Beskrivning", excerpt(s.description))
+      )}
+      ${submissionModerationButtons(id)}
+      ${capNotice}
+    `),
+  };
+}
+
+/** No approve/reject buttons: a tip goes through the normal intake, where the
+ *  website check and the relevance gate happen. */
+function tipEmail(s: Submission, capNotice: string) {
+  return {
+    subject: `Tips om gård: ${s.name}`,
+    html: emailHtml(`
+      <p style="margin:0 0 16px;font-size:15px;font-weight:600;color:#1c1917;">Tips om gård från besökare</p>
+      ${table(
+        row("Gårdsnamn", s.name) +
+        row("Plats", s.address) +
+        linkRows(s.links) +
+        row("Meddelande", s.message) +
+        row("Från", s.submittedEmail || "–")
+      )}
+      <p style="margin:16px 0 0;font-size:13px;color:#78716c;">Tips läggs till via det vanliga flödet.</p>
+      ${capNotice}
+    `),
+  };
+}
 
 export async function POST(req: NextRequest) {
   let body: unknown;
@@ -37,81 +201,17 @@ export async function POST(req: NextRequest) {
   } catch {
     return NextResponse.json({ error: "Ogiltig förfrågan" }, { status: 400 });
   }
+  const parsed = parseSubmission((body ?? {}) as Record<string, unknown>);
+  if (!parsed.ok) return NextResponse.json({ error: parsed.error }, { status: parsed.status ?? 400 });
+  const s = parsed.submission;
 
-  const {
-    name, description, address, kommun, lan,
-    website, phone, email, products,
-    openingHours, season, onSiteSales, tastingRoom,
-    facebook, instagram,
-    submittedEmail,
-    lat, lng,
-  } = body as Record<string, unknown>;
-
-  if (!name || typeof name !== "string" || !name.trim()) {
-    return NextResponse.json({ error: "Ange gårdens namn" }, { status: 400 });
-  }
-  if (name.length > 200) {
-    return NextResponse.json({ error: "Gårdsnamnet är för långt" }, { status: 400 });
-  }
-  if (
-    !submittedEmail ||
-    typeof submittedEmail !== "string" ||
-    !isValidEmail(submittedEmail) ||
-    submittedEmail.length > MAX_EMAIL
-  ) {
-    return NextResponse.json({ error: "Ange en giltig e-postadress" }, { status: 400 });
-  }
-  if (lan && !VALID_LAN.includes(lan as string)) {
-    return NextResponse.json({ error: "Ogiltigt län" }, { status: 400 });
-  }
-  if (typeof description === "string" && description.length > MAX_DESCRIPTION) {
-    return NextResponse.json({ error: `Beskrivningen är för lång (max ${MAX_DESCRIPTION} tecken)` }, { status: 400 });
-  }
-  // Length first: the link normalisers run on whatever arrives, so they must
-  // never see more than a form field's worth.
-  const tooLong = [address, kommun, phone, openingHours, season, website, facebook, instagram]
-    .some((v) => typeof v === "string" && v.length > MAX_LINK);
-  if (tooLong) {
-    return NextResponse.json({ error: `Ett av fälten är för långt (max ${MAX_LINK} tecken)` }, { status: 400 });
-  }
-  // The form tidies links before sending ("ljungbacken.se", "@handle"); doing
-  // it again here means a hand-made request cannot store anything the form
-  // would have refused, and the presence check below sees the tidied values.
-  const links = normalizeLinks({ website, instagram, facebook });
-  if (!links.ok) {
-    return NextResponse.json({ error: LINK_ERRORS[links.field] }, { status: 400 });
-  }
-  // Farms without any online presence never pass the public visibility gate
-  // (getFilteredFarms requires website OR facebook OR instagram) — reject up
-  // front instead of approving a farm that can never be shown.
-  if (!hasAnyLink(links.values)) {
-    return NextResponse.json({ error: NO_LINK_ERROR }, { status: 400 });
-  }
-
-  const acceptedProducts = knownProducts(products);
-  // The free-text fields, read once for both the row and the e-mail.
-  const f = {
-    description: text(description),
-    address: text(address),
-    kommun: text(kommun),
-    lan: text(lan),
-    phone: text(phone),
-    email: text(email),
-    openingHours: text(openingHours),
-    season: text(season),
-  };
-  const db = getDb();
-  const submissionId = generateId();
-
-  // Until this stage a login was the only thing standing between this endpoint
-  // and unlimited submissions.  Same guards as the other public writes: one
-  // pending submission per visitor, and a shared ceiling on admin email.
+  // Same guards as the other public writes: a few submissions per visitor and
+  // hour across both roles, and a shared ceiling on admin email.
   const visitor = visitorHash(req.headers, "submit");
-  const pending = db.prepare(`
+  const pending = getDb().prepare(`
     SELECT COUNT(*) AS n FROM farm_submissions
     WHERE visitor_hash = ? AND created_at > datetime('now', '-1 hour')
   `).get(visitor) as { n: number };
-
   if (pending.n >= 3) {
     return NextResponse.json(
       { error: "Du har redan skickat in flera gårdar. Försök igen om en stund." },
@@ -119,68 +219,12 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  db.prepare(`
-    INSERT INTO farm_submissions
-      (id, name, description, address, kommun, lan, website, phone, email,
-       products, opening_hours, season, on_site_sales, tasting_room,
-       facebook, instagram, submitted_email, visitor_hash, lat, lng)
-    VALUES
-      (?, ?, ?, ?, ?, ?, ?, ?, ?,
-       ?, ?, ?, ?, ?,
-       ?, ?, ?, ?, ?, ?)
-  `).run(
-    submissionId,
-    (name as string).trim(),
-    f.description,
-    f.address,
-    f.kommun,
-    f.lan,
-    links.values.website || null,
-    f.phone,
-    f.email,
-    JSON.stringify(acceptedProducts),
-    f.openingHours,
-    f.season,
-    onSiteSales  ? 1 : 0,
-    tastingRoom  ? 1 : 0,
-    links.values.facebook  || null,
-    links.values.instagram || null,
-    (submittedEmail as string).trim(),
-    visitor,
-    isFiniteCoord(lat, 90) ? (lat as number) : null,
-    isFiniteCoord(lng, 180) ? (lng as number) : null,
-  );
+  const id = insertSubmission(s, visitor);
 
   const decision = requestAlertSlot();
   if (decision === "suppress") return NextResponse.json({ ok: true });
-
-  sendEmail({
-    to: ADMIN_EMAIL,
-    subject: `Ny gård inskickad: ${(name as string).trim()}`,
-    html: emailHtml(`
-      <p style="margin:0 0 16px;font-size:15px;font-weight:600;color:#1c1917;">Ny gård inskickad</p>
-      ${table(
-        row("Gårdsnamn",  (name as string).trim()) +
-        row("Inlämnad av", (submittedEmail as string).trim()) +
-        (links.values.website   ? linkRow("Webbplats", links.values.website)   : "") +
-        (links.values.instagram ? linkRow("Instagram", links.values.instagram) : "") +
-        (links.values.facebook  ? linkRow("Facebook",  links.values.facebook)  : "") +
-        row("Adress",     f.address) +
-        row("Kommun",     f.kommun) +
-        row("Län",        f.lan) +
-        row("Telefon",    f.phone) +
-        row("E-post",     f.email) +
-        row("Produkter",  acceptedProducts.join(", ")) +
-        row("Gårdsförsäljning", onSiteSales ? "Ja" : "Nej") +
-        row("Provsmakning",     tastingRoom ? "Ja" : "Nej") +
-        row("Öppettider", f.openingHours) +
-        row("Säsong",     f.season) +
-        row("Beskrivning", excerpt(f.description))
-      )}
-      ${submissionModerationButtons(submissionId)}
-      ${decision === "send-last" ? ALERT_CAP_NOTICE : ""}
-    `),
-  });
+  const capNotice = decision === "send-last" ? ALERT_CAP_NOTICE : "";
+  sendEmail({ to: ADMIN_EMAIL, ...(s.role === "owner" ? ownerEmail(s, id, capNotice) : tipEmail(s, capNotice)) });
 
   return NextResponse.json({ ok: true });
 }

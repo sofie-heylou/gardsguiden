@@ -18,6 +18,7 @@ All `dataLayer.push()` calls are implemented in the codebase. Follow the steps b
 | `add_farm_step` | `step` (1–5; step-by-step form) | No |
 | `add_farm_error` | `kind` (required / invalid / link_invalid / no_link / rate_limited / server / network), `field`, `step` | No |
 | `add_farm_submitted` | `mode`, `seconds` (first touch → sent, rounded to 5) | **Yes** |
+| `add_farm_tip_submitted` | `mode` (tip), `seconds` | No |
 | `add_farm_draft_restored` | — | No |
 
 The `add_farm_*` family is the add-a-farm funnel. Never any field contents —

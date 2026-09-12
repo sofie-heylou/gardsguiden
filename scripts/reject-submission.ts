@@ -19,6 +19,7 @@
 
 import { getDb } from "../src/lib/db";
 import { rejectSubmission } from "../src/lib/submissionActions";
+import { FAILURE_TEXT } from "../src/lib/actionResult";
 
 const submissionId = process.argv[2];
 const reason = process.argv[3] ?? null;
@@ -47,7 +48,7 @@ if (sub.status !== "pending") {
 
 const result = rejectSubmission(submissionId, reason);
 if (!result.ok) {
-  console.error(`Could not reject: ${result.reason}`);
+  console.error(`Could not reject: ${FAILURE_TEXT[result.reason]}`);
   process.exit(1);
 }
 

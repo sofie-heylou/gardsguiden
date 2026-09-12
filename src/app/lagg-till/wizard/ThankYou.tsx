@@ -7,7 +7,13 @@ import { CONTACT_EMAIL } from "../../../lib/site";
 import type { Farm } from "../../../types/farm";
 import { cardCls, hintCls } from "./fields";
 
-export default function ThankYou({ name, email, lan }: { name: string; email: string; lan: string }) {
+export default function ThankYou({ name, email, lan, onTip }: {
+  name: string;
+  email: string;
+  lan: string;
+  /** Owners often know the neighbouring farms — opens the tip form. */
+  onTip: () => void;
+}) {
   const gardarSlug = GARDAR_COUNTY_TO_SLUG[lan as Farm["lan"]];
   const lanName = gardarSlug ? countyDisplayName(lan) : "";
   const listHref = gardarSlug ? `/gardar/${gardarSlug}` : "/gardar";
@@ -46,6 +52,14 @@ export default function ThankYou({ name, email, lan }: { name: string; email: st
       <section className={cardCls}>
         <h2 className="text-sm font-semibold text-stone-800">Behöver något ändras senare?</h2>
         <p className={hintCls}>Använd &rdquo;Föreslå en ändring&rdquo; på gårdens sida – inget konto behövs.</p>
+      </section>
+
+      <section className={cardCls}>
+        <h2 className="text-sm font-semibold text-stone-800">Känner du fler gårdar som borde vara med?</h2>
+        <p className={hintCls}>En granne, ett musteri, ett gårdscafé – tipsa oss så kollar vi upp dem.</p>
+        <button type="button" onClick={onTip} className="min-h-11 px-4 rounded-lg border border-stone-300 text-sm font-semibold text-stone-800 hover:border-stone-500">
+          Tipsa om en gård →
+        </button>
       </section>
 
       <Link href={listHref} className="block text-center text-sm text-stone-600 underline hover:text-stone-900 py-2">

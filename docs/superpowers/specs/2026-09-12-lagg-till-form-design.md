@@ -65,8 +65,10 @@ utan konto." Under the title: "Gratis · Inget konto behövs".
 
 **Mode switch** (segmented control, directly under the title):
 `Jag driver gården` | `Jag vill tipsa om en gård`. Owner is selected by default;
-`?tips=1` in the URL selects the tip side. Switching modes keeps each mode's
-draft. The switch is a `role="tablist"` with two `role="tab"` buttons.
+`?tips=1` in the URL selects the tip side. Both sides stay mounted, so
+switching keeps what was typed on the other; only the owner side is also
+saved to the browser (§6.4) — a tip is five boxes. The switch is a
+`role="tablist"` with two `role="tab"` buttons.
 
 **Cookie pill:** the fixed "Hantera kakor" pill sits at `bottom-16` to clear
 the BottomNav bar (or the homepage sheet). On routes with a free bottom edge —
@@ -341,7 +343,7 @@ exact shape `parseTodaySegment` (Öppet nu, today's hours) and the strict
 ### 6.4 Draft (`useDraft`)
 
 `localStorage` key `gardsguiden:lagg-till:draft:v1`, value
-`{ savedAt: ISO, mode: "owner"|"tip", step: 1–5, owner: FormValues, tip: TipValues }`.
+`{ savedAt: ISO, step: 1–5, values: FormValues }` (owner side only).
 Written on every change, debounced 300 ms; every read/write wrapped in
 try/catch. On mount: a draft older than 30 days, or with no non-empty text
 field, is discarded silently; otherwise the "Fortsätt / Börja om" banner shows
@@ -372,9 +374,10 @@ approval e-mail can never target the empty address.
   Meddelande, Från ({email} or "–"), a line "Tips läggs till via det vanliga
   flödet." and **no** buttons. Same `requestAlertSlot` budget.
 - `approveSubmission` / `rejectSubmission` return `{ ok: false, reason: "is_tip" }`
-  for `role='visitor'` rows (new `ActionFailure` reason). `/atgard` shows "Det
-  här är ett tips från en besökare — lägg till gården via det vanliga flödet."
-  and the CLI scripts print the same.
+  for `role='visitor'` rows (new `ActionFailure` reason; `FAILURE_TEXT` holds
+  the wording). The CLI scripts print it; `/atgard` cannot be reached for a tip
+  in practice since tip e-mails carry no buttons, and shows its generic
+  "nothing changed" text if it ever is.
 - `scripts/approve-submission.ts` / `reject-submission.ts`: unchanged apart from
   the new reason.
 
