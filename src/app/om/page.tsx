@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { MapPin, PlusCircle } from "lucide-react";
 import ContactForm from "./ContactForm";
+import AddFarmLink from "../../components/AddFarmLink";
 import { getAllFarms } from "../../lib/farms";
 import { COUNTIES } from "../../lib/counties";
 import { SITE_URL } from "../../lib/site";
@@ -96,13 +97,13 @@ export default function OmPage() {
             på gårdens sida — vi uppdaterar den åt dig.
           </p>
           <div className="flex flex-col gap-2">
-            <Link
-              href="/lagg-till"
+            <AddFarmLink
+              surface="om_page"
               className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-stone-800 text-white text-sm font-semibold hover:bg-stone-700 transition-colors"
             >
               <PlusCircle size={15} />
               Lägg till din gård
-            </Link>
+            </AddFarmLink>
           </div>
         </div>
 

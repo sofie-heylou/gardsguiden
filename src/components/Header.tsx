@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X, ChevronRight } from "lucide-react";
 import { COUNTIES } from "../lib/counties";
-import { track } from "../lib/analytics";
+import AddFarmLink from "./AddFarmLink";
 
 function GardsguidentIcon({ size = 24 }: { size?: number }) {
   const petal =
@@ -145,14 +145,14 @@ export default function Header() {
           <div className="border-t border-stone-100 pt-4 flex items-center justify-between gap-4">
             <div>
               <p className="text-[11px] text-stone-400 mb-1">Är du gårdsägare?</p>
-              <Link
-                href="/lagg-till"
-                onClick={() => { closeMenu(); track("add_farm_clicked"); }}
+              <AddFarmLink
+                surface="header_menu"
+                onClick={closeMenu}
                 className="text-[13px] font-semibold text-stone-800 hover:text-stone-600 transition-colors flex items-center gap-1"
               >
                 Lägg till din gård
                 <ChevronRight size={13} />
-              </Link>
+              </AddFarmLink>
             </div>
           </div>
 

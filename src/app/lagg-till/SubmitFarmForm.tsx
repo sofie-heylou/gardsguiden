@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Loader2, Check } from "lucide-react";
 import nextDynamic from "next/dynamic";
@@ -21,6 +21,7 @@ import {
   LINK_ERRORS, LINK_LABELS, NO_LINK_ERROR, hasAnyLink, normalizeLinks, type LinkField,
 } from "../../lib/links";
 import { SUBMIT_PRODUCT_LIST } from "../../lib/submitProducts";
+import { trackAddFarm, type AddFarmErrorKind } from "../../lib/analytics";
 
 const TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
 
@@ -81,6 +82,38 @@ export default function SubmitFarmForm() {
     setLinkError(field);
     onlineSection.current?.scrollIntoView({ behavior: "smooth", block: "center" });
     linkInputs.current[field === "none" ? "website" : field]?.focus({ preventScroll: true });
+    trackAddFarm("add_farm_error", field === "none" ? { kind: "no_link" } : { kind: "link_invalid", field });
+  }
+
+  // Funnel events: one "view" per page load, one "start" at the first touch,
+  // and how long it took from that touch to a successful send.
+  const startedAt = useRef<number | null>(null);
+  const lastRequiredReport = useRef(0);
+  const viewed = useRef(false);
+  useEffect(() => {
+    // Effects run twice in development (Strict Mode); count the view once.
+    if (viewed.current) return;
+    viewed.current = true;
+    trackAddFarm("add_farm_view", { mode: "owner" });
+  }, []);
+
+  function noteStart() {
+    if (startedAt.current !== null) return;
+    startedAt.current = Date.now();
+    trackAddFarm("add_farm_start");
+  }
+
+  // The browser fires one `invalid` event per empty required box on every
+  // failed submit; report the first of each burst so one attempt is one event.
+  function noteRequired(e: React.FormEvent<HTMLFormElement>) {
+    if (Date.now() - lastRequiredReport.current < 500) return;
+    lastRequiredReport.current = Date.now();
+    trackAddFarm("add_farm_error", { kind: "required", field: (e.target as HTMLInputElement).name || undefined });
+  }
+
+  function reportServerError(status: number) {
+    const kind: AddFarmErrorKind = status === 429 ? "rate_limited" : "server";
+    trackAddFarm("add_farm_error", { kind });
   }
 
   const linkFields: { field: LinkField; value: string; set: (v: string) => void; placeholder: string; hint: string }[] = [
@@ -162,10 +195,19 @@ export default function SubmitFarmForm() {
         }),
       });
       const data = await res.json() as { ok?: boolean; error?: string };
-      if (!res.ok) { setError(data.error ?? "Något gick fel"); return; }
+      if (!res.ok) {
+        setError(data.error ?? "Något gick fel");
+        reportServerError(res.status);
+        return;
+      }
       setSent(true);
+      trackAddFarm("add_farm_submitted", {
+        mode: "owner",
+        seconds: startedAt.current ? Math.round((Date.now() - startedAt.current) / 5) * 5 : undefined,
+      });
     } catch {
       setError("Nätverksfel – försök igen");
+      trackAddFarm("add_farm_error", { kind: "network" });
     } finally {
       setSaving(false);
     }
@@ -193,7 +235,13 @@ export default function SubmitFarmForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form
+      onSubmit={handleSubmit}
+      onChange={noteStart}
+      onClickCapture={noteStart}
+      onInvalidCapture={noteRequired}
+      className="space-y-6"
+    >
 
       {/* ── Grundinfo ──────────────────────────────────────────────────────── */}
       <section className="bg-white rounded-xl border border-stone-100 shadow-sm p-5 space-y-4">
@@ -204,6 +252,7 @@ export default function SubmitFarmForm() {
         <Field label="Gårdens namn" required>
           <input
             type="text"
+            name="name"
             required
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -234,6 +283,7 @@ export default function SubmitFarmForm() {
           >
             <input
               type="text"
+              name="address"
               required
               autoComplete="shipping address-line1"
               value={address}
@@ -256,6 +306,7 @@ export default function SubmitFarmForm() {
           </Field>
           <Field label="Län" required>
             <select
+              name="lan"
               required
               value={lan}
               onChange={(e) => setLan(e.target.value)}
@@ -456,6 +507,7 @@ export default function SubmitFarmForm() {
         <Field label="Din e-postadress" required>
           <input
             type="email"
+            name="submittedEmail"
             required
             maxLength={MAX_EMAIL}
             value={submittedEmail}

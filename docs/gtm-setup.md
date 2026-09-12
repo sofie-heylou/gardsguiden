@@ -12,7 +12,29 @@ All `dataLayer.push()` calls are implemented in the codebase. Follow the steps b
 | `farm_contact` | `contact_type`, `farm_id`, `farm_name`, `farm_county` | **Yes** |
 | `farm_card_clicked` | `farm_id`, `farm_name`, `farm_county` | No |
 | `near_me_activated` | `radius_km` | No |
-| `add_farm_clicked` | — | No |
+| `add_farm_clicked` | `surface` (header_menu / bottom_bar / listing_callout / om_page / musterier_empty) | No |
+| `add_farm_view` | `mode` (owner / tip) | No |
+| `add_farm_start` | — | No |
+| `add_farm_step` | `step` (1–5; step-by-step form) | No |
+| `add_farm_error` | `kind` (required / link_invalid / no_link / rate_limited / server / network), `field` | No |
+| `add_farm_submitted` | `mode`, `seconds` (first touch → sent, rounded to 5) | **Yes** |
+| `add_farm_draft_restored` | — | No |
+
+The `add_farm_*` family is the add-a-farm funnel. Never any field contents —
+only which box, which kind of problem, how far. The names are a TypeScript
+union in `src/lib/analytics.ts` (`trackAddFarm`), so a typo fails to compile.
+
+**GTM state (workspace 8, 2026-09-12):** trigger 16 matches
+`^(farm_contact|filter_applied|near_me_activated|add_farm_.*|advertise_contact_clicked|upgrade_profile_clicked)$`
+and fires tag 17 (GA4 event, consent `analytics_storage` required) with the
+parameters `contact_type, farm_id, farm_name, farm_county, filter_type,
+filter_value, surface, county, mode, kind, field, step, seconds` from
+matching `DLV - …` variables.
+
+**Still to do in GA4 Admin → Custom definitions** (the API has no tool for it):
+register event-scoped custom dimensions `surface`, `mode`, `kind`, `field`,
+`step` and a custom metric `seconds`; mark `add_farm_submitted` as a key event.
+Until then the parameters arrive but do not show in standard reports.
 
 ---
 

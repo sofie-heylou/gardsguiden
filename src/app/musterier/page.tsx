@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Info } from "lucide-react";
 import { getMusterier } from "../../lib/farms";
 import { groupFarmsByCounty, farmPath } from "../../lib/counties";
@@ -7,6 +6,7 @@ import type { CountyGroup } from "../../lib/counties";
 import { SITE_URL } from "../../lib/site";
 import { FarmCardList } from "../../components/FarmCard";
 import ShowOnMapLink from "../../components/ShowOnMapLink";
+import AddFarmLink from "../../components/AddFarmLink";
 import AddFarmCallout from "../../components/AddFarmCallout";
 import type { Farm } from "../../types/farm";
 
@@ -88,7 +88,7 @@ function Intro({ count }: { count: number }) {
         ) : (
           <>
             Inga musterier ännu — vet du ett?{" "}
-            <Link href="/lagg-till" className="underline underline-offset-2">Lägg till det.</Link>
+            <AddFarmLink surface="musterier_empty" className="underline underline-offset-2">Lägg till det.</AddFarmLink>
           </>
         )}
       </p>
