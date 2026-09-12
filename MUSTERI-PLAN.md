@@ -77,20 +77,20 @@
 ## Stages (one branch, one PR — nothing here is risky enough to stage separately)
 
 ### Stage 1 — Seasons list + banner
-- [ ] `src/lib/seasons.ts` with the campaign type, the list, `activeCampaign()` and the Stockholm-date helper.
-- [ ] `src/components/SeasonalBanner.tsx`.
-- [ ] Homepage wiring: banner above the map, map height adjusted only when a campaign is active.
+- [x] `src/lib/seasons.ts` with the campaign type, the list, `activeCampaign()` and the Stockholm-date helper. *Done 2026-09-12. Dates compare as month×100+day so padding doesn't matter, and a malformed entry throws at prerender instead of silently never showing. Each campaign names its icon (`icon: "apple"`), so the next campaign really is one more entry.*
+- [x] `src/components/SeasonalBanner.tsx`. *Done 2026-09-12. Minimum 44px rather than fixed, so the text may wrap on a phone.*
+- [x] Homepage wiring. *Done 2026-09-12, but as layout rather than arithmetic: banner and map sit in one flex column that owns the single 5.5rem peek constant and the map takes the remainder, so nothing needs to know the banner's height. Verified: 48px banner + 620px map = 668px = viewport minus the 88px peek.*
 
 ### Stage 2 — Shared farm card
-- [ ] Move `FarmCard` out of `src/app/[county]/page.tsx` into `src/components/FarmCard.tsx`; add the "Mustar din frukt" badge; county page uses the shared one.
+- [x] Move `FarmCard` out of `src/app/[county]/page.tsx` into `src/components/FarmCard.tsx`; county page uses the shared one. *Done 2026-09-12. The review pass went one step deeper: the flag→badge mapping now lives once in `src/lib/farmBadges.ts` (the farm page shows every badge, cards the compact subset), so a new boolean on `Farm` gets its badge in one place. Card headings went `h2`→`h3` since cards sit under section headings. `FarmCardList` renders the ul/li wrapper the three list sections share.*
 
 ### Stage 3 — The page and how people find it
-- [ ] `getMusterier()` in `src/lib/farms.ts`.
-- [ ] `src/app/musterier/page.tsx` with metadata, JSON-LD, all six sections and the empty state.
-- [ ] Header link, sitemap entry, `llms.txt` line.
+- [x] `getMusterier()` in `src/lib/farms.ts`. *Done 2026-09-12; sorts A–Ö once at the source (`compareFarmNames`, now shared with the county page) so no section sorts on its own.*
+- [x] `src/app/musterier/page.tsx` with metadata, JSON-LD, all six sections and the empty state. *Done 2026-09-12. Built on helpers that also serve the homepage and county pages: `groupFarmsByCounty` in `src/lib/counties.ts` (PopularAreas uses it too), `AddFarmCallout` (lifted out of PopularAreas), and `ShowOnMapLink`, whose URL comes from the filter codec's new `mapHref()` rather than a hand-typed `?q=must` — the county page's map pill uses the same.*
+- [x] Header link, sitemap entry, `llms.txt` line. *Done 2026-09-12.*
 
 ### Stage 4 — Check, then record
-- [ ] Verification below, then tick these boxes with what actually shipped.
+- [x] Verification below, then tick these boxes with what actually shipped. *Done 2026-09-12 against the dev build: banner + sheet peek on a 375px phone and at desktop width; window logic checked at 23:30/00:30 Stockholm time around 1 Sept and 15 Nov, and 1 Sept 2027; raw `/musterier` HTML carries 13 county sections, 13 jump links, 108 farm links and parseable BreadcrumbList + ItemList (95 items); `/stockholm` brewery cards and a farm page's badge order unchanged; banner click lands on `/musterier` and pushes `seasonal_banner_clicked`. Follow-up noted, not done: the BreadcrumbList/ItemList JSON-LD is now hand-written on three pages and could become one shared helper.*
 
 ## Verification (before Sofie looks)
 

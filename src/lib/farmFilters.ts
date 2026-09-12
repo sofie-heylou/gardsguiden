@@ -126,6 +126,13 @@ export function buildFilterParams(f: FilterState): string {
   return params.toString();
 }
 
+/** A link to the homepage map with these filters applied — the one place
+ *  that knows the map reads its filters from the query string. */
+export function mapHref(filters: Partial<FilterState>): string {
+  const qs = buildFilterParams({ ...emptyFilters(), ...filters });
+  return qs ? `/?${qs}` : "/";
+}
+
 /**
  * Mirror the filter state onto the current URL without navigating or adding
  * history entries — reload, back-from-detail and copy-the-link all keep the

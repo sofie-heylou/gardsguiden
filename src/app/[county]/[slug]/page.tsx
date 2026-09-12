@@ -1,13 +1,7 @@
 import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
-import {
-  ShoppingBag,
-  GlassWater,
-  BadgeCheck,
-  Sailboat,
-  Apple,
-} from "lucide-react";
 import { getFarmById, getAllFarms } from "../../../lib/farms";
+import { farmBadges } from "../../../lib/farmBadges";
 import { SLUG_TO_COUNTY, COUNTY_TO_SLUG, farmPath } from "../../../lib/counties";
 import BackButton from "../../../components/BackButton";
 import FarmContactSection from "../../../components/FarmContactSection";
@@ -169,13 +163,7 @@ export default async function FarmDetailPage({ params }: Props) {
     ? `https://www.google.com/maps/dir/?api=1&destination=${farm.lat},${farm.lng}`
     : undefined;
 
-  const labels = [
-    farm.tastingRoom            && { label: "Provsmakning",             icon: GlassWater  },
-    farm.onSiteSales            && { label: "Gårdsförsäljning",         icon: ShoppingBag },
-    farm.gardsförsäljningLicense && { label: "Gårdsförsäljningslicens", icon: BadgeCheck  },
-    farm.isArchipelago          && { label: "Skärgård",                 icon: Sailboat    },
-    farm.legomustning           && { label: "Mustar din frukt",         icon: Apple       },
-  ].filter(Boolean) as { label: string; icon: React.ElementType }[];
+  const labels = farmBadges(farm);
 
   const visibleProducts = farm.products.filter((p) => p !== "annat");
 

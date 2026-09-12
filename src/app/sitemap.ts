@@ -21,6 +21,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      // Every "Mustar din frukt" farm grouped by county; linked from the
+      // seasonal homepage banner in autumn and from the menu year-round.
+      url: `${SITE_URL}/musterier`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    {
       url: `${SITE_URL}/om`,
       lastModified: now,
       changeFrequency: "monthly",

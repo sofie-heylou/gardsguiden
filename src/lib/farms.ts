@@ -139,3 +139,22 @@ export function searchFarms(query: string): Farm[] {
   return getFilteredFarms({ q: query });
 }
 
+/** Swedish A–Ö: SQL's ORDER BY name is byte order and puts Å/Ä/Ö wrong. */
+export function compareFarmNames(a: Farm, b: Farm): number {
+  return a.name.localeCompare(b.name, "sv");
+}
+
+// ── Musterier ───────────────────────────────────────────────────────────────
+
+/** The two groups behind /musterier, both A–Ö: farms that press the visitor's
+ *  own fruit (the "Mustar din frukt" flag) and gårdsbutiker that only sell
+ *  must. Built on getAllFarms() so the page obeys the same visibility gate as
+ *  every other listing. */
+export function getMusterier(): { pressers: Farm[]; sellers: Farm[] } {
+  const farms = getAllFarms().sort(compareFarmNames);
+  return {
+    pressers: farms.filter((f) => f.legomustning),
+    sellers: farms.filter((f) => !f.legomustning && f.products.includes("must")),
+  };
+}
+

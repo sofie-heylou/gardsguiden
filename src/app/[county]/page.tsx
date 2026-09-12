@@ -1,12 +1,14 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { ChevronLeft, MapIcon, ShoppingBag, GlassWater } from "lucide-react";
-import { getFarmsByCounty } from "../../lib/farms";
+import { ChevronLeft } from "lucide-react";
+import { getFarmsByCounty, compareFarmNames } from "../../lib/farms";
 import { SLUG_TO_COUNTY, COUNTY_SLUGS, farmPath } from "../../lib/counties";
 import { COUNTY_DESCRIPTIONS } from "../../lib/county-descriptions";
 import { SITE_URL } from "../../lib/site";
 import FarmList from "../../components/FarmList";
+import { FarmCardList } from "../../components/FarmCard";
+import ShowOnMapLink from "../../components/ShowOnMapLink";
 import AdvertiseCallout from "../../components/AdvertiseCallout";
 import type { Farm } from "../../types/farm";
 
@@ -98,58 +100,13 @@ function isBrewery(farm: Farm): boolean {
   return farm.products.length === 1 && farm.products[0] === "öl" && !farm.onSiteSales;
 }
 
-function FarmCard({ farm }: { farm: Farm }) {
-  const visibleProducts = farm.products.filter((p) => p !== "annat");
-  return (
-    <Link
-      href={farmPath(farm)}
-      className="block bg-white rounded-xl border border-stone-100 shadow-sm hover:shadow-md active:shadow-none transition-shadow px-4 py-4"
-    >
-      <h2 className="font-display text-[15px] text-stone-900 leading-snug mb-0.5">
-        {farm.name}
-      </h2>
-      <p className="text-[11px] text-stone-400 mb-2.5">{farm.kommun || `${farm.lan} län`}</p>
-
-      {visibleProducts.length > 0 && (
-        <div className="flex flex-wrap gap-1 mb-2.5">
-          {visibleProducts.map((p) => (
-            <span
-              key={p}
-              className="px-1.5 py-0.5 rounded text-[10px] bg-stone-100 text-stone-500 capitalize"
-            >
-              {p}
-            </span>
-          ))}
-        </div>
-      )}
-
-      {(farm.onSiteSales || farm.tastingRoom) && (
-        <div className="flex items-center gap-3 text-[11px] text-stone-400">
-          {farm.onSiteSales && (
-            <span className="flex items-center gap-1">
-              <ShoppingBag size={11} />
-              Gårdsförsäljning
-            </span>
-          )}
-          {farm.tastingRoom && (
-            <span className="flex items-center gap-1">
-              <GlassWater size={11} />
-              Provsmakning
-            </span>
-          )}
-        </div>
-      )}
-    </Link>
-  );
-}
-
 export default async function CountyPage({ params }: Props) {
   const { county } = await params;
   const lan = SLUG_TO_COUNTY[county];
   if (!lan) notFound();
 
   const farms = getFarmsByCounty(lan);
-  const sorted = [...farms].sort((a, b) => a.name.localeCompare(b.name, "sv"));
+  const sorted = [...farms].sort(compareFarmNames);
   const gardar = sorted.filter((farm) => !isBrewery(farm));
   const bryggerier = sorted.filter(isBrewery);
 
@@ -177,13 +134,7 @@ export default async function CountyPage({ params }: Props) {
             {COUNTY_DESCRIPTIONS[lan] && (
               <p className="mt-2 text-sm text-stone-600 leading-relaxed">{COUNTY_DESCRIPTIONS[lan]}</p>
             )}
-            <Link
-              href={`/?lan=${county}`}
-              className="mt-3 inline-flex items-center gap-1.5 text-[12px] font-medium text-stone-600 bg-white border border-stone-200 hover:border-stone-400 rounded-full px-3.5 py-1.5 transition-colors"
-            >
-              <MapIcon size={13} />
-              Visa på karta
-            </Link>
+            <ShowOnMapLink filters={{ counties: new Set([lan]) }} className="mt-3" />
           </div>
 
           <AdvertiseCallout lan={lan} />
@@ -198,13 +149,7 @@ export default async function CountyPage({ params }: Props) {
                   Hantverksbryggerier i {lan} — utan gårdsbutik, men väl värda ett besök för den ölintresserade.
                 </p>
               </div>
-              <ul className="space-y-2">
-                {bryggerier.map((farm) => (
-                  <li key={farm.id}>
-                    <FarmCard farm={farm} />
-                  </li>
-                ))}
-              </ul>
+              <FarmCardList farms={bryggerier} />
             </>
           )}
         </div>

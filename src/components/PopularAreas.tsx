@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
 import { getAllFarms } from "../lib/farms";
 import { CATEGORIES, farmMatchesCategory } from "../lib/categories";
-import { COUNTIES } from "../lib/counties";
+import { groupFarmsByCounty } from "../lib/counties";
+import AddFarmCallout from "./AddFarmCallout";
 import type { Farm } from "../types/farm";
 
 // Ranked by search demand, not farm count: per GSC (12-month export, Aug
@@ -35,24 +35,13 @@ function topCategories(farms: Farm[], max = 2): string[] {
  */
 export default function PopularAreas() {
   const farms = getAllFarms();
-  const byCounty = new Map<string, Farm[]>();
-  for (const f of farms) {
-    const list = byCounty.get(f.lan) ?? [];
-    list.push(f);
-    byCounty.set(f.lan, list);
-  }
+  const groups = groupFarmsByCounty(farms);
 
-  const popular = POPULAR_ORDER
-    .map((name) => ({
-      county: COUNTIES.find((c) => c.name === name)!,
-      farms: byCounty.get(name) ?? [],
-    }))
-    .filter((p) => p.farms.length > 0);
+  const popular = POPULAR_ORDER.flatMap((name) => groups.filter((g) => g.county.name === name));
 
-  const rest = COUNTIES
-    .filter((c) => !POPULAR_ORDER.includes(c.name))
-    .map((c) => ({ county: c, count: (byCounty.get(c.name) ?? []).length }))
-    .filter((c) => c.count > 0)
+  const rest = groups
+    .filter((g) => !POPULAR_ORDER.includes(g.county.name))
+    .map(({ county, farms }) => ({ county, count: farms.length }))
     .sort((a, b) => b.count - a.count);
 
   return (
@@ -120,19 +109,11 @@ export default function PopularAreas() {
           Se alla {farms.length} gårdar
         </Link>
 
-        <div className="bg-amber-50 border border-amber-100 rounded-xl px-4 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex flex-col gap-0.5">
-            <p className="font-display text-lg text-stone-900">Driver du en gård?</p>
-            <p className="text-sm text-stone-500">Nå tusentals besökare som letar lokalt.</p>
-          </div>
-          <Link
-            href="/lagg-till"
-            className="shrink-0 inline-flex items-center justify-center gap-1 px-4 py-2 rounded-full bg-stone-800 text-white text-sm font-semibold hover:bg-stone-700 active:bg-stone-900 transition-colors"
-          >
-            Lägg till din gård
-            <ChevronRight size={14} />
-          </Link>
-        </div>
+        <AddFarmCallout
+          title="Driver du en gård?"
+          text="Nå tusentals besökare som letar lokalt."
+          cta="Lägg till din gård"
+        />
       </div>
     </section>
   );

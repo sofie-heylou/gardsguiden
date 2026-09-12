@@ -16,7 +16,8 @@ export const COUNTIES = [
   { name: "Östergötland",    slug: "ostergotland",    gardarSlug: "ostergotlands-lan",     displayName: "Östergötlands län" },
 ] as const;
 
-type CountyName = (typeof COUNTIES)[number]["name"];
+export type County = (typeof COUNTIES)[number];
+type CountyName = County["name"];
 
 export const COUNTY_TO_SLUG: Record<Farm["lan"], string> =
   Object.fromEntries(COUNTIES.map((c) => [c.name, c.slug])) as Record<CountyName, string>;
@@ -42,4 +43,25 @@ export const COUNTY_LAN_NAME: Record<Farm["lan"], string> =
 /** Canonical URL path for a farm: /stockholm/farm-slug */
 export function farmPath(farm: Pick<Farm, "id" | "lan">): string {
   return `/${COUNTY_TO_SLUG[farm.lan]}/${farm.id}`;
+}
+
+export interface CountyGroup {
+  county: County;
+  farms: Farm[];
+}
+
+/** Farms bucketed by county in COUNTIES order, keeping each bucket's input
+ *  order; counties with no farms are left out. Callers apply their own
+ *  county ordering on top. */
+export function groupFarmsByCounty(farms: Farm[]): CountyGroup[] {
+  const byName = new Map<Farm["lan"], Farm[]>();
+  for (const farm of farms) {
+    const list = byName.get(farm.lan) ?? [];
+    list.push(farm);
+    byName.set(farm.lan, list);
+  }
+  return COUNTIES.flatMap((county) => {
+    const list = byName.get(county.name);
+    return list ? [{ county, farms: list }] : [];
+  });
 }
