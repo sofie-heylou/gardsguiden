@@ -1,15 +1,19 @@
 import type { Metadata } from "next";
-import dynamic from "next/dynamic";
+import nextDynamic from "next/dynamic";
 
 /** Kill switch for the step-by-step form: set SUBMIT_FORM_V2=1 in the
  *  environment to serve it, unset to fall back to the single-page form.  The
- *  page is static, so a flip takes effect on the next deploy.  Loading the
- *  chosen form dynamically keeps the other one out of the visitor's bundle. */
+ *  page renders per request so the flag is read where it is set — at runtime
+ *  — rather than baked in at build time, where the Docker build never sees
+ *  it.  Loading the chosen form dynamically keeps the other one out of the
+ *  visitor's bundle. */
+export const dynamic = "force-dynamic";
+
 const WIZARD = process.env.SUBMIT_FORM_V2 === "1";
 
 const Form = WIZARD
-  ? dynamic(() => import("./wizard/SubmitFarmWizard"))
-  : dynamic(() => import("./SubmitFarmForm"));
+  ? nextDynamic(() => import("./wizard/SubmitFarmWizard"))
+  : nextDynamic(() => import("./SubmitFarmForm"));
 
 const copy = WIZARD
   ? {

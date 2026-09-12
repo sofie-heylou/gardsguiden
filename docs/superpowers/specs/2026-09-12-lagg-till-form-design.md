@@ -384,8 +384,10 @@ approval e-mail can never target the empty address.
 ### 6.7 Kill switch
 
 `page.tsx` renders `SubmitFarmWizard` when `process.env.SUBMIT_FORM_V2 === "1"`,
-otherwise the old `SubmitFarmForm`. Unset in prod until stage 2 ships; the flag
-and the old form are deleted in stage 4.
+otherwise the old `SubmitFarmForm`. The page is `force-dynamic` so the flag
+is read at runtime: a flip in Railway takes effect on the restart it triggers,
+no rebuild needed (the Docker build only sees `NEXT_PUBLIC_*` variables). The
+flag and the old form are deleted in stage 4.
 
 ### 6.8 Other touch points
 
