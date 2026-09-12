@@ -152,22 +152,6 @@
     "tastingRoom": 1
   },
   {
-    "id": "restaurang-logen",
-    "name": "Restaurang Logen",
-    "products": [
-      "vin"
-    ],
-    "tastingRoom": 1
-  },
-  {
-    "id": "restaurang-ang",
-    "name": "Restaurang ÄNG",
-    "products": [
-      "vin"
-    ],
-    "tastingRoom": 1
-  },
-  {
     "id": "skafto-vingard",
     "name": "Skaftö Vingård",
     "products": [

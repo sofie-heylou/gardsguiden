@@ -117,6 +117,24 @@ function loadCache() {
   try { return JSON.parse(fs.readFileSync(GEOCODE_CACHE, 'utf8')); } catch { return {}; }
 }
 
+/** "72691" → "726 91": Nominatim only knows Swedish postcodes written with
+ *  the space. Anything that is not five digits is returned as-is. */
+function formatPostcode(raw) {
+  const digits = String(raw || '').replace(/\s+/g, '');
+  return /^\d{5}$/.test(digits) ? `${digits.slice(0, 3)} ${digits.slice(3)}` : raw;
+}
+
+/** Nominatim never says "no match" for a postcode it doesn't know — it falls
+ *  back to the nearest textual match, and "NNNNN, Sverige" resolves to a
+ *  hamlet literally named Sverige in Finspång. Eight musterier were pinned
+ *  there on 2026-09-06. So an answer only counts if it mentions the postcode
+ *  or one of the towns we asked about. */
+function plausible(result, postcode, towns) {
+  const display = (result.display_name || '').toLowerCase();
+  return (postcode && display.includes(postcode.toLowerCase())) ||
+    towns.some(town => display.includes(town.toLowerCase()));
+}
+
 /**
  * Tries the full street address first, then falls back to postcode + town.
  * A postcode pin is a village, not a town centre, so it is still useful — but
@@ -126,12 +144,13 @@ async function geocode(lead, cache) {
   // "Uppsala/Alunda" and "Skutskär/Gårdskär" are two towns in one field, and
   // Nominatim resolves neither as written — each half has to be tried alone.
   const towns = (lead.ort || '').split(/[/,]/).map(s => s.trim()).filter(Boolean);
+  const postcode = formatPostcode(lead.postnummer);
   const attempts = [];
   for (const town of towns.length ? towns : ['']) {
-    attempts.push({ precision: 'address', q: [lead.postadress, `${lead.postnummer} ${town}`.trim(), 'Sverige'].filter(Boolean).join(', ') });
+    attempts.push({ precision: 'address', q: [lead.postadress, `${postcode || ''} ${town}`.trim(), 'Sverige'].filter(Boolean).join(', ') });
   }
   // A Swedish postcode is specific on its own, so it beats a bare town name.
-  if (lead.postnummer) attempts.push({ precision: 'postcode', q: `${lead.postnummer}, Sverige` });
+  if (postcode) attempts.push({ precision: 'postcode', q: `${postcode}, Sverige` });
   for (const town of towns) {
     attempts.push({ precision: 'town', q: `${town}, Sverige` });
   }
@@ -147,7 +166,7 @@ async function geocode(lead, cache) {
           headers: { 'User-Agent': GEO_AGENT },
         });
         const data = res.ok ? await res.json() : [];
-        cache[q] = data.length
+        cache[q] = data.length && plausible(data[0], postcode, towns)
           ? { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon), display: data[0].display_name }
           : null;
       } catch {

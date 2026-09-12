@@ -1,6 +1,7 @@
 import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import { getFarmById, getAllFarms } from "../../../lib/farms";
+import { FARM_REDIRECTS } from "../../../lib/farmRedirects";
 import { farmBadges } from "../../../lib/farmBadges";
 import { SLUG_TO_COUNTY, COUNTY_TO_SLUG, farmPath } from "../../../lib/counties";
 import BackButton from "../../../components/BackButton";
@@ -58,7 +59,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!lan) return { title: "Gård hittades inte" };
 
   const farm = getFarmById(slug);
-  if (!farm) return { title: "Gård hittades inte" };
+  if (!farm) return FARM_REDIRECTS[slug] ? {} : { title: "Gård hittades inte" };
   if (COUNTY_TO_SLUG[farm.lan] !== county) return {}; // page redirects to the real URL
 
   const description = buildDescription(farm);
@@ -144,6 +145,12 @@ function FarmJsonLd({ farm }: { farm: Farm }) {
   );
 }
 
+/** The surviving row for an id that was deleted as a duplicate, if any. */
+function redirectTarget(slug: string): Farm | null {
+  const keptId = FARM_REDIRECTS[slug];
+  return keptId ? getFarmById(keptId) : null;
+}
+
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function FarmDetailPage({ params }: Props) {
@@ -151,11 +158,12 @@ export default async function FarmDetailPage({ params }: Props) {
   const lan = SLUG_TO_COUNTY[county];
   if (!lan) notFound();
 
-  const farm = getFarmById(slug);
+  const farm = getFarmById(slug) ?? redirectTarget(slug);
   if (!farm) notFound();
   // A farm reached under the wrong county (moved after curation, stale Google
-  // result) keeps working via its real URL instead of 404ing.
-  if (COUNTY_TO_SLUG[farm.lan] !== county) permanentRedirect(farmPath(farm));
+  // result), or under the id of a deleted duplicate, keeps working via its
+  // real URL instead of 404ing.
+  if (COUNTY_TO_SLUG[farm.lan] !== county || farm.id !== slug) permanentRedirect(farmPath(farm));
 
   // 49 farms have no coordinates yet — no map hero and no directions link for them.
   const hasCoords = farm.lat != null && farm.lng != null;

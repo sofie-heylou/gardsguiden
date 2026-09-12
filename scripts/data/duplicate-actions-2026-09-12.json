@@ -1,0 +1,17 @@
+{
+  "note": "Duplicate cleanup decided by Sofie 2026-09-12 from scripts/duplicate-review.js output. Every kept/deleted pair was checked against the business's own website. Applied with scripts/apply-trust-actions.js to the seed DB and prod; the deleted ids 301 to keptId via src/lib/farmRedirects.ts. cafe-angsbacken exists in prod only.",
+  "actions": [
+    { "action": "delete-duplicate", "id": "hagby-gard", "keptId": "hagby-gard-gardsbutik", "reason": "same site, phone and address; kept row has opening hours" },
+    { "action": "delete-duplicate", "id": "bryggerifabriken-fd-bryggeri-skeppsgossen", "keptId": "bryggerifabriken", "reason": "same site and address" },
+    { "action": "delete-duplicate", "id": "hops-n-leon-of-skaraborg-ab", "keptId": "bryggeriet-i-mariestad", "reason": "Hops N' Leon is the company behind Bryggeriet i Mariestad — same site, same door" },
+    { "action": "delete-duplicate", "id": "lidingo-musteri", "keptId": "lidingo-musteri-fiket", "reason": "same site and address; kept row is older and has hours" },
+    { "action": "delete-duplicate", "id": "skogslidens-bar", "keptId": "skogslidens-gardsbutik", "reason": "48 m apart, same farm" },
+    { "action": "delete-duplicate", "id": "fulltofta-gard-ab", "keptId": "bryggeri-1766", "reason": "one estate: fulltofta.com is 'Fulltofta Gård & Bryggeri 1766'; kept row has the street address" },
+    { "action": "delete-duplicate", "id": "bergs-appelgard-kopings-musteri-ab-hallstahammar", "keptId": "kopings-musteri-ab", "reason": "kopingsmusteri.se: shop, pressing and tastings at Norra Rasgärde 1, Köping; the Bergs row is the orchard in Hallstahammar" },
+    { "action": "delete-duplicate", "id": "tradgardscaf", "keptId": "susegard-gardsforsaljning", "reason": "Susegård's own café (same site and phone)" },
+    { "action": "delete-duplicate", "id": "brunneby-restaurang", "keptId": "brunneby-musteri-ab", "reason": "the musteri's restaurant; restaurants are not farm shops (2026-08-23 rule)" },
+    { "action": "delete-duplicate", "id": "restaurang-logen", "keptId": "astad-vingard", "reason": "Ästad Vingård's restaurant, filed under Västra Götaland with no kommun" },
+    { "action": "delete-duplicate", "id": "restaurang-ang", "keptId": "astad-vingard", "reason": "Ästad Vingård's restaurant, filed under Västra Götaland with no kommun" },
+    { "action": "delete-duplicate", "id": "cafe-angsbacken", "keptId": "angsbackens-handelstradgard", "reason": "the handelsträdgård's café (same site and address); prod-only manual row" }
+  ]
+}

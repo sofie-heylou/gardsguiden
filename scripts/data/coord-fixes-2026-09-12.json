@@ -1,0 +1,69 @@
+{
+  "note": "Eight musterier.se-lead rows whose postcode fallback had geocoded to the hamlet named Sverige in Finspång (see scripts/enrich-leads.js). Re-geocoded 2026-09-12 with verified results; kommun from scripts/kommun-lookup.js. Applied with scripts/apply-coord-fixes.js.",
+  "fixes": [
+    {
+      "id": "hakarps-musteri",
+      "lat": 57.7918701,
+      "lng": 14.2739261,
+      "kommun": "Jönköping",
+      "precision": "postcode",
+      "note": "Huskvarna, Jönköpings kommun, Jönköpings län, 561 30, Sverige"
+    },
+    {
+      "id": "musteri-lilla-grundemar",
+      "lat": 57.9043481,
+      "lng": 16.6931184,
+      "kommun": "Västervik",
+      "precision": "postcode",
+      "note": "Loftahammar, Västerviks kommun, Kalmar län, 590 95, Sverige"
+    },
+    {
+      "id": "sormlands-musteri-ab",
+      "lat": 59.3763155,
+      "lng": 17.0268194,
+      "kommun": "Strängnäs",
+      "precision": "town",
+      "note": "Strängnäs, Strängnäs kommun, Södermanlands län, 645 31, Sverige"
+    },
+    {
+      "id": "vastergard-pressen",
+      "lat": 59.0567823,
+      "lng": 16.5893,
+      "kommun": "Flen",
+      "precision": "postcode",
+      "note": "Flen, Flens kommun, Södermanlands län, 642 35, Sverige"
+    },
+    {
+      "id": "harakers-kvarnmusteri",
+      "lat": 59.7217766,
+      "lng": 16.4281471,
+      "kommun": "Västerås",
+      "precision": "postcode",
+      "note": "Skultuna, Västerås kommun, Västmanlands län, Sverige"
+    },
+    {
+      "id": "lungers-musteri",
+      "lat": 59.394187,
+      "lng": 15.8396643,
+      "kommun": "Arboga",
+      "precision": "town",
+      "note": "Arboga, Arboga kommun, Västmanlands län, 732 30, Sverige"
+    },
+    {
+      "id": "just-must",
+      "lat": 57.6629291,
+      "lng": 12.0401086,
+      "kommun": "Mölndal",
+      "precision": "address",
+      "note": "Rådavägen, Stensjöhöjd, Lackarebäck, Mölndal, Mölndals kommun, Västra Götalands län, 431 36, Sverige"
+    },
+    {
+      "id": "lodose-musteri",
+      "lat": 58.033758,
+      "lng": 12.1545711,
+      "kommun": "Lilla Edet",
+      "precision": "postcode",
+      "note": "Lödöse, Lilla Edets kommun, Västra Götalands län, 463 72, Sverige"
+    }
+  ]
+}
