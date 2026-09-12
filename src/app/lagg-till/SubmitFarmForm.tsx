@@ -82,7 +82,7 @@ export default function SubmitFarmForm() {
     setLinkError(field);
     onlineSection.current?.scrollIntoView({ behavior: "smooth", block: "center" });
     linkInputs.current[field === "none" ? "website" : field]?.focus({ preventScroll: true });
-    trackAddFarm("add_farm_error", field === "none" ? { kind: "no_link" } : { kind: "link_invalid", field });
+    trackAddFarm("add_farm_error", { mode: "owner", kind: field === "none" ? "no_link" : "link_invalid", field: field === "none" ? undefined : field });
   }
 
   // Funnel events: one "view" per page load, one "start" at the first touch,
@@ -100,7 +100,7 @@ export default function SubmitFarmForm() {
   function noteStart() {
     if (startedAt.current !== null) return;
     startedAt.current = Date.now();
-    trackAddFarm("add_farm_start");
+    trackAddFarm("add_farm_start", { mode: "owner" });
   }
 
   // The browser fires one `invalid` event per empty required box on every
@@ -108,12 +108,12 @@ export default function SubmitFarmForm() {
   function noteRequired(e: React.FormEvent<HTMLFormElement>) {
     if (Date.now() - lastRequiredReport.current < 500) return;
     lastRequiredReport.current = Date.now();
-    trackAddFarm("add_farm_error", { kind: "required", field: (e.target as HTMLInputElement).name || undefined });
+    trackAddFarm("add_farm_error", { mode: "owner", kind: "required", field: (e.target as HTMLInputElement).name || undefined });
   }
 
   function reportServerError(status: number) {
     const kind: AddFarmErrorKind = status === 429 ? "rate_limited" : "server";
-    trackAddFarm("add_farm_error", { kind });
+    trackAddFarm("add_farm_error", { mode: "owner", kind });
   }
 
   const linkFields: { field: LinkField; value: string; set: (v: string) => void; placeholder: string; hint: string }[] = [
@@ -207,7 +207,7 @@ export default function SubmitFarmForm() {
       });
     } catch {
       setError("Nätverksfel – försök igen");
-      trackAddFarm("add_farm_error", { kind: "network" });
+      trackAddFarm("add_farm_error", { mode: "owner", kind: "network" });
     } finally {
       setSaving(false);
     }

@@ -38,6 +38,15 @@ export interface AddFarmParams {
   seconds?: number;
 }
 
+const ADD_FARM_PARAM_KEYS: (keyof AddFarmParams)[] = [
+  "surface", "mode", "step", "kind", "field", "seconds",
+];
+
 export function trackAddFarm(event: AddFarmEvent, params: AddFarmParams = {}): void {
-  track(event, { ...params });
+  // GTM keeps every dataLayer key until it is overwritten, so an error's
+  // `kind` would otherwise ride along on the next event.  Pushing a key as
+  // undefined clears it, and the GA4 tag then leaves that parameter out
+  // (verified live; null would send an empty string instead).
+  const cleared = Object.fromEntries(ADD_FARM_PARAM_KEYS.map((key) => [key, undefined]));
+  track(event, { ...cleared, ...params });
 }
