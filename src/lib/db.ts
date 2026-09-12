@@ -170,6 +170,15 @@ function initSchema(db: Database.Database): void {
   if (!columnExists(db, "farm_submissions", "lng")) {
     db.exec(`ALTER TABLE farm_submissions ADD COLUMN lng REAL`);
   }
+  // Who sent it: the owner ('owner') or a visitor tipping us off ('visitor'),
+  // plus the visitor's free-text note.  Landed ahead of the tip form so the
+  // schema change has booted in prod before any code depends on it.
+  if (!columnExists(db, "farm_submissions", "role")) {
+    db.exec(`ALTER TABLE farm_submissions ADD COLUMN role TEXT NOT NULL DEFAULT 'owner'`);
+  }
+  if (!columnExists(db, "farm_submissions", "message")) {
+    db.exec(`ALTER TABLE farm_submissions ADD COLUMN message TEXT`);
+  }
 
   // ── Anonymous flag dedup ───────────────────────────────────────────────────
   // One row per (farm, visitor). visitor_hash is a keyed hash of the caller's

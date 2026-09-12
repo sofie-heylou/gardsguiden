@@ -39,8 +39,10 @@ desktop in the in-app browser; no new console errors.
 
 ## Stage 2 — owner wizard behind `SUBMIT_FORM_V2` (branch `lagg-till-stage2`)
 
-0. **Baseline** — `scripts/submission-stats.js` (spec §7); run once over
-   `railway ssh` and paste the numbers into the PR description.
+0. **Baseline** — `scripts/submission-stats.js` (spec §7). Run against prod
+   2026-09-12 (last 180 days): 6 submissions (W13: 2, W14: 2, W33: 1, W34: 1);
+   products 100 %, opening hours 17 %, description 83 %, phone or e-mail 83 %;
+   4 approved, 2 rejected.
 1. **`src/lib/openingHours.ts`** — `formatOpeningHours` + tests that round-trip
    through `getTodayHours`, `isOpenNow`, `parseHours`.
 2. **`src/lib/db.ts`** — `role` and `message` columns via `columnExists`.

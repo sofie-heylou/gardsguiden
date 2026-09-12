@@ -27,6 +27,18 @@ export const LINK_ERRORS: Record<LinkField, string> = {
 
 export const NO_LINK_ERROR = "Fyll i minst en: webbplats, Instagram eller Facebook.";
 
+export const LINK_PLACEHOLDERS: Record<LinkField, string> = {
+  website:   "ljungbacken.se",
+  instagram: "@ljungbackensgard",
+  facebook:  "facebook.com/ljungbacken",
+};
+
+export const LINK_HINTS: Record<LinkField, string> = {
+  website:   "Utan https:// går bra.",
+  instagram: "Bara namnet räcker.",
+  facebook:  "Sidans namn eller länk.",
+};
+
 const SCHEME = /^https?:\/\//i;
 /** Labels of letters (incl. å/ä/ö), digits and hyphens, then a TLD of ≥2 letters. */
 const HOST = /^([A-Za-z0-9À-ɏ-]+\.)+[A-Za-zÀ-ɏ]{2,}$/;

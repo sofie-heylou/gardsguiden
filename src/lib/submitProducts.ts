@@ -5,21 +5,22 @@
  *  is always one a category page shows. */
 
 import { CATEGORIES } from "./categories";
+import { capitalize } from "./utils";
 
 export interface SubmitProduct {
   value: string;
   label: string;
 }
 
-function capitalize(value: string): string {
-  return value.charAt(0).toLocaleUpperCase("sv") + value.slice(1);
-}
-
 export const SUBMIT_PRODUCT_LIST: readonly SubmitProduct[] = CATEGORIES
   .flatMap((category) => category.products)
   .map((value) => ({ value, label: capitalize(value) }));
 
-const KNOWN = new Set(SUBMIT_PRODUCT_LIST.map((p) => p.value));
+/** value → label, for anything that shows a picked product back. */
+export const PRODUCT_LABELS: ReadonlyMap<string, string> =
+  new Map(SUBMIT_PRODUCT_LIST.map((p) => [p.value, p.label]));
+
+const KNOWN = new Set(PRODUCT_LABELS.keys());
 
 /** Keeps only values the form offers, each once; anything else is dropped. */
 export function knownProducts(input: unknown): string[] {

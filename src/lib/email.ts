@@ -5,9 +5,11 @@
  * execution continues.
  */
 
+import { CONTACT_EMAIL } from "./site";
+
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const FROM = "Gårdsguiden <noreply@gardsguiden.se>";
-export const ADMIN_EMAIL = "hej@gardsguiden.se";
+export const ADMIN_EMAIL = CONTACT_EMAIL;
 
 export interface EmailPayload {
   to: string | string[];

@@ -19,3 +19,8 @@ export function slugify(name: string): string {
 export function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
+
+/** "ost" → "Ost", with Swedish casing rules for å/ä/ö. */
+export function capitalize(value: string): string {
+  return value.charAt(0).toLocaleUpperCase("sv") + value.slice(1);
+}

@@ -1,19 +1,19 @@
 import type { Farm } from "../types/farm";
 
 export const COUNTIES = [
-  { name: "Stockholm",    slug: "stockholm",    gardarSlug: "stockholms-lan",    displayName: "Stockholms län" },
-  { name: "Uppsala",      slug: "uppsala",      gardarSlug: "uppsala-lan",       displayName: "Uppsala län" },
-  { name: "Västmanland",  slug: "vastmanland",  gardarSlug: "vastmanlands-lan",  displayName: "Västmanlands län" },
-  { name: "Södermanland", slug: "sodermanland", gardarSlug: "sodermanlands-lan", displayName: "Södermanlands län" },
-  { name: "Skåne",        slug: "skane",        gardarSlug: "skane-lan",         displayName: "Skåne län" },
-  { name: "Kalmar",       slug: "kalmar",       gardarSlug: "kalmar-lan",        displayName: "Kalmar län" },
-  { name: "Gotland",        slug: "gotland",        gardarSlug: "gotlands-lan",        displayName: "Gotlands län" },
-  { name: "Västra Götaland", slug: "vastra-gotaland", gardarSlug: "vastra-gotalands-lan", displayName: "Västra Götalands län" },
-  { name: "Halland",         slug: "halland",         gardarSlug: "hallands-lan",          displayName: "Hallands län" },
-  { name: "Blekinge",        slug: "blekinge",        gardarSlug: "blekinge-lan",          displayName: "Blekinge län" },
-  { name: "Kronoberg",       slug: "kronoberg",       gardarSlug: "kronobergs-lan",        displayName: "Kronobergs län" },
-  { name: "Jönköping",       slug: "jonkoping",       gardarSlug: "jonkopings-lan",        displayName: "Jönköpings län" },
-  { name: "Östergötland",    slug: "ostergotland",    gardarSlug: "ostergotlands-lan",     displayName: "Östergötlands län" },
+  { name: "Stockholm",       slug: "stockholm",       gardarSlug: "stockholms-lan",       displayName: "Stockholms län",       iso: "SE-AB" },
+  { name: "Uppsala",         slug: "uppsala",         gardarSlug: "uppsala-lan",          displayName: "Uppsala län",          iso: "SE-C" },
+  { name: "Västmanland",     slug: "vastmanland",     gardarSlug: "vastmanlands-lan",     displayName: "Västmanlands län",     iso: "SE-U" },
+  { name: "Södermanland",    slug: "sodermanland",    gardarSlug: "sodermanlands-lan",    displayName: "Södermanlands län",    iso: "SE-D" },
+  { name: "Skåne",           slug: "skane",           gardarSlug: "skane-lan",            displayName: "Skåne län",            iso: "SE-M" },
+  { name: "Kalmar",          slug: "kalmar",          gardarSlug: "kalmar-lan",           displayName: "Kalmar län",           iso: "SE-H" },
+  { name: "Gotland",         slug: "gotland",         gardarSlug: "gotlands-lan",         displayName: "Gotlands län",         iso: "SE-I" },
+  { name: "Västra Götaland", slug: "vastra-gotaland", gardarSlug: "vastra-gotalands-lan", displayName: "Västra Götalands län", iso: "SE-O" },
+  { name: "Halland",         slug: "halland",         gardarSlug: "hallands-lan",         displayName: "Hallands län",         iso: "SE-N" },
+  { name: "Blekinge",        slug: "blekinge",        gardarSlug: "blekinge-lan",         displayName: "Blekinge län",         iso: "SE-K" },
+  { name: "Kronoberg",       slug: "kronoberg",       gardarSlug: "kronobergs-lan",       displayName: "Kronobergs län",       iso: "SE-G" },
+  { name: "Jönköping",       slug: "jonkoping",       gardarSlug: "jonkopings-lan",       displayName: "Jönköpings län",       iso: "SE-F" },
+  { name: "Östergötland",    slug: "ostergotland",    gardarSlug: "ostergotlands-lan",    displayName: "Östergötlands län",    iso: "SE-E" },
 ] as const;
 
 export type County = (typeof COUNTIES)[number];
@@ -64,4 +64,29 @@ export function groupFarmsByCounty(farms: Farm[]): CountyGroup[] {
     const list = byName.get(county.name);
     return list ? [{ county, farms: list }] : [];
   });
+}
+
+/** ISO 3166-2:SE code → county, derived like the other lookups above. */
+const ISO_TO_COUNTY: Record<string, Farm["lan"]> =
+  Object.fromEntries(COUNTIES.map((c) => [c.iso, c.name]));
+
+/** The county a geocoder region stands for, or "" when it is none of ours.
+ *  The ISO code (what Mapbox puts in `short_code`) is the stable key; the
+ *  text fallback accepts "Uppsala län", "Stockholms län" and the bare
+ *  genitive "Stockholms" — all of which the table's displayName already has. */
+export function countyFromRegion(region: { text?: string; short_code?: string }): Farm["lan"] | "" {
+  const byCode = region.short_code ? ISO_TO_COUNTY[region.short_code.toUpperCase()] : undefined;
+  if (byCode) return byCode;
+  const text = (region.text ?? "").trim().toLowerCase();
+  if (!text) return "";
+  const match = COUNTIES.find((c) => {
+    const display = c.displayName.toLowerCase();
+    return display === text || display === `${text} län`;
+  });
+  return match ? match.name : "";
+}
+
+/** "Uppsala län" for a county string, or the string itself when unknown. */
+export function countyDisplayName(lan: string): string {
+  return COUNTY_LAN_NAME[lan as Farm["lan"]] ?? lan;
 }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "../../../../lib/db";
 import { generateId, isValidEmail } from "../../../../lib/utils";
-import { sendEmail, emailHtml, table, row, ADMIN_EMAIL } from "../../../../lib/email";
+import { sendEmail, emailHtml, table, row, linkRow, ADMIN_EMAIL } from "../../../../lib/email";
 import { visitorHash } from "../../../../lib/visitor";
 import { requestAlertSlot, ALERT_CAP_NOTICE } from "../../../../lib/alertBudget";
 import { MAX_DESCRIPTION, MAX_EMAIL, MAX_LINK } from "../../../../lib/limits";
@@ -10,6 +10,16 @@ import { knownProducts } from "../../../../lib/submitProducts";
 import { submissionModerationButtons } from "../../../../lib/moderationEmail";
 
 export const dynamic = "force-dynamic";
+
+/** A body field is unknown until proven a string; blank means null, which is
+ *  also what an empty link stores. */
+function text(v: unknown): string | null {
+  return typeof v === "string" && v.trim() ? v.trim() : null;
+}
+
+function excerpt(t: string | null): string | null {
+  return t && t.length > 300 ? `${t.slice(0, 300)}…` : t;
+}
 
 /** Coordinates arrive from the client, so they are validated as numbers in
  *  range rather than trusted. */
@@ -79,6 +89,17 @@ export async function POST(req: NextRequest) {
   }
 
   const acceptedProducts = knownProducts(products);
+  // The free-text fields, read once for both the row and the e-mail.
+  const f = {
+    description: text(description),
+    address: text(address),
+    kommun: text(kommun),
+    lan: text(lan),
+    phone: text(phone),
+    email: text(email),
+    openingHours: text(openingHours),
+    season: text(season),
+  };
   const db = getDb();
   const submissionId = generateId();
 
@@ -110,16 +131,16 @@ export async function POST(req: NextRequest) {
   `).run(
     submissionId,
     (name as string).trim(),
-    typeof description === "string" ? description.trim() : null,
-    typeof address     === "string" ? address.trim()     : null,
-    typeof kommun      === "string" ? kommun.trim()      : null,
-    typeof lan         === "string" ? lan.trim()         : null,
+    f.description,
+    f.address,
+    f.kommun,
+    f.lan,
     links.values.website || null,
-    typeof phone       === "string" ? phone.trim()       : null,
-    typeof email       === "string" ? email.trim()       : null,
+    f.phone,
+    f.email,
     JSON.stringify(acceptedProducts),
-    typeof openingHours === "string" ? openingHours.trim() : null,
-    typeof season      === "string" ? season.trim()      : null,
+    f.openingHours,
+    f.season,
     onSiteSales  ? 1 : 0,
     tastingRoom  ? 1 : 0,
     links.values.facebook  || null,
@@ -141,12 +162,20 @@ export async function POST(req: NextRequest) {
       ${table(
         row("Gårdsnamn",  (name as string).trim()) +
         row("Inlämnad av", (submittedEmail as string).trim()) +
-        row("Webbplats",  links.values.website || null) +
-        row("Adress",     typeof address === "string" ? address.trim() : null) +
-        row("Kommun",     typeof kommun  === "string" ? kommun.trim()  : null) +
-        row("Län",        typeof lan     === "string" ? lan.trim()     : null) +
-        row("Säsong",     typeof season  === "string" ? season.trim()  : null) +
-        row("Produkter",  acceptedProducts.join(", "))
+        (links.values.website   ? linkRow("Webbplats", links.values.website)   : "") +
+        (links.values.instagram ? linkRow("Instagram", links.values.instagram) : "") +
+        (links.values.facebook  ? linkRow("Facebook",  links.values.facebook)  : "") +
+        row("Adress",     f.address) +
+        row("Kommun",     f.kommun) +
+        row("Län",        f.lan) +
+        row("Telefon",    f.phone) +
+        row("E-post",     f.email) +
+        row("Produkter",  acceptedProducts.join(", ")) +
+        row("Gårdsförsäljning", onSiteSales ? "Ja" : "Nej") +
+        row("Provsmakning",     tastingRoom ? "Ja" : "Nej") +
+        row("Öppettider", f.openingHours) +
+        row("Säsong",     f.season) +
+        row("Beskrivning", excerpt(f.description))
       )}
       ${submissionModerationButtons(submissionId)}
       ${decision === "send-last" ? ALERT_CAP_NOTICE : ""}

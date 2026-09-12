@@ -26,7 +26,7 @@ export type AddFarmSurface =
   | "header_menu" | "bottom_bar" | "listing_callout" | "om_page" | "musterier_empty";
 
 export type AddFarmErrorKind =
-  | "required" | "link_invalid" | "no_link" | "rate_limited" | "server" | "network";
+  | "required" | "invalid" | "link_invalid" | "no_link" | "rate_limited" | "server" | "network";
 
 /** Never field contents — only which box, which kind of problem, how far. */
 export interface AddFarmParams {

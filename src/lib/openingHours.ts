@@ -127,3 +127,47 @@ export function getOpenStatus(rows: ParsedDay[], now: Date): OpenStatus {
 
   return { status: "unknown" };
 }
+
+// ── Building the string from the form ───────────────────────────────────────
+// The add-a-farm form collects hours as one row per day and stores them in
+// the same 7-segment shape Google-sourced farms already have, so every
+// consumer above (today's hours, Öppet nu, the table) works for submitted
+// farms without special cases.
+
+export const DAY_KEYS = [
+  "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
+] as const;
+export type DayKey = (typeof DAY_KEYS)[number];
+
+/** Monday-first view of DAYS_SV (which is Sunday-first to match getDay()). */
+export const DAY_NAMES_SV: Record<DayKey, string> = Object.fromEntries(
+  DAY_KEYS.map((day, i) => [day, DAYS_SV[(i + 1) % 7]])
+) as Record<DayKey, string>;
+
+export interface DayHours {
+  open: boolean;
+  /** "HH:MM" as <input type="time"> gives it; "" until filled in. */
+  from: string;
+  to: string;
+}
+
+export type WeekHours = Record<DayKey, DayHours>;
+
+export function emptyWeek(): WeekHours {
+  return Object.fromEntries(
+    DAY_KEYS.map((day) => [day, { open: false, from: "", to: "" }])
+  ) as WeekHours;
+}
+
+/** "måndag: 10:00–16:00, tisdag: Stängt, …" in Monday→Sunday order, or ""
+ *  when no day is open.  Open days with a missing time are left out of the
+ *  check here — validation refuses them before this runs. */
+export function formatOpeningHours(week: WeekHours): string {
+  if (!DAY_KEYS.some((day) => week[day].open)) return "";
+  return DAY_KEYS
+    .map((day) => {
+      const { open, from, to } = week[day];
+      return `${DAY_NAMES_SV[day]}: ${open ? `${from}–${to}` : "Stängt"}`;
+    })
+    .join(", ");
+}

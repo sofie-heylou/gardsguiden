@@ -15,10 +15,12 @@ const AddressAutofill = nextDynamic(
 );
 import type { AddressAutofillRetrieveResponse } from "@mapbox/search-js-core";
 import { COUNTY_NAMES } from "../../lib/counties";
+import { isWidgetWrite, pickFromRetrieve } from "../../lib/addressAutofill";
 import { inputCls } from "../../lib/ui";
 import { MAX_DESCRIPTION, MAX_EMAIL, MAX_LINK } from "../../lib/limits";
 import {
-  LINK_ERRORS, LINK_LABELS, NO_LINK_ERROR, hasAnyLink, normalizeLinks, type LinkField,
+  LINK_ERRORS, LINK_FIELDS, LINK_HINTS, LINK_LABELS, LINK_PLACEHOLDERS, NO_LINK_ERROR,
+  hasAnyLink, normalizeLinks, type LinkField,
 } from "../../lib/links";
 import { SUBMIT_PRODUCT_LIST } from "../../lib/submitProducts";
 import { secondsSince, trackAddFarm, type AddFarmErrorKind } from "../../lib/analytics";
@@ -116,31 +118,18 @@ export default function SubmitFarmForm() {
     trackAddFarm("add_farm_error", { mode: "owner", kind });
   }
 
-  const linkFields: { field: LinkField; value: string; set: (v: string) => void; placeholder: string; hint: string }[] = [
-    { field: "website",   value: website,   set: setWebsite,   placeholder: "ljungbacken.se",           hint: "Utan https:// går bra." },
-    { field: "facebook",  value: facebook,  set: setFacebook,  placeholder: "facebook.com/ljungbacken", hint: "Sidans namn eller länk." },
-    { field: "instagram", value: instagram, set: setInstagram, placeholder: "@ljungbackensgard",        hint: "Bara namnet räcker." },
-  ];
+  const linkState: Record<LinkField, [string, (v: string) => void]> = {
+    website: [website, setWebsite], instagram: [instagram, setInstagram], facebook: [facebook, setFacebook],
+  };
 
   function handleAutofill(res: AddressAutofillRetrieveResponse) {
-    const feature = res.features[0];
-    if (!feature) return;
-    const props = feature.properties;
-    // GeoJSON order is [lng, lat]. Keeping these is what gives the approved
-    // farm a working map and directions link.
-    const coords = feature.geometry?.coordinates;
-    if (Array.isArray(coords) && coords.length === 2) {
-      setLng(coords[0]);
-      setLat(coords[1]);
-    }
-    setAddress(props.full_address ?? props.place_name ?? "");
-    const ctx = props.context ?? [];
-    const placeText  = ctx.find((c) => c.id.startsWith("place"))?.text  ?? "";
-    const regionText = ctx.find((c) => c.id.startsWith("region"))?.text ?? "";
-    // Mapbox returns Swedish counties in genitive (e.g. "Stockholms") — strip trailing "s"
-    const normalizedLan = regionText.endsWith("s") ? regionText.slice(0, -1) : regionText;
-    if (placeText)      setKommun(placeText);
-    if (normalizedLan)  setLan(normalizedLan);
+    const pick = pickFromRetrieve(res);
+    if (!pick) return;
+    setAddress(pick.address);
+    setLat(pick.lat);
+    setLng(pick.lng);
+    if (pick.kommun) setKommun(pick.kommun);
+    if (pick.lan) setLan(pick.lan);
   }
 
   function toggleProduct(value: string) {
@@ -287,7 +276,7 @@ export default function SubmitFarmForm() {
               required
               autoComplete="shipping address-line1"
               value={address}
-              onChange={(e) => { setAddress(e.target.value); setLat(null); setLng(null); }}
+              onChange={(e) => { if (isWidgetWrite(e)) return; setAddress(e.target.value); setLat(null); setLng(null); }}
               placeholder="Gårdsvägen 1, 123 45 Orten"
               className={inputCls}
             />
@@ -338,16 +327,16 @@ export default function SubmitFarmForm() {
           )}
         </div>
 
-        {linkFields.map(({ field, value, set, placeholder, hint }) => (
-          <Field key={field} label={LINK_LABELS[field]} hint={hint}>
+        {LINK_FIELDS.map((field) => (
+          <Field key={field} label={LINK_LABELS[field]} hint={LINK_HINTS[field]}>
             <input
               ref={(el) => { linkInputs.current[field] = el; }}
               type="text"
               inputMode={field === "website" ? "url" : undefined}
               maxLength={MAX_LINK}
-              value={value}
-              onChange={(e) => { set(e.target.value); setLinkError(null); }}
-              placeholder={placeholder}
+              value={linkState[field][0]}
+              onChange={(e) => { linkState[field][1](e.target.value); setLinkError(null); }}
+              placeholder={LINK_PLACEHOLDERS[field]}
               aria-invalid={linkError === field || undefined}
               className={inputCls}
             />
