@@ -42,6 +42,12 @@ const ADD_FARM_PARAM_KEYS: (keyof AddFarmParams)[] = [
   "surface", "mode", "step", "kind", "field", "seconds",
 ];
 
+/** Seconds since `startedAtMs`, rounded to the nearest 5 — coarse on purpose. */
+export function secondsSince(startedAtMs: number | null): number | undefined {
+  if (startedAtMs === null) return undefined;
+  return Math.round((Date.now() - startedAtMs) / 5000) * 5;
+}
+
 export function trackAddFarm(event: AddFarmEvent, params: AddFarmParams = {}): void {
   // GTM keeps every dataLayer key until it is overwritten, so an error's
   // `kind` would otherwise ride along on the next event.  Pushing a key as

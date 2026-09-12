@@ -21,7 +21,7 @@ import {
   LINK_ERRORS, LINK_LABELS, NO_LINK_ERROR, hasAnyLink, normalizeLinks, type LinkField,
 } from "../../lib/links";
 import { SUBMIT_PRODUCT_LIST } from "../../lib/submitProducts";
-import { trackAddFarm, type AddFarmErrorKind } from "../../lib/analytics";
+import { secondsSince, trackAddFarm, type AddFarmErrorKind } from "../../lib/analytics";
 
 const TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
 
@@ -203,7 +203,7 @@ export default function SubmitFarmForm() {
       setSent(true);
       trackAddFarm("add_farm_submitted", {
         mode: "owner",
-        seconds: startedAt.current ? Math.round((Date.now() - startedAt.current) / 5) * 5 : undefined,
+        seconds: secondsSince(startedAt.current),
       });
     } catch {
       setError("Nätverksfel – försök igen");
