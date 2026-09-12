@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
+import { Check, Loader2 } from "lucide-react";
 import type { ReactNode } from "react";
 import { STEP_COUNT, STEP_TITLES } from "./state";
 
@@ -12,6 +12,13 @@ export const labelCls = "block text-sm font-medium text-stone-700";
 export const hintCls = "text-xs text-stone-500 leading-relaxed";
 export const errorTextCls = "text-sm text-red-700";
 export const cardCls = "bg-white rounded-xl border border-stone-100 shadow-sm p-5 space-y-4";
+export const secondaryBtnCls = "min-h-11 px-4 rounded-lg border border-stone-300 text-sm font-semibold text-stone-800 hover:border-stone-500";
+
+/** After a failed check: focus lands on the first box marked invalid, once
+ *  React has painted the marks. */
+export function focusFirstInvalid(form: HTMLFormElement | null): void {
+  requestAnimationFrame(() => form?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus());
+}
 
 /** What a box and its Field share: the id, and the message or hint under it. */
 export interface FieldSpec {
@@ -187,5 +194,25 @@ export function StepButtons({ onBack, primaryLabel, busy }: {
         {busy ? <Loader2 size={16} className="animate-spin" /> : primaryLabel}
       </button>
     </div>
+  );
+}
+
+/** The green tick line that opens every "it went through" screen. */
+export function SentHeading({ children }: { children: ReactNode }) {
+  return (
+    <p className="flex items-center gap-2 text-lg font-semibold text-emerald-700">
+      <Check size={20} className="shrink-0" />
+      {children}
+    </p>
+  );
+}
+
+/** What the server said when a send failed; nothing when it did not. */
+export function ServerError({ message }: { message: string }) {
+  if (!message) return null;
+  return (
+    <p role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+      {message}
+    </p>
   );
 }

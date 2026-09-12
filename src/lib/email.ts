@@ -99,6 +99,11 @@ export function escapeHtml(value: string): string {
 }
 
 /** A label/value row.  The value is escaped — pass trusted markup via rowRaw. */
+/** The bold first line of an admin alert. */
+export function emailHeading(text: string): string {
+  return `<p style="margin:0 0 16px;font-size:15px;font-weight:600;color:#1c1917;">${escapeHtml(text)}</p>`;
+}
+
 export function row(label: string, value: string | null | undefined): string {
   if (!value) return "";
   return rowRaw(label, escapeHtml(value));

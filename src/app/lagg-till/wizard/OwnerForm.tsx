@@ -1,71 +1,39 @@
 "use client";
 
-import { useEffect, useReducer, useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { secondsSince, trackAddFarm } from "../../../lib/analytics";
 import { normalizeLinks } from "../../../lib/links";
 import { emptyWeek, formatOpeningHours } from "../../../lib/openingHours";
 import { ProgressBar, StepButtons } from "./fields";
-import {
-  STEP_COUNT, STEP_ERROR_KEY, errorKind, errorsAfterPatch, initialValues, validateStep,
-  type FormValues, type StepErrors,
-} from "./state";
+import { STEP_COUNT, initialValues, validateStep, type FormValues } from "./state";
 import Step1Farm from "./steps/Step1Farm";
 import Step2Links from "./steps/Step2Links";
 import Step3Offer from "./steps/Step3Offer";
 import Step4Description from "./steps/Step4Description";
 import Step5Review from "./steps/Step5Review";
-import type { Patch } from "./steps/types";
 import ThankYou from "./ThankYou";
+import { useAddFarmForm } from "./useAddFarmForm";
 import { clearDraft, formatDraftDate, readDraft, useDraftAutosave, type Draft } from "./useDraft";
 
-type Phase = "editing" | "sending" | "sent";
-
 const MODE = "owner" as const;
-
-// Values and their errors change together — a box's message goes away as
-// soon as its value changes — so they live in one reducer.
-interface FormState { values: FormValues; errors: StepErrors }
-type FormAction =
-  | { type: "patch"; patch: Patch }
-  | { type: "errors"; errors: StepErrors }
-  | { type: "restore"; values: FormValues };
-
-function formReducer(state: FormState, action: FormAction): FormState {
-  switch (action.type) {
-    case "patch": {
-      const patch = typeof action.patch === "function" ? action.patch(state.values) : action.patch;
-      return { values: { ...state.values, ...patch }, errors: errorsAfterPatch(state.errors, Object.keys(patch)) };
-    }
-    case "errors":
-      return { ...state, errors: action.errors };
-    case "restore":
-      return { values: action.values, errors: {} };
-  }
-}
 
 /** A saved draft may predate a field; missing keys fall back to the blanks. */
 function restoreValues(saved: FormValues): FormValues {
   return { ...initialValues(), ...saved, hours: { ...emptyWeek(), ...saved.hours } };
 }
 
-/** The five-step owner form.  `active` is false while the tip side of the
- *  page is showing: the form stays mounted (and keeps its state) but only
- *  reports its first step once it is actually on screen. */
-export default function OwnerForm({ active, onTip }: { active: boolean; onTip: () => void }) {
-  const [{ values, errors }, dispatch] = useReducer(formReducer, undefined, (): FormState => ({ values: initialValues(), errors: {} }));
+/** The five-step owner form.  Step 1's "shown" event belongs to the page
+ *  container, which knows which side is on screen. */
+export default function OwnerForm({ onTip }: { onTip: () => void }) {
+  const form = useAddFarmForm(MODE, initialValues);
+  const { values, errors, update } = form;
   const [step, setStep] = useState(1);
   const [returnToReview, setReturnToReview] = useState(false);
-  const [phase, setPhase] = useState<Phase>("editing");
-  const [serverError, setServerError] = useState("");
   // undefined: not looked yet · Draft: banner showing · null: decided.
   const [pendingDraft, setPendingDraft] = useState<Draft | null | undefined>(undefined);
-
   const rootRef = useRef<HTMLDivElement>(null);
-  const formRef = useRef<HTMLFormElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
-  const startedAt = useRef<number | null>(null);
   const mounted = useRef(false);
-  const shown = useRef(false);
 
   useEffect(() => {
     // Effects run twice in development (Strict Mode); read the draft once.
@@ -74,30 +42,12 @@ export default function OwnerForm({ active, onTip }: { active: boolean; onTip: (
     setPendingDraft(readDraft());
   }, []);
 
-  useEffect(() => {
-    if (!active || shown.current) return;
-    shown.current = true;
-    trackAddFarm("add_farm_step", { mode: MODE, step: 1 });
-  }, [active]);
-
-  useDraftAutosave(values, step, pendingDraft === null && phase === "editing");
-
-  function noteStart() {
-    if (startedAt.current !== null) return;
-    startedAt.current = Date.now();
-    trackAddFarm("add_farm_start", { mode: MODE });
-  }
-
-  function update(patch: Patch) {
-    dispatch({ type: "patch", patch });
-    noteStart();
-  }
+  useDraftAutosave(values, step, pendingDraft === null && form.phase === "editing");
 
   /** Every step change goes through here: one event, the new step brought
    *  into view, focus on its question. */
   function goTo(next: number) {
-    dispatch({ type: "errors", errors: {} });
-    setServerError("");
+    form.clearErrors();
     setStep(next);
     trackAddFarm("add_farm_step", { mode: MODE, step: next });
     requestAnimationFrame(() => {
@@ -106,66 +56,36 @@ export default function OwnerForm({ active, onTip }: { active: boolean; onTip: (
     });
   }
 
-  function handleNext(e: FormEvent) {
+  async function handleNext(e: FormEvent) {
     e.preventDefault();
-    const found = validateStep(step, values);
-    const firstKey = Object.keys(found)[0];
-    if (firstKey) {
-      dispatch({ type: "errors", errors: found });
-      trackAddFarm("add_farm_error", {
-        mode: MODE, step, kind: errorKind(firstKey),
-        field: firstKey === STEP_ERROR_KEY ? undefined : firstKey,
-      });
-      requestAnimationFrame(() => formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus());
+    if (form.reportErrors(validateStep(step, values), step)) return;
+    if (step < STEP_COUNT) {
+      if (returnToReview) { setReturnToReview(false); goTo(STEP_COUNT); } else goTo(step + 1);
       return;
     }
-    if (step === STEP_COUNT) { void submit(); return; }
-    if (returnToReview) { setReturnToReview(false); goTo(STEP_COUNT); return; }
-    goTo(step + 1);
-  }
-
-  async function submit() {
     // Step 2 has already refused links that cannot be read, so this succeeds.
     const links = normalizeLinks(values);
-    setPhase("sending");
-    setServerError("");
-    try {
-      const res = await fetch("/api/farms/submit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: values.name, description: values.description,
-          address: values.address, kommun: values.kommun, lan: values.lan,
-          ...(links.ok ? links.values : {}),
-          phone: values.phone, email: values.email,
-          products: values.products,
-          onSiteSales: values.onSiteSales, tastingRoom: values.tastingRoom,
-          openingHours: values.hoursMode === "fixed" ? formatOpeningHours(values.hours) : "",
-          season: values.season,
-          submittedEmail: values.submittedEmail,
-          lat: values.lat, lng: values.lng,
-        }),
-      });
-      const data = (await res.json()) as { ok?: boolean; error?: string };
-      if (!res.ok) {
-        setServerError(data.error ?? "Något gick fel");
-        trackAddFarm("add_farm_error", { mode: MODE, step, kind: res.status === 429 ? "rate_limited" : "server" });
-        setPhase("editing");
-        return;
-      }
+    const result = await form.send({
+      name: values.name, description: values.description,
+      address: values.address, kommun: values.kommun, lan: values.lan,
+      ...(links.ok ? links.values : {}),
+      phone: values.phone, email: values.email,
+      products: values.products,
+      onSiteSales: values.onSiteSales, tastingRoom: values.tastingRoom,
+      openingHours: values.hoursMode === "fixed" ? formatOpeningHours(values.hours) : "",
+      season: values.season,
+      submittedEmail: values.submittedEmail,
+      lat: values.lat, lng: values.lng,
+    }, step);
+    if (result.ok) {
       clearDraft();
-      setPhase("sent");
-      trackAddFarm("add_farm_submitted", { mode: MODE, seconds: secondsSince(startedAt.current) });
-    } catch {
-      setServerError("Nätverksfel – försök igen");
-      trackAddFarm("add_farm_error", { mode: MODE, step, kind: "network" });
-      setPhase("editing");
+      trackAddFarm("add_farm_submitted", { mode: MODE, seconds: secondsSince(form.startedAt.current) });
     }
   }
 
   function restoreDraft(draft: Draft) {
-    dispatch({ type: "restore", values: restoreValues(draft.values) });
-    startedAt.current = Date.now();
+    form.replace(restoreValues(draft.values));
+    form.startedAt.current = Date.now();
     setPendingDraft(null);
     trackAddFarm("add_farm_draft_restored", { mode: MODE });
     goTo(Math.min(Math.max(draft.step, 1), STEP_COUNT));
@@ -176,7 +96,7 @@ export default function OwnerForm({ active, onTip }: { active: boolean; onTip: (
     setPendingDraft(null);
   }
 
-  if (phase === "sent") {
+  if (form.phase === "sent") {
     return <ThankYou name={values.name} email={values.submittedEmail} lan={values.lan} onTip={onTip} />;
   }
 
@@ -204,7 +124,7 @@ export default function OwnerForm({ active, onTip }: { active: boolean; onTip: (
 
       <ProgressBar step={step} />
 
-      <form ref={formRef} onSubmit={handleNext} noValidate className="space-y-4">
+      <form ref={form.formRef} onSubmit={handleNext} noValidate className="space-y-4">
         {step === 1 && <Step1Farm {...stepProps} />}
         {step === 2 && <Step2Links {...stepProps} />}
         {step === 3 && <Step3Offer {...stepProps} />}
@@ -212,7 +132,7 @@ export default function OwnerForm({ active, onTip }: { active: boolean; onTip: (
         {step === 5 && (
           <Step5Review
             {...stepProps}
-            serverError={serverError}
+            serverError={form.serverError}
             onEdit={(target) => { setReturnToReview(true); goTo(target); }}
           />
         )}
@@ -220,7 +140,7 @@ export default function OwnerForm({ active, onTip }: { active: boolean; onTip: (
         <StepButtons
           onBack={step > 1 ? () => goTo(step - 1) : undefined}
           primaryLabel={primaryLabel}
-          busy={phase === "sending"}
+          busy={form.phase === "sending"}
         />
 
         {step === 1 && (

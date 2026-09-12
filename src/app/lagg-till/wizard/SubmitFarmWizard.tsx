@@ -1,40 +1,39 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { trackAddFarm } from "../../../lib/analytics";
+import { trackAddFarm, type AddFarmMode } from "../../../lib/analytics";
 import OwnerForm from "./OwnerForm";
-import TipForm from "./steps/TipForm";
+import TipForm from "./TipForm";
 
-type Mode = "owner" | "tip";
-
-const TABS: { mode: Mode; label: string }[] = [
+const TABS: { mode: AddFarmMode; label: string }[] = [
   { mode: "owner", label: "Jag driver gården" },
   { mode: "tip",   label: "Jag vill tipsa om en gård" },
 ];
 
 /** The page's two sides: the owner's five steps, and a visitor's one-screen
- *  tip.  Both stay mounted so switching never loses what was typed; the
- *  owner side is what the entry links land on, `?tips=1` opens the other. */
-export default function SubmitFarmWizard() {
-  // null until the URL has been read on the client: the owner side is drawn
-  // meanwhile (what the server rendered), but neither side counts as shown.
-  const [mode, setMode] = useState<Mode | null>(null);
-  const shownMode = mode ?? "owner";
+ *  tip.  A side is mounted the first time it is shown and stays mounted, so
+ *  switching never loses what was typed — and a visitor who only came to tip
+ *  never loads the owner form's address widget. */
+export default function SubmitFarmWizard({ initialMode }: { initialMode: AddFarmMode }) {
+  const [mode, setMode] = useState<AddFarmMode>(initialMode);
+  const [seen, setSeen] = useState<Set<AddFarmMode>>(() => new Set([initialMode]));
   const mounted = useRef(false);
 
   useEffect(() => {
     // Effects run twice in development (Strict Mode); count the view once.
     if (mounted.current) return;
     mounted.current = true;
-    const initial: Mode = new URLSearchParams(window.location.search).get("tips") === "1" ? "tip" : "owner";
-    setMode(initial);
-    trackAddFarm("add_farm_view", { mode: initial });
-  }, []);
+    trackAddFarm("add_farm_view", { mode: initialMode });
+    trackAddFarm("add_farm_step", { mode: initialMode, step: 1 });
+  }, [initialMode]);
 
-  function switchTo(next: Mode) {
+  function switchTo(next: AddFarmMode) {
     if (next === mode) return;
     setMode(next);
-    if (next === "tip") trackAddFarm("add_farm_step", { mode: "tip", step: 1 });
+    if (!seen.has(next)) {
+      setSeen(new Set(seen).add(next));
+      trackAddFarm("add_farm_step", { mode: next, step: 1 });
+    }
   }
 
   return (
@@ -46,11 +45,11 @@ export default function SubmitFarmWizard() {
             type="button"
             role="tab"
             id={`tab-${tab.mode}`}
-            aria-selected={shownMode === tab.mode}
+            aria-selected={mode === tab.mode}
             aria-controls={`panel-${tab.mode}`}
             onClick={() => switchTo(tab.mode)}
             className={`flex-1 min-h-11 rounded-lg px-2 text-sm font-medium transition-colors ${
-              shownMode === tab.mode ? "bg-white text-stone-900 shadow-sm" : "text-stone-600 hover:text-stone-900"
+              mode === tab.mode ? "bg-white text-stone-900 shadow-sm" : "text-stone-600 hover:text-stone-900"
             }`}
           >
             {tab.label}
@@ -58,11 +57,11 @@ export default function SubmitFarmWizard() {
         ))}
       </div>
 
-      <div id="panel-owner" role="tabpanel" aria-labelledby="tab-owner" hidden={shownMode !== "owner"}>
-        <OwnerForm active={mode === "owner"} onTip={() => switchTo("tip")} />
+      <div id="panel-owner" role="tabpanel" aria-labelledby="tab-owner" hidden={mode !== "owner"}>
+        {seen.has("owner") && <OwnerForm onTip={() => switchTo("tip")} />}
       </div>
-      <div id="panel-tip" role="tabpanel" aria-labelledby="tab-tip" hidden={shownMode !== "tip"}>
-        <TipForm />
+      <div id="panel-tip" role="tabpanel" aria-labelledby="tab-tip" hidden={mode !== "tip"}>
+        {seen.has("tip") && <TipForm />}
       </div>
     </div>
   );

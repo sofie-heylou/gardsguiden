@@ -29,10 +29,13 @@ export type AddFarmSurface =
 export type AddFarmErrorKind =
   | "required" | "invalid" | "link_invalid" | "no_link" | "rate_limited" | "server" | "network";
 
+/** Which side of the add-a-farm page: the owner's steps or a visitor's tip. */
+export type AddFarmMode = "owner" | "tip";
+
 /** Never field contents — only which box, which kind of problem, how far. */
 export interface AddFarmParams {
   surface?: AddFarmSurface;
-  mode?: "owner" | "tip";
+  mode?: AddFarmMode;
   step?: number;
   kind?: AddFarmErrorKind;
   field?: string;

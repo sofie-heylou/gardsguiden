@@ -13,15 +13,26 @@ import { sendEmail, emailHtml, btn, escapeHtml, ADMIN_EMAIL } from "./email";
 import { slugify } from "./utils";
 import { COUNTY_TO_SLUG, farmPath } from "./counties";
 import type { Farm } from "../types/farm";
-import { isTip, notFound, type ActionFailure } from "./actionResult";
+import { notFound, type ActionFailure } from "./actionResult";
 import { geocodeAddress } from "./geocode";
 import { SITE_URL } from "./site";
+
+/** Who sent a row in farm_submissions: the farm's owner, whose submission
+ *  can be approved into the catalogue, or a visitor tipping us off, whose row
+ *  is a lead that is only ever marked handled. */
+export type SubmissionRole = "owner" | "visitor";
 
 export interface PendingSubmission {
   id: string;
   name: string;
   submitted_email: string;
-  role: "owner" | "visitor";
+}
+
+export interface PendingTip {
+  id: string;
+  name: string;
+  address: string | null;
+  submitted_email: string;
 }
 
 interface SubmissionRow extends PendingSubmission {
@@ -58,14 +69,37 @@ function newFarmId(db: Database, name: string): string {
   throw new Error(`Could not mint a free farm id for "${name}"`);
 }
 
-/** The submission behind a pending id, or null.  Used to name the target on the
- *  confirmation page before anything is changed. */
+/** The owner submission behind a pending id, or null.  Used to name the
+ *  target on the confirmation page before anything is changed.  Tips never
+ *  match: they are not approvable, so to this family they do not exist. */
 export function getPendingSubmission(id: string): PendingSubmission | null {
   const row = getDb().prepare(`
-    SELECT id, name, submitted_email, role
-    FROM farm_submissions WHERE id = ? AND status = 'pending'
+    SELECT id, name, submitted_email
+    FROM farm_submissions WHERE id = ? AND status = 'pending' AND role = 'owner'
   `).get(id) as PendingSubmission | undefined;
   return row ?? null;
+}
+
+/** The visitor tip behind a pending id, or null. */
+export function getPendingTip(id: string): PendingTip | null {
+  const row = getDb().prepare(`
+    SELECT id, name, address, submitted_email
+    FROM farm_submissions WHERE id = ? AND status = 'pending' AND role = 'visitor'
+  `).get(id) as PendingTip | undefined;
+  return row ?? null;
+}
+
+/** Close the loop on a tip once the farm has been looked up.  No e-mail to
+ *  the sender: they were not promised one, and "handled" may mean the farm
+ *  did not fit. */
+export function markTipHandled(id: string): RejectResult {
+  if (!getPendingTip(id)) return notFound();
+  getDb().prepare(`
+    UPDATE farm_submissions
+    SET status = 'handled', reviewed_at = datetime('now')
+    WHERE id = ?
+  `).run(id);
+  return { ok: true };
 }
 
 /** Publish the farm and close the submission.  All-or-nothing: a half-approved
@@ -165,13 +199,12 @@ export async function approveSubmission(id: string): Promise<ApproveResult> {
   const submission = db.prepare(`
     SELECT id, name, description, address, kommun, lan,
            website, phone, email, products, opening_hours, season,
-           on_site_sales, tasting_room, submitted_email, role,
+           on_site_sales, tasting_room, submitted_email,
            facebook, instagram, lat, lng
-    FROM farm_submissions WHERE id = ? AND status = 'pending'
+    FROM farm_submissions WHERE id = ? AND status = 'pending' AND role = 'owner'
   `).get(id) as SubmissionRow | undefined;
 
   if (!submission) return notFound();
-  if (submission.role === "visitor") return isTip();
 
   // Prefer what the address autofill captured; fall back to geocoding so a
   // hand-typed address still yields a farm with a working map.
@@ -190,7 +223,6 @@ export async function approveSubmission(id: string): Promise<ApproveResult> {
 export function rejectSubmission(id: string, notes?: string | null): RejectResult {
   const submission = getPendingSubmission(id);
   if (!submission) return notFound();
-  if (submission.role === "visitor") return isTip();
 
   getDb().prepare(`
     UPDATE farm_submissions

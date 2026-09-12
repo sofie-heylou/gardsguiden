@@ -1,21 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "../../../../lib/db";
 import { generateId, isValidEmail } from "../../../../lib/utils";
-import { sendEmail, emailHtml, table, row, linkRow, ADMIN_EMAIL } from "../../../../lib/email";
+import { sendEmail, emailHtml, emailHeading, table, row, linkRow, ADMIN_EMAIL } from "../../../../lib/email";
 import { visitorHash } from "../../../../lib/visitor";
 import { requestAlertSlot, ALERT_CAP_NOTICE } from "../../../../lib/alertBudget";
 import { MAX_DESCRIPTION, MAX_EMAIL, MAX_LINK, MAX_NAME, MAX_TIP_MESSAGE } from "../../../../lib/limits";
 import { LINK_ERRORS, NO_LINK_ERROR, hasAnyLink, normalizeLinks, type LinkValues } from "../../../../lib/links";
-import { submissionModerationButtons } from "../../../../lib/moderationEmail";
+import { submissionModerationButtons, tipModerationButtons } from "../../../../lib/moderationEmail";
+import type { SubmissionRole } from "../../../../lib/submissionActions";
 import { knownProducts } from "../../../../lib/submitProducts";
 import { COUNTY_NAMES } from "../../../../lib/counties";
 
 export const dynamic = "force-dynamic";
-
-/** Two kinds of sender.  An owner adds their own farm and can be approved
- *  straight into the catalogue; a visitor's tip is a lead for the normal
- *  intake, so it needs less and is never approved as-is. */
-type Role = "owner" | "visitor";
 
 /** A body field is unknown until proven a string; blank means null, which is
  *  also what an empty link stores. */
@@ -34,7 +30,7 @@ function coord(v: unknown, max: number): number | null {
 }
 
 interface Submission {
-  role: Role;
+  role: SubmissionRole;
   name: string;
   description: string | null;
   address: string | null;
@@ -49,30 +45,33 @@ interface Submission {
   onSiteSales: boolean;
   tastingRoom: boolean;
   message: string | null;
+  /** Required from an owner (the approval e-mail goes there); a visitor may
+   *  leave it, which the NOT NULL column stores as "". */
   submittedEmail: string;
   lat: number | null;
   lng: number | null;
 }
 
-type Parsed = { ok: true; submission: Submission } | { ok: false; error: string; status?: number };
+type Parsed = { ok: true; submission: Submission } | { ok: false; error: string };
 
-function fail(error: string, status?: number): Parsed {
-  return { ok: false, error, status };
+function fail(error: string): Parsed {
+  return { ok: false, error };
 }
 
 /** Every rule in one place: what each role must give, and the caps that keep
- *  a hand-made request from storing more than a form field's worth. */
+ *  a hand-made request from storing more than a form field's worth.  An
+ *  owner adds their own farm and can be approved straight into the catalogue;
+ *  a visitor's tip is a lead for the normal intake, so it needs less.
+ *  Anything but an explicit "visitor" gets the stricter owner rules. */
 function parseSubmission(body: Record<string, unknown>): Parsed {
-  const role: Role | null = body.role === "visitor" ? "visitor" : body.role === undefined || body.role === "owner" ? "owner" : null;
-  if (!role) return fail("Ogiltig förfrågan");
+  const role: SubmissionRole = body.role === "visitor" ? "visitor" : "owner";
 
   const name = text(body.name);
   if (!name) return fail("Ange gårdens namn");
   if (name.length > MAX_NAME) return fail("Gårdsnamnet är för långt");
 
   const submittedEmail = text(body.submittedEmail) ?? "";
-  const emailRequired = role === "owner";
-  if ((emailRequired || submittedEmail) && (!isValidEmail(submittedEmail) || submittedEmail.length > MAX_EMAIL)) {
+  if ((role === "owner" || submittedEmail) && (!isValidEmail(submittedEmail) || submittedEmail.length > MAX_EMAIL)) {
     return fail("Ange en giltig e-postadress");
   }
 
@@ -147,11 +146,11 @@ function linkRows(links: LinkValues): string {
   );
 }
 
-function ownerEmail(s: Submission, id: string, capNotice: string) {
+function ownerEmail(s: Submission, id: string) {
   return {
     subject: `Ny gård inskickad: ${s.name}`,
-    html: emailHtml(`
-      <p style="margin:0 0 16px;font-size:15px;font-weight:600;color:#1c1917;">Ny gård inskickad</p>
+    body: `
+      ${emailHeading("Ny gård inskickad")}
       ${table(
         row("Gårdsnamn", s.name) +
         row("Inlämnad av", s.submittedEmail) +
@@ -169,18 +168,18 @@ function ownerEmail(s: Submission, id: string, capNotice: string) {
         row("Beskrivning", excerpt(s.description))
       )}
       ${submissionModerationButtons(id)}
-      ${capNotice}
-    `),
+    `,
   };
 }
 
-/** No approve/reject buttons: a tip goes through the normal intake, where the
- *  website check and the relevance gate happen. */
-function tipEmail(s: Submission, capNotice: string) {
+/** No approve/reject: a tip goes through the normal intake, where the website
+ *  check and the relevance gate happen — the one button closes the loop
+ *  afterwards. */
+function tipEmail(s: Submission, id: string) {
   return {
     subject: `Tips om gård: ${s.name}`,
-    html: emailHtml(`
-      <p style="margin:0 0 16px;font-size:15px;font-weight:600;color:#1c1917;">Tips om gård från besökare</p>
+    body: `
+      ${emailHeading("Tips om gård från besökare")}
       ${table(
         row("Gårdsnamn", s.name) +
         row("Plats", s.address) +
@@ -188,9 +187,9 @@ function tipEmail(s: Submission, capNotice: string) {
         row("Meddelande", s.message) +
         row("Från", s.submittedEmail || "–")
       )}
-      <p style="margin:16px 0 0;font-size:13px;color:#78716c;">Tips läggs till via det vanliga flödet.</p>
-      ${capNotice}
-    `),
+      <p style="margin:16px 0 0;font-size:13px;color:#78716c;">Tips läggs till via det vanliga flödet. Markera tipset som hanterat när du tittat på det.</p>
+      ${tipModerationButtons(id)}
+    `,
   };
 }
 
@@ -202,7 +201,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Ogiltig förfrågan" }, { status: 400 });
   }
   const parsed = parseSubmission((body ?? {}) as Record<string, unknown>);
-  if (!parsed.ok) return NextResponse.json({ error: parsed.error }, { status: parsed.status ?? 400 });
+  if (!parsed.ok) return NextResponse.json({ error: parsed.error }, { status: 400 });
   const s = parsed.submission;
 
   // Same guards as the other public writes: a few submissions per visitor and
@@ -223,8 +222,8 @@ export async function POST(req: NextRequest) {
 
   const decision = requestAlertSlot();
   if (decision === "suppress") return NextResponse.json({ ok: true });
-  const capNotice = decision === "send-last" ? ALERT_CAP_NOTICE : "";
-  sendEmail({ to: ADMIN_EMAIL, ...(s.role === "owner" ? ownerEmail(s, id, capNotice) : tipEmail(s, capNotice)) });
+  const { subject, body: mail } = s.role === "owner" ? ownerEmail(s, id) : tipEmail(s, id);
+  sendEmail({ to: ADMIN_EMAIL, subject, html: emailHtml(mail + (decision === "send-last" ? ALERT_CAP_NOTICE : "")) });
 
   return NextResponse.json({ ok: true });
 }

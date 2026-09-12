@@ -40,6 +40,9 @@ export const LINK_HINTS: Record<LinkField, string> = {
 };
 
 const SCHEME = /^https?:\/\//i;
+/** The hosts the two handle normalisers recognise, once www. is gone. */
+const INSTAGRAM_HOST = /^instagram\.com\//i;
+const FACEBOOK_HOST = /^(?:m\.)?(?:facebook|fb)\.com\//i;
 /** Labels of letters (incl. å/ä/ö), digits and hyphens, then a TLD of ≥2 letters. */
 const HOST = /^([A-Za-z0-9À-ɏ-]+\.)+[A-Za-zÀ-ɏ]{2,}$/;
 /** What Instagram and Facebook allow in a username. */
@@ -75,7 +78,7 @@ export function normalizeWebsite(raw: string): string | null {
 export function normalizeInstagram(raw: string): string | null {
   const value = raw.trim();
   if (!value) return "";
-  const url = stripScheme(value).match(/^instagram\.com\/([^/?#]+)/i);
+  const url = stripScheme(value).match(new RegExp(INSTAGRAM_HOST.source + "([^/?#]+)", "i"));
   const handle = url ? url[1] ?? "" : value.replace(/^@/, "");
   if (!url && LOOKS_LIKE_DOMAIN.test(handle)) return null;
   if (!HANDLE.test(handle)) return null;
@@ -88,7 +91,7 @@ export function normalizeInstagram(raw: string): string | null {
 export function normalizeFacebook(raw: string): string | null {
   const value = raw.trim();
   if (!value) return "";
-  const url = stripScheme(value).match(/^(?:m\.)?(?:facebook|fb)\.com\/(.+)$/i);
+  const url = stripScheme(value).match(new RegExp(FACEBOOK_HOST.source + "(.+)$", "i"));
   if (url) {
     const full = stripTrailingSlashes(url[1] ?? "");
     const profile = full.match(/^profile\.php\?id=\d+/i);
@@ -138,8 +141,8 @@ export function classifyLink(raw: string): { field: LinkField; url: string } | n
   if (!value) return null;
   const bare = stripScheme(value);
   const field: LinkField =
-    value.startsWith("@") || /^instagram\.com\//i.test(bare) ? "instagram"
-    : /^(?:m\.)?(?:facebook|fb)\.com\//i.test(bare) ? "facebook"
+    value.startsWith("@") || INSTAGRAM_HOST.test(bare) ? "instagram"
+    : FACEBOOK_HOST.test(bare) ? "facebook"
     : "website";
   const url = NORMALIZERS[field](value);
   return url ? { field, url } : null;

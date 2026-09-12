@@ -362,7 +362,8 @@ ALTER TABLE farm_submissions ADD COLUMN message TEXT;
 
 Tips without an e-mail store `''` in `submitted_email` (the column is NOT NULL
 and a rebuild is not worth it); `role='visitor'` rows are never approved, so the
-approval e-mail can never target the empty address.
+approval e-mail can never target the empty address. A tip's `status` goes
+`pending` → `handled` (never `approved`/`rejected`).
 
 ### 6.6 E-mails and moderation
 
@@ -372,12 +373,13 @@ approval e-mail can never target the empty address.
   buttons as today.
 - **Tip** — subject "Tips om gård: {name}", rows Gårdsnamn, Plats, Länk,
   Meddelande, Från ({email} or "–"), a line "Tips läggs till via det vanliga
-  flödet." and **no** buttons. Same `requestAlertSlot` budget.
-- `approveSubmission` / `rejectSubmission` return `{ ok: false, reason: "is_tip" }`
-  for `role='visitor'` rows (new `ActionFailure` reason; `FAILURE_TEXT` holds
-  the wording). The CLI scripts print it; `/atgard` cannot be reached for a tip
-  in practice since tip e-mails carry no buttons, and shows its generic
-  "nothing changed" text if it ever is.
+  flödet." and one button, **Markera som hanterat** (`tip:mark-handled`, like
+  the suggestion e-mails), which sets `status = 'handled'`. No approve/reject.
+  Same `requestAlertSlot` budget.
+- Tips never enter the approve/reject family: `getPendingSubmission` and the
+  approve query filter `role = 'owner'`, so a tip id is simply "not found"
+  there. `scripts/review-flagged-farms.ts` lists pending tips in their own
+  section with the mark-handled instruction.
 - `scripts/approve-submission.ts` / `reject-submission.ts`: unchanged apart from
   the new reason.
 

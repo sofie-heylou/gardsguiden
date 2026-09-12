@@ -13,6 +13,8 @@ export const MAX_DESCRIPTION = 1000;
 export const MAX_LINK = 500;
 /** "Något mer vi bör veta?" on the tip form. */
 export const MAX_TIP_MESSAGE = 1000;
+/** "Var ligger den?" on the tip form — an address or just a town. */
+export const MAX_PLACE = 200;
 export const MAX_SUGGESTION_MESSAGE = 2000;
 export const MAX_CONTACT_MESSAGE = 5000;
 export const MAX_NAME = 200;

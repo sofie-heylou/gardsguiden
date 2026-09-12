@@ -20,7 +20,6 @@
 
 import { getDb } from "../src/lib/db";
 import { approveSubmission } from "../src/lib/submissionActions";
-import { FAILURE_TEXT } from "../src/lib/actionResult";
 import { COUNTY_TO_SLUG, farmPath } from "../src/lib/counties";
 import { SITE_URL } from "../src/lib/site";
 import type { Farm } from "../src/types/farm";
@@ -73,7 +72,7 @@ async function main(): Promise<void> {
 
   const result = await approveSubmission(submissionId);
   if (!result.ok) {
-    console.error(`\nCould not approve: ${FAILURE_TEXT[result.reason]}`);
+    console.error(`\nCould not approve: ${result.reason}`);
     process.exit(1);
   }
 

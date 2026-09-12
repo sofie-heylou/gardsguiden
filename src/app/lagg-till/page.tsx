@@ -33,7 +33,10 @@ export const metadata: Metadata = {
   alternates: { canonical: "/lagg-till" },
 };
 
-export default function LaggTillPage() {
+export default async function LaggTillPage({ searchParams }: { searchParams: Promise<{ tips?: string }> }) {
+  // ?tips=1 opens the visitor's side; the server renders the right tab, so
+  // nothing flips after the page has loaded.
+  const { tips } = await searchParams;
   return (
     <div className="h-full overflow-y-auto" style={{ background: "#FAFAF8" }}>
       <div className="max-w-lg mx-auto px-4 py-6 pb-12 space-y-6">
@@ -41,7 +44,7 @@ export default function LaggTillPage() {
           <h1 className="font-display text-2xl text-stone-900">{copy.title}</h1>
           <p className="text-sm text-stone-500 mt-1 leading-relaxed">{copy.intro}</p>
         </div>
-        <Form />
+        <Form initialMode={tips === "1" ? "tip" : "owner"} />
       </div>
     </div>
   );

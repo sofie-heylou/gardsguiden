@@ -13,6 +13,8 @@ import type { Metadata } from "next";
 import { verifyActionToken, type AdminAction } from "../../lib/actionTokens";
 import {
   getPendingSubmission,
+  getPendingTip,
+  markTipHandled,
   approveSubmission,
   rejectSubmission,
 } from "../../lib/submissionActions";
@@ -70,6 +72,14 @@ function loadFarm(targetId: string): Target | null {
 }
 
 const SUBMISSION_GONE = "Ansökan är redan godkänd eller avvisad — ingenting har ändrats.";
+const TIP_GONE = "Tipset är redan hanterat — ingenting har ändrats.";
+
+function loadTip(targetId: string): Target | null {
+  const tip = getPendingTip(targetId);
+  if (!tip) return null;
+  const from = tip.submitted_email || "en besökare";
+  return { name: tip.name, subtitle: `Tips från ${from}${tip.address ? ` · ${tip.address}` : ""}` };
+}
 const FARM_GONE = "Gården finns inte längre — ingenting har ändrats.";
 const SUGGESTION_GONE =
   "Förslaget är redan hanterat, eller så finns gården inte längre — ingenting har ändrats.";
@@ -131,6 +141,15 @@ const ACTIONS: Record<AdminAction, ActionSpec> = {
     goneText: SUGGESTION_GONE,
     run: markSuggestionHandled,
     revalidates: false, // suggestions are never rendered publicly
+  },
+  "tip:mark-handled": {
+    load: loadTip,
+    question: (t) => `Markera tipset om ${t.name} som hanterat?`,
+    confirmLabel: "Ja, markera som hanterat",
+    tone: "approve",
+    goneText: TIP_GONE,
+    run: markTipHandled,
+    revalidates: false, // tips are never rendered publicly
   },
 };
 

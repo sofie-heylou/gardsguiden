@@ -112,7 +112,7 @@ function listSuggestions(): void {
 function listPendingSubmissions(db: Database.Database): void {
   const rows = db.prepare(`
     SELECT id, name, submitted_email, lan, kommun, created_at
-    FROM farm_submissions WHERE status = 'pending'
+    FROM farm_submissions WHERE status = 'pending' AND role = 'owner'
     ORDER BY created_at ASC
   `).all() as {
     id: string; name: string; submitted_email: string;
@@ -133,6 +133,33 @@ function listPendingSubmissions(db: Database.Database): void {
   console.log("\n  Approve or reject with:");
   console.log("    npx tsx scripts/approve-submission.ts <id>");
   console.log("    npx tsx scripts/reject-submission.ts <id>");
+}
+
+/** Visitors' tips are leads, not submissions: look the farm up, add it through
+ *  the normal intake if it fits, then close the tip with the button in its
+ *  e-mail. */
+function listPendingTips(db: Database.Database): void {
+  const rows = db.prepare(`
+    SELECT id, name, address, submitted_email, message, created_at
+    FROM farm_submissions WHERE status = 'pending' AND role = 'visitor'
+    ORDER BY created_at ASC
+  `).all() as {
+    id: string; name: string; address: string | null; submitted_email: string;
+    message: string | null; created_at: string;
+  }[];
+
+  console.log(`\nTips from visitors (${rows.length})`);
+  if (rows.length === 0) {
+    console.log("  none");
+    return;
+  }
+  for (const r of rows) {
+    console.log(`  ${r.id}`);
+    console.log(`      ${r.name} — ${r.address ?? "okänd plats"}`);
+    if (r.message) console.log(`      ”${r.message}”`);
+    console.log(`      från ${r.submitted_email || "anonym"}, ${r.created_at}`);
+  }
+  console.log("\n  Close one with the ”Markera som hanterat” button in its e-mail.");
 }
 
 function main(): void {
@@ -259,7 +286,7 @@ function main(): void {
     list(db, "Visitor-reported (user_flag_count > 0)", "COALESCE(user_flag_count, 0) > 0");
   }
 
-  if (showBoth) listPendingSubmissions(db);
+  if (showBoth) { listPendingSubmissions(db); listPendingTips(db); }
   if (showBoth) listSuggestions();
 
   console.log("\nAct on flagged farms with:");

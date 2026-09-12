@@ -1,11 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { Check } from "lucide-react";
 import { GARDAR_COUNTY_TO_SLUG, countyDisplayName } from "../../../lib/counties";
 import { CONTACT_EMAIL } from "../../../lib/site";
 import type { Farm } from "../../../types/farm";
-import { cardCls, hintCls } from "./fields";
+import { SentHeading, cardCls, hintCls, secondaryBtnCls } from "./fields";
 
 export default function ThankYou({ name, email, lan, onTip }: {
   name: string;
@@ -22,10 +21,7 @@ export default function ThankYou({ name, email, lan, onTip }: {
   return (
     <div className="space-y-4">
       <section className={cardCls}>
-        <p className="flex items-center gap-2 text-lg font-semibold text-emerald-700">
-          <Check size={20} className="shrink-0" />
-          Tack! {name} är inskickad.
-        </p>
+        <SentHeading>Tack! {name} är inskickad.</SentHeading>
         <ol className="space-y-2 text-sm text-stone-700">
           {[
             "Vi läser igenom uppgifterna – oftast inom 1–3 dagar.",
@@ -57,7 +53,7 @@ export default function ThankYou({ name, email, lan, onTip }: {
       <section className={cardCls}>
         <h2 className="text-sm font-semibold text-stone-800">Känner du fler gårdar som borde vara med?</h2>
         <p className={hintCls}>En granne, ett musteri, ett gårdscafé – tipsa oss så kollar vi upp dem.</p>
-        <button type="button" onClick={onTip} className="min-h-11 px-4 rounded-lg border border-stone-300 text-sm font-semibold text-stone-800 hover:border-stone-500">
+        <button type="button" onClick={onTip} className={secondaryBtnCls}>
           Tipsa om en gård →
         </button>
       </section>

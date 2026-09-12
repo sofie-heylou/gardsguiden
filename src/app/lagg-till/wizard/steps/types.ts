@@ -1,7 +1,8 @@
 import type { RefObject } from "react";
 import type { FormValues, StepErrors } from "../state";
+import type { Patch as AnyPatch } from "../useAddFarmForm";
 
-export type Patch = Partial<FormValues> | ((current: FormValues) => Partial<FormValues>);
+export type Patch = AnyPatch<FormValues>;
 
 /** What every step gets: the values, this step's errors, one way to change
  *  things, and the heading to focus when the step appears. */

@@ -9,7 +9,7 @@ import { LINK_LABELS, normalizeLinks, type LinkValues } from "../../../../lib/li
 import { formatOpeningHours, getTodayHours } from "../../../../lib/openingHours";
 import { PRODUCT_LABELS } from "../../../../lib/submitProducts";
 import { inputCls } from "../../../../lib/ui";
-import { Field, StepHeading, cardCls, fieldAria, hintCls } from "../fields";
+import { Field, ServerError, StepHeading, cardCls, fieldAria, hintCls } from "../fields";
 import type { FormValues } from "../state";
 import type { StepProps } from "./types";
 
@@ -57,11 +57,7 @@ export default function Step5Review({ values, errors, update, headingRef, onEdit
         </p>
       </section>
 
-      {serverError && (
-        <p role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
-          {serverError}
-        </p>
-      )}
+      <ServerError message={serverError} />
     </>
   );
 }

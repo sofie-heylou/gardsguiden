@@ -58,6 +58,12 @@ export function hourErrorKey(day: DayKey): string {
 }
 
 const TIME = /^\d{2}:\d{2}$/;
+const NAME_REQUIRED = "Skriv gårdens namn.";
+
+/** An e-mail box that may stay empty, but must make sense when it is not. */
+function optionalEmailError(value: string): string | undefined {
+  return value.trim() && !isValidEmail(value.trim()) ? "Det ser inte ut som en e-postadress." : undefined;
+}
 
 function validateHours(v: FormValues): StepErrors {
   const errors: StepErrors = {};
@@ -82,9 +88,8 @@ function validateLinks(v: FormValues): StepErrors {
   } else if (!hasAnyLink(links.values)) {
     errors[STEP_ERROR_KEY] = NO_LINK_ERROR;
   }
-  if (v.email.trim() && !isValidEmail(v.email.trim())) {
-    errors.email = "Det ser inte ut som en e-postadress.";
-  }
+  const email = optionalEmailError(v.email);
+  if (email) errors.email = email;
   return errors;
 }
 
@@ -92,7 +97,7 @@ export function validateStep(step: number, v: FormValues): StepErrors {
   const errors: StepErrors = {};
   switch (step) {
     case 1:
-      if (!v.name.trim()) errors.name = "Skriv gårdens namn.";
+      if (!v.name.trim()) errors.name = NAME_REQUIRED;
       if (!v.address.trim()) errors.address = "Skriv gårdens adress.";
       else if (!v.lan) errors.lan = "Välj adressen i listan som dyker upp, eller fyll i kommun och län här.";
       return errors;
@@ -108,7 +113,8 @@ export function validateStep(step: number, v: FormValues): StepErrors {
   }
 }
 
-const LINK_KEYS: readonly string[] = LINK_FIELDS;
+/** The three owner link boxes, plus the tip form's single one. */
+const LINK_KEYS: readonly string[] = [...LINK_FIELDS, "link"];
 
 /** The errors that still apply after `changedKeys` were edited: a message
  *  goes away as soon as its value changes, the step-wide link message when
@@ -158,11 +164,12 @@ export function initialTipValues(): TipValues {
 
 export function validateTip(v: TipValues): StepErrors {
   const errors: StepErrors = {};
-  if (!v.name.trim()) errors.name = "Skriv gårdens namn.";
+  if (!v.name.trim()) errors.name = NAME_REQUIRED;
   if (!v.place.trim()) errors.place = "Skriv ort eller adress.";
   if (v.link.trim() && !classifyLink(v.link)) {
     errors.link = "Skriv en länk eller ett Instagram-namn, t.ex. ljungbacken.se eller @ljungbacken.";
   }
-  if (v.email.trim() && !isValidEmail(v.email.trim())) errors.email = "Det ser inte ut som en e-postadress.";
+  const email = optionalEmailError(v.email);
+  if (email) errors.email = email;
   return errors;
 }

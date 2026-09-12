@@ -77,7 +77,7 @@ for (const [label, has] of [
 
 // Outcomes.
 console.log("\nOutcomes:");
-for (const status of ["approved", "rejected", "pending"]) {
+for (const status of ["approved", "rejected", "pending", "handled"]) {
   console.log(`  ${status.padEnd(10)} ${rows.filter((r) => r.status === status).length}`);
 }
 

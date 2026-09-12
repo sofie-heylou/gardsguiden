@@ -32,6 +32,16 @@ export function suggestionModerationButtons(suggestionId: string): string {
   ]);
 }
 
+/** Mark-handled button for a visitor's tip — a lead for the normal intake,
+ *  so there is nothing to approve, only a loop to close once you have looked
+ *  the farm up. */
+export function tipModerationButtons(submissionId: string): string {
+  if (!actionTokensAvailable()) return "";
+  return btnRow([
+    { label: "Markera som hanterat", href: actionUrl("tip:mark-handled", submissionId), tone: "approve" },
+  ]);
+}
+
 /** Approve / reject pair, for new submission notifications. */
 export function submissionModerationButtons(submissionId: string): string {
   if (!actionTokensAvailable()) return "";
