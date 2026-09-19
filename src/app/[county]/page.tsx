@@ -135,7 +135,7 @@ export default async function CountyPage({ params }: Props) {
 
           <AdvertiseCallout lan={lan} />
 
-          <NewFarms farms={gardar} limit={3} lan={lan} className="mb-8" />
+          <NewFarms farms={gardar} limit={6} lan={lan} className="mb-8" />
 
           <FarmList initialFarms={gardar} lockedCounty={lan} embedded />
 

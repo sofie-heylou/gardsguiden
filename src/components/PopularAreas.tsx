@@ -110,7 +110,7 @@ export default function PopularAreas() {
           Se alla {farms.length} gårdar
         </Link>
 
-        <NewFarms farms={farms} limit={4} className="pt-3 border-t border-stone-100" />
+        <NewFarms farms={farms} limit={8} className="pt-3 border-t border-stone-100" />
 
         <AddFarmCallout
           title="Driver du en gård?"

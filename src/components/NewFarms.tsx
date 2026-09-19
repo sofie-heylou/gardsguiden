@@ -1,12 +1,13 @@
 import { newestFarms } from "../lib/newFarms";
-import { FarmCardList } from "./FarmCard";
+import { FarmCardStrip } from "./FarmCard";
 import type { Farm } from "../types/farm";
 
 /**
  * The farms that entered the guide most recently — on the homepage from every
  * county, on a county page from that county alone. Renders nothing when no
  * farm was added inside the window, so the section never presents an old
- * farm as new. The cards are the ordinary ones, photo thumbnail included.
+ * farm as new. The cards are the ordinary ones, photo thumbnail included,
+ * in a row that scrolls sideways so the block stays one card tall.
  */
 export default function NewFarms({ farms, limit, lan, className }: {
   farms: Farm[];
@@ -22,7 +23,7 @@ export default function NewFarms({ farms, limit, lan, className }: {
         <h2 className="font-display text-xl text-stone-900">{lan ? `Nya i ${lan}` : "Nya gårdar"}</h2>
         <p className="mt-1 text-sm text-stone-500">Senast tillagda i guiden.</p>
       </div>
-      <FarmCardList farms={fresh} />
+      <FarmCardStrip farms={fresh} />
     </section>
   );
 }
