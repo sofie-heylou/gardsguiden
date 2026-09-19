@@ -112,7 +112,11 @@ snapshot and a restore both cover **only the SQLite file**:
 - A restore to an older snapshot can leave files with no row (harmless; run
   `node scripts/review-photos.js prune` to delete them) or rows with no files
   (the page shows a broken image; `prune` lists them — delete those photos).
-- A backup that should include photos is a backup of the whole volume
-  (Railway's volume backups), not of `gardsguiden.db` alone.
+- A backup that should include photos is a backup of the whole volume, not
+  of `gardsguiden.db` alone. Railway's own volume backups are Pro-plan only;
+  on the Hobby plan run `scripts/backup-volume.sh` from your Mac now and
+  then (and after a batch of approvals). It takes a consistent snapshot of
+  the database plus every photo down to `~/Backups/gardsguiden/<timestamp>/`
+  and checks the copy. Keep that folder somewhere that is itself backed up.
 
-See `docs/running-scripts-in-production.md` for the script.
+See `docs/running-scripts-in-production.md` for the photo script.
