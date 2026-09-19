@@ -152,6 +152,14 @@ function initSchema(db: Database.Database): void {
   if (!columnExists(db, "farms", "legomustning")) {
     db.exec(`ALTER TABLE farms ADD COLUMN legomustning INTEGER NOT NULL DEFAULT 0`);
   }
+  // When the farm entered the guide, as the UTC text datetime('now') writes.
+  // Nullable because SQLite cannot ADD COLUMN with a non-constant default:
+  // the seed build dates each farm from git history, the approval insert
+  // stamps datetime('now'), and the boot sync below fills in prod rows that
+  // predate the column. NULL means "unknown, never new".
+  if (!columnExists(db, "farms", "created_at")) {
+    db.exec(`ALTER TABLE farms ADD COLUMN created_at TEXT`);
+  }
   if (!columnExists(db, "farm_submissions", "facebook")) {
     db.exec(`ALTER TABLE farm_submissions ADD COLUMN facebook TEXT`);
   }
@@ -253,16 +261,26 @@ function initSchema(db: Database.Database): void {
           "id", "name", "description", "address", "kommun", "lan", "lat", "lng",
           "website", "facebook", "instagram", "phone", "email", "products", "onSiteSales", "tastingRoom",
           "gardsförsäljningLicense", "isArchipelago", "legomustning", "openingHours", "season", "source",
+          "created_at",
         ] as const;
         const placeholders = SYNC_COLS.map(() => "?").join(", ");
         const insert = db.prepare(
           `INSERT OR IGNORE INTO farms (${SYNC_COLS.join(", ")}) VALUES (${placeholders})`
         );
+        // Rows that were already here before created_at existed get the seed's
+        // date. Only NULLs are touched, so this is a no-op after the first boot
+        // and never overwrites a date prod already has.
+        const backfill = db.prepare(`UPDATE farms SET created_at = ? WHERE id = ? AND created_at IS NULL`);
+        let backfilled = 0;
         db.transaction((rows: Record<string, unknown>[]) => {
-          for (const r of rows) insert.run(SYNC_COLS.map((c) => r[c] ?? null));
+          for (const r of rows) {
+            insert.run(SYNC_COLS.map((c) => r[c] ?? null));
+            if (typeof r.created_at === "string") backfilled += backfill.run(r.created_at, r.id).changes;
+          }
         })(farms);
         const newCount = (db.prepare("SELECT COUNT(*) as n FROM farms").get() as { n: number }).n;
         console.log(`[db] Sync complete. Runtime DB now has ${newCount} farms.`);
+        if (backfilled > 0) console.log(`[db] Backfilled created_at for ${backfilled} farms.`);
       }
     } catch (err) {
       console.error(`[db] Farm sync failed:`, err);

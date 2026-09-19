@@ -85,6 +85,9 @@ npx tsx scripts/fix-empty-kommun.ts
 npx tsx scripts/clean-farms.ts
 
 # 6. Migrera JSON → SQLite
+#    Datumet en gård lades till (farms.created_at) hämtas ur git-historiken
+#    för data/farms.json, så steget kräver en full klon — inte en grund (shallow).
+#    Gårdar som ännu inte är committade får dagens datum.
 npx tsx scripts/migrate-json-to-sqlite.ts
 
 # 7. Bygg kategorikopplingstabellerna

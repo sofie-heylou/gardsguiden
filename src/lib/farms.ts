@@ -28,6 +28,7 @@ interface FarmRow {
   instagram: string | null;
   tier: string | null;
   photo_id: string | null;
+  created_at: string | null;
 }
 
 /** Every farm read carries the id of its first visible photo, so cards and
@@ -40,12 +41,13 @@ function parseProducts(raw: string | null): string[] {
 }
 
 function rowToFarm(row: FarmRow): Farm {
-  const { photo_id, ...rest } = row;
+  const { photo_id, created_at, ...rest } = row;
   return {
     ...rest,
     lan: row.lan as Farm["lan"],
     tier: row.tier === "extended" ? "extended" : "free",
     photoId: photo_id ?? null,
+    addedAt: created_at ?? null,
     products: parseProducts(row.products),
     onSiteSales: row.onSiteSales === 1,
     tastingRoom: row.tastingRoom === 1,

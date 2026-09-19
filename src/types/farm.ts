@@ -26,4 +26,7 @@ export interface Farm {
   tier: "free" | "extended";
   /** The farm's first visible photo, or null — see photos.ts. */
   photoId: string | null;
+  /** When the farm entered the guide, as SQLite UTC text ("2026-09-06 14:02:11"),
+   *  or null for rows that predate the column — see db.ts. */
+  addedAt: string | null;
 }

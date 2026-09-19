@@ -127,12 +127,12 @@ function insertApprovedFarm(
         (id, name, description, address, kommun, lan,
          website, phone, email, products, openingHours, season,
          onSiteSales, tastingRoom, gardsförsäljningLicense, isArchipelago,
-         source, is_boosted, tier, lat, lng, facebook, instagram)
+         source, is_boosted, tier, lat, lng, facebook, instagram, created_at)
       VALUES
         (?, ?, ?, ?, ?, ?,
          ?, ?, ?, ?, ?, ?,
          ?, ?, 0, 0,
-         'submission', 0, 'free', ?, ?, ?, ?)
+         'submission', 0, 'free', ?, ?, ?, ?, datetime('now'))
     `).run(
       farmId,
       submission.name,
