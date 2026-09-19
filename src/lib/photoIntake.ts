@@ -15,8 +15,8 @@ import { photoLimit } from "./photoNames.js";
 import { renderPhoto, PhotoRefusal } from "./photoPipeline.js";
 import { uploadBlock, type UploadBlock, type UploadTarget } from "./photoCard";
 import {
-  countRecentUploads, generatePhotoId, getPhotoTally, getSubmissionTally, insertPhoto, photosEnabled,
-  writePhotoFiles, type PhotoTally,
+  countRecentUploads, generatePhotoId, getPhotoTally, getSubmissionTally, insertPhoto, writePhotoFiles,
+  type PhotoTally,
 } from "./photos";
 import { MAX_EMAIL, MAX_PHOTO_BYTES } from "./limits";
 import { PHOTO_PICK, PHOTO_TOO_BIG } from "./photoText";
@@ -42,7 +42,7 @@ export interface PhotoUpload {
   visitor: string;
 }
 
-type IntakeStatus = 400 | 404 | 409 | 413 | 429 | 503;
+type IntakeStatus = 400 | 404 | 409 | 413 | 429;
 
 export type IntakeResult =
   | { ok: true; photoId: string }
@@ -95,8 +95,6 @@ const BLOCK_TEXT: Record<UploadBlock, string> = {
 const fail = (status: IntakeStatus, error: string): IntakeResult => ({ ok: false, status, error });
 
 export async function intakePhoto(upload: PhotoUpload): Promise<IntakeResult> {
-  if (!photosEnabled()) return fail(503, "Uppladdning av bilder är tillfälligt stängd.");
-
   const target = upload.target.kind === "farm" ? resolveFarm(upload.target.id) : resolveSubmission(upload.target.id);
   if (!target) return fail(404, "Gården hittades inte.");
 

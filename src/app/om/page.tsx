@@ -96,6 +96,10 @@ export default function OmPage() {
             behöver något rättas använder du &rdquo;Föreslå en ändring&rdquo;
             på gårdens sida — vi uppdaterar den åt dig.
           </p>
+          <p className="text-sm text-stone-600 leading-relaxed">
+            Har du en bild på gården? Lägg till den direkt på gårdens sida —
+            det är gratis, och vi tittar på den innan den visas.
+          </p>
           <div className="flex flex-col gap-2">
             <AddFarmLink
               surface="om_page"

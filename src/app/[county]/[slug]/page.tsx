@@ -15,7 +15,7 @@ import FlagFarmButton from "../../../components/FlagFarmButton";
 import SuggestChangeForm from "../../../components/SuggestChangeForm";
 import UpgradeProfileCallout from "../../../components/UpgradeProfileCallout";
 import { SITE_URL } from "../../../lib/site";
-import { getFarmPhotos, getPhotoTally, photosEnabled } from "../../../lib/photos";
+import { getFarmPhotos, getPhotoTally } from "../../../lib/photos";
 import { photoAlt, photoUrl } from "../../../lib/photoNames.js";
 import type { Farm } from "../../../types/farm";
 
@@ -321,7 +321,6 @@ export default async function FarmDetailPage({ params }: Props) {
             <UpgradeProfileCallout
               farm={farm}
               photos={getPhotoTally(farm.id)}
-              uploadsOpen={photosEnabled()}
             />
 
             <SuggestChangeForm farmId={farm.id} farmName={farm.name} />

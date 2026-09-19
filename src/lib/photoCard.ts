@@ -37,9 +37,9 @@ export interface PhotoCardPlan {
   limit: number;
 }
 
-export function photoCardPlan(tally: PhotoTally, tier: Farm["tier"], uploadsOpen: boolean): PhotoCardPlan {
+export function photoCardPlan(tally: PhotoTally, tier: Farm["tier"]): PhotoCardPlan {
   const extended = tier === "extended";
-  const upload = uploadsOpen && uploadBlock(tally, tier) === null;
+  const upload = uploadBlock(tally, tier) === null;
   return {
     offer: !extended && upload,
     waiting: tally.pending,

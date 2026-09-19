@@ -24,7 +24,7 @@ function restoreValues(saved: FormValues): FormValues {
 
 /** The five-step owner form.  Step 1's "shown" event belongs to the page
  *  container, which knows which side is on screen. */
-export default function OwnerForm({ onTip, photosOpen }: { onTip: () => void; photosOpen: boolean }) {
+export default function OwnerForm({ onTip }: { onTip: () => void }) {
   const form = useAddFarmForm(MODE, initialValues);
   const { values, errors, update } = form;
   const [step, setStep] = useState(1);
@@ -106,7 +106,7 @@ export default function OwnerForm({ onTip, photosOpen }: { onTip: () => void; ph
         email={values.submittedEmail}
         lan={values.lan}
         onTip={onTip}
-        photoTarget={photosOpen && submissionId ? { kind: "submission", id: submissionId } : null}
+        photoTarget={submissionId ? { kind: "submission", id: submissionId } : null}
       />
     );
   }

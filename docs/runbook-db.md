@@ -102,3 +102,17 @@ Expected output: `ok`.
 ```
 sqlite3 /data/gardsguiden.db 'PRAGMA wal_checkpoint(TRUNCATE);'
 ```
+
+## Farm photos live next to the database
+
+Uploaded farm photos are files under `/data/photos/` (three renditions per
+photo, named by the photo's id) with their rows in `farm_photos`. The pre-boot
+snapshot and a restore both cover **only the SQLite file**:
+
+- A restore to an older snapshot can leave files with no row (harmless; run
+  `node scripts/review-photos.js prune` to delete them) or rows with no files
+  (the page shows a broken image; `prune` lists them — delete those photos).
+- A backup that should include photos is a backup of the whole volume
+  (Railway's volume backups), not of `gardsguiden.db` alone.
+
+See `docs/running-scripts-in-production.md` for the script.

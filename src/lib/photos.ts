@@ -47,14 +47,6 @@ export function getFarmPhotos(farmId: string): FarmPhoto[] {
   ).all(farmId) as FarmPhoto[];
 }
 
-/** The kill switch: a Railway variable, read per request so flipping it
- *  needs no deploy. Off → the endpoint refuses and the card shows no form.
- *  Lives here rather than in photoIntake.ts so the farm page can ask
- *  without loading sharp. */
-export function photosEnabled(): boolean {
-  return process.env.FARM_PHOTOS === "1";
-}
-
 /** How many of a farm's photos show, and whether one is waiting — the input
  *  to uploadBlock() in photoCard.ts, for the card and the endpoint alike. */
 export interface PhotoTally {

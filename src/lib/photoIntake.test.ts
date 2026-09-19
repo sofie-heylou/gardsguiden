@@ -10,7 +10,6 @@ import sharp from "sharp";
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), "gardsguiden-intake-"));
 process.env.DB_PATH = path.join(dir, "test.db");
 process.env.PHOTO_DIR = path.join(dir, "photos");
-process.env.FARM_PHOTOS = "1";
 delete process.env.RESEND_API_KEY;
 
 const FARM = "boo-musteri";
@@ -55,10 +54,6 @@ const upload = (over: Partial<Parameters<Intake["intakePhoto"]>[0]> & { file: Fi
 
 test("the guards, in order", async () => {
   const file = await image("jpeg");
-
-  process.env.FARM_PHOTOS = "";
-  assert.deepEqual(await upload({ file }), { ok: false, status: 503, error: "Uppladdning av bilder är tillfälligt stängd." });
-  process.env.FARM_PHOTOS = "1";
 
   assert.equal((await upload({ file, target: { kind: "farm", id: "finns-inte" } }) as { status: number }).status, 404);
   assert.equal((await upload({ file, target: { kind: "submission", id: "finns-inte" } }) as { status: number }).status, 404);

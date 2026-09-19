@@ -15,12 +15,11 @@ const TEASER: { icon: LucideIcon; label: string }[] = [
 
 /** The owner's card on every farm page: the free photo first, the paid
  *  profile below. Which pieces show is decided in photoCardPlan(). */
-export default function UpgradeProfileCallout({ farm, photos, uploadsOpen }: {
+export default function UpgradeProfileCallout({ farm, photos }: {
   farm: Pick<Farm, "id" | "name" | "lan" | "tier">;
   photos: PhotoTally;
-  uploadsOpen: boolean;
 }) {
-  const plan = photoCardPlan(photos, farm.tier, uploadsOpen);
+  const plan = photoCardPlan(photos, farm.tier);
   const photoPart = plan.offer || plan.waiting || plan.count;
 
   return (

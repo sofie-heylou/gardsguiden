@@ -35,6 +35,25 @@ locally against `https://www.gardsguiden.se/api/farms`, generate the SQL, and
 send only the finished statements. That is how the coordinate backfill was
 applied: 65 addresses geocoded locally, 30 `UPDATE`s shipped to the container.
 
+## Farm photos: `scripts/review-photos.js` ships in the image
+
+The one exception to "ship a script by hand": the photo script is copied into
+the runner image (with `src/lib/photoPipeline.js` + `photoNames.js`, the
+plain-JS modules it shares with the server), so it runs directly:
+
+```bash
+railway ssh "cp /data/gardsguiden.db /data/gardsguiden.db.pre-photos-$(date +%Y%m%dT%H%M%SZ)"   # snapshot first
+railway ssh "cd /app && DB_PATH=/data/gardsguiden.db node scripts/review-photos.js list"
+```
+
+Commands: `list [farmId]`, `attach <farmId> --file <path> | --url <https://…>`
+(a photo you received by e-mail — it goes through the same pipeline as an
+upload and is inserted as approved), `delete <photoId>`, `order <farmId> <id>…`,
+`tier <farmId> free|extended` (the paid profile: five photos instead of one),
+`prune` (files without rows). Approve/reject of uploads is done from the
+e-mail buttons, not here. Getting a local file into the container: base64 it
+the same way as a script, or use `--url` with a photo the owner has online.
+
 ## Two things to remember
 
 - **Cache.** Farm pages are statically generated with `revalidate = 3600`, so a

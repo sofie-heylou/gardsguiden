@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import nextDynamic from "next/dynamic";
-import { photosEnabled } from "../../lib/photos";
 
 /** Kill switch for the step-by-step form: set SUBMIT_FORM_V2=1 in the
  *  environment to serve it, unset to fall back to the single-page form.  The
@@ -45,7 +44,7 @@ export default async function LaggTillPage({ searchParams }: { searchParams: Pro
           <p className="text-sm text-stone-500 mt-1 leading-relaxed">{copy.intro}</p>
         </div>
         {WIZARD
-          ? <SubmitFarmWizard initialMode={tips === "1" ? "tip" : "owner"} photosOpen={photosEnabled()} />
+          ? <SubmitFarmWizard initialMode={tips === "1" ? "tip" : "owner"} />
           : <SubmitFarmForm />}
       </div>
     </div>

@@ -14,8 +14,8 @@ export default function ThankYou({ name, email, lan, onTip, photoTarget }: {
   lan: string;
   /** Owners often know the neighbouring farms — opens the tip form. */
   onTip: () => void;
-  /** Where a photo can be uploaded to right now, or null while uploads are
-   *  closed — then the card falls back to asking for one by e-mail. */
+  /** The submission a photo attaches to; null only if the submit endpoint
+   *  answered without an id, when the card falls back to asking by e-mail. */
   photoTarget: UploadTarget | null;
 }) {
   const gardarSlug = GARDAR_COUNTY_TO_SLUG[lan as Farm["lan"]];
