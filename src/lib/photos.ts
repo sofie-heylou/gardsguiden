@@ -44,6 +44,56 @@ export function getFarmPhotos(farmId: string): FarmPhoto[] {
   ).all(farmId) as FarmPhoto[];
 }
 
+/** The kill switch: a Railway variable, read per request so flipping it
+ *  needs no deploy. Off → the endpoint refuses and the card shows no form.
+ *  Lives here rather than in photoIntake.ts so the farm page can ask
+ *  without loading sharp. */
+export function photosEnabled(): boolean {
+  return process.env.FARM_PHOTOS === "1";
+}
+
+/** How many of a farm's photos show, and whether one is waiting — the input
+ *  to uploadBlock() in photoCard.ts, for the card and the endpoint alike. */
+export interface PhotoTally {
+  approved: number;
+  pending: boolean;
+}
+
+export function getPhotoTally(farmId: string): PhotoTally {
+  const row = getDb().prepare(`
+    SELECT COALESCE(SUM(${VISIBLE}), 0) AS approved, COALESCE(SUM(status = 'pending'), 0) AS pending
+    FROM farm_photos WHERE farm_id = ?
+  `).get(farmId) as { approved: number; pending: number };
+  return { approved: row.approved, pending: row.pending > 0 };
+}
+
+/** Uploads by one visitor in the last hour, across all farms — the rate
+ *  limit key (photoIntake.ts). Rejected rows count too, on purpose. */
+export function countRecentUploads(visitor: string): number {
+  return (getDb().prepare(
+    "SELECT COUNT(*) AS n FROM farm_photos WHERE visitor_hash = ? AND created_at > datetime('now', '-1 hour')"
+  ).get(visitor) as { n: number }).n;
+}
+
+export interface NewPhoto {
+  id: string;
+  farmId: string | null;
+  submissionId: string | null;
+  uploaderEmail: string;
+  visitorHash: string;
+  width: number;
+  height: number;
+}
+
+/** A pending row; sort_order is assigned on approval so the order of
+ *  approval, not of upload, decides the gallery. */
+export function insertPhoto(p: NewPhoto): void {
+  getDb().prepare(`
+    INSERT INTO farm_photos (id, farm_id, submission_id, uploader_email, visitor_hash, width, height)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+  `).run(p.id, p.farmId, p.submissionId, p.uploaderEmail, p.visitorHash, p.width, p.height);
+}
+
 // ── Files ──────────────────────────────────────────────────────────────────
 
 /** See PHOTO_ID_RE in photoNames.js for why this is not generateId(). */

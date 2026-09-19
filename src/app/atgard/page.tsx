@@ -20,6 +20,10 @@ import {
 } from "../../lib/submissionActions";
 import { getFarmSummary, clearFarmFlags, deleteFarm } from "../../lib/farmActions";
 import { getPendingSuggestion, markSuggestionHandled } from "../../lib/suggestionActions";
+import {
+  getPendingPhoto, getLivePhoto, approvePhoto, rejectPhoto, deletePhoto, photoTargetName, type PhotoTarget,
+} from "../../lib/photoActions";
+import { photoUrl } from "../../lib/photoNames.js";
 
 export const dynamic = "force-dynamic";
 
@@ -34,6 +38,8 @@ type Status = "done" | "gone" | "invalid";
 interface Target {
   name: string;
   subtitle?: string;
+  /** Shown above the question — a photo is judged by looking at it. */
+  imageUrl?: string;
 }
 
 interface ActionSpec {
@@ -93,6 +99,19 @@ function loadSuggestion(targetId: string): Target | null {
   return { name: s.farm_name, subtitle: `”${excerpt}” — från ${s.email}` };
 }
 
+const PHOTO_GONE = "Bilden är redan granskad eller borttagen — ingenting har ändrats.";
+
+function photoTarget(photo: PhotoTarget | null): Target | null {
+  if (!photo) return null;
+  return {
+    name: photoTargetName(photo),
+    subtitle: `Uppladdad av ${photo.uploader_email}`,
+    imageUrl: photoUrl(photo.id, "card"),
+  };
+}
+const loadPendingPhoto = (targetId: string) => photoTarget(getPendingPhoto(targetId));
+const loadLivePhoto = (targetId: string) => photoTarget(getLivePhoto(targetId));
+
 /** The single registry of what a token may do.  Because it is keyed by
  *  AdminAction, adding an action to that union fails to compile until it is
  *  handled here — the page has no `if (action === ...)` branches. */
@@ -150,6 +169,33 @@ const ACTIONS: Record<AdminAction, ActionSpec> = {
     goneText: TIP_GONE,
     run: markTipHandled,
     revalidates: false, // tips are never rendered publicly
+  },
+  "photo:approve": {
+    load: loadPendingPhoto,
+    question: (t) => `Godkänn bilden på ${t.name} och visa den på sidan?`,
+    confirmLabel: "Ja, godkänn bilden",
+    tone: "approve",
+    goneText: PHOTO_GONE,
+    run: approvePhoto,
+    revalidates: true, // the hero, the cards and the preview image change
+  },
+  "photo:reject": {
+    load: loadPendingPhoto,
+    question: (t) => `Avvisa bilden på ${t.name}? Filerna raderas direkt.`,
+    confirmLabel: "Ja, avvisa bilden",
+    tone: "danger",
+    goneText: PHOTO_GONE,
+    run: rejectPhoto,
+    revalidates: false, // a pending photo was never shown
+  },
+  "photo:delete": {
+    load: loadLivePhoto,
+    question: (t) => `Ta bort bilden på ${t.name}?`,
+    confirmLabel: "Ja, ta bort bilden",
+    tone: "danger",
+    goneText: PHOTO_GONE,
+    run: deletePhoto,
+    revalidates: true,
   },
 };
 
@@ -229,6 +275,14 @@ export default async function AtgardPage({
   return (
     <Shell>
       <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">Gårdsguiden</p>
+      {target.imageUrl && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={target.imageUrl}
+          alt=""
+          className="mx-auto mt-4 max-h-56 rounded-lg border border-stone-200 object-contain"
+        />
+      )}
       <p className="mt-3 text-lg font-semibold leading-snug text-stone-900">
         {spec.question(target)}
       </p>

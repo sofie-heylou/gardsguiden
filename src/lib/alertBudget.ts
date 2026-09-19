@@ -21,6 +21,8 @@
  * restart is one extra window's worth of email.
  */
 
+import { sendEmail, ADMIN_EMAIL } from "./email";
+
 const MAX_PER_HOUR = 6;
 const WINDOW_MS = 60 * 60 * 1000;
 
@@ -45,6 +47,16 @@ export const ALERT_CAP_NOTICE = `<p style="margin:20px 0 0;font-size:12px;color:
   Gränsen för antal aviseringar den här timmen är nådd. Fler rapporter
   registreras men mejlas inte förrän nästa timme.
 </p>`;
+
+/** Send an admin alert if the budget allows, appending the cap notice to the
+ *  last one that fits. The caller's row is already written; only the mail is
+ *  subject to the budget. */
+export function sendAdminAlert(subject: string, html: (isLast: boolean) => string): void {
+  const decision = requestAlertSlot();
+  if (decision === "suppress") return;
+  const body = html(decision === "send-last");
+  sendEmail({ to: ADMIN_EMAIL, subject, html: decision === "send-last" ? body + ALERT_CAP_NOTICE : body });
+}
 
 /** Test-only: reset the window so suites do not leak state into each other. */
 export function __resetAlertBudget(): void {

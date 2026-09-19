@@ -19,3 +19,7 @@ export const MAX_SUGGESTION_MESSAGE = 2000;
 export const MAX_CONTACT_MESSAGE = 5000;
 export const MAX_NAME = 200;
 export const MAX_REASON = 2000;
+/** One uploaded farm photo. Phones produce 2–6 MB; the cap is for the
+ *  endpoint, the pipeline shrinks everything to web size anyway. */
+export const MAX_PHOTO_MB = 10;
+export const MAX_PHOTO_BYTES = MAX_PHOTO_MB * 1024 * 1024;

@@ -104,6 +104,16 @@ export function emailHeading(text: string): string {
   return `<p style="margin:0 0 16px;font-size:15px;font-weight:600;color:#1c1917;">${escapeHtml(text)}</p>`;
 }
 
+/** The opening sentence of a visitor-facing mail; `html` is trusted markup. */
+export function emailLead(html: string): string {
+  return `<p style="margin:0 0 12px;font-size:15px;color:#1c1917;">${html}</p>`;
+}
+
+/** The quieter paragraph under the lead. */
+export function emailNote(html: string): string {
+  return `<p style="margin:0 0 20px;font-size:14px;color:#57534e;line-height:1.6;">${html}</p>`;
+}
+
 export function row(label: string, value: string | null | undefined): string {
   if (!value) return "";
   return rowRaw(label, escapeHtml(value));

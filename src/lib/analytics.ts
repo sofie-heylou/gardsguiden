@@ -1,3 +1,5 @@
+import type { PostFailure } from "./postJson";
+
 declare global {
   interface Window {
     dataLayer: Record<string, unknown>[];
@@ -52,11 +54,30 @@ export function secondsSince(startedAtMs: number | null): number | undefined {
   return Math.round((Date.now() - startedAtMs) / 5000) * 5;
 }
 
-export function trackAddFarm(event: AddFarmEvent, params: AddFarmParams = {}): void {
-  // GTM keeps every dataLayer key until it is overwritten, so an error's
-  // `kind` would otherwise ride along on the next event.  Pushing a key as
-  // undefined clears it, and the GA4 tag then leaves that parameter out
-  // (verified live; null would send an empty string instead).
-  const cleared = Object.fromEntries(ADD_FARM_PARAM_KEYS.map((key) => [key, undefined]));
+/** GTM keeps every dataLayer key until it is overwritten, so an error's
+ *  `kind` would otherwise ride along on the next event.  Pushing a key as
+ *  undefined clears it, and the GA4 tag then leaves that parameter out
+ *  (verified live; null would send an empty string instead). */
+function trackCleared(event: string, keys: readonly string[], params: object): void {
+  const cleared = Object.fromEntries(keys.map((key) => [key, undefined]));
   track(event, { ...cleared, ...params });
+}
+
+export function trackAddFarm(event: AddFarmEvent, params: AddFarmParams = {}): void {
+  trackCleared(event, ADD_FARM_PARAM_KEYS, params);
+}
+
+/** The photo upload, on the farm page or the wizard's thank-you screen.
+ *  GTM trigger: a regex on ^farm_photo_ (docs/gtm-setup.md). */
+export type PhotoEvent = "farm_photo_submitted" | "farm_photo_error";
+export type PhotoSurface = "farm_page" | "thank_you";
+export type PhotoErrorKind = PostFailure;
+
+export interface PhotoParams {
+  surface: PhotoSurface;
+  kind?: PhotoErrorKind;
+}
+
+export function trackPhoto(event: PhotoEvent, params: PhotoParams): void {
+  trackCleared(event, ["surface", "kind"], params);
 }

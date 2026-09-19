@@ -12,6 +12,7 @@
  */
 
 const sharp = require("sharp");
+const { MIN_PHOTO_EDGE: MIN_EDGE } = require("./photoNames.js");
 
 // One small container and every upload is a different image: libvips'
 // operation cache can never hit but would keep ~50 MB resident, and its
@@ -26,8 +27,6 @@ const HERO_EDGE = 1600;
 const CARD_EDGE = 320;
 /** Link-preview crop (Open Graph). */
 const OG_SIZE = { width: 1200, height: 630 };
-/** Smallest long edge we accept — below this a photo looks soft as the hero. */
-const MIN_EDGE = 800;
 /** Decompression-bomb guard: a 40 MP JPEG is already far beyond any phone. */
 const MAX_INPUT_PIXELS = 40e6;
 /** Decided from the bytes, never from a file name or a Content-Type header. */

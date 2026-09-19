@@ -25,7 +25,7 @@ export default function IntegritetPage() {
         {/* ── Header ────────────────────────────────────────────────────────── */}
         <div className="space-y-2">
           <h1 className="font-display text-3xl text-stone-900">Integritetspolicy</h1>
-          <p className="text-xs text-stone-400">Senast uppdaterad: augusti 2026</p>
+          <p className="text-xs text-stone-400">Senast uppdaterad: september 2026</p>
         </div>
 
         <hr className="border-stone-100" />
@@ -82,6 +82,30 @@ export default function IntegritetPage() {
               efter 180 dagar.
             </li>
           </ul>
+          <p>Om du laddar upp en bild av en gård sparar vi:</p>
+          <ul className="list-disc list-inside space-y-1 text-stone-600">
+            <li>
+              <strong>Bilden, i förminskad form</strong> — dold information som
+              kameran lägger in, till exempel platsdata, tas bort innan bilden
+              sparas. Bilden visas publikt först när vi har granskat den; en
+              bild som inte godkänns raderas direkt.
+            </li>
+            <li>
+              <strong>Din e-postadress</strong> — så länge bilden visas, för att
+              kunna meddela dig när den granskats och nå dig om den. Visas inte
+              publikt.
+            </li>
+            <li>
+              <strong>En pseudonymiserad uppgift om din IP-adress</strong> — samma
+              slags kod som ovan, som bara används för att begränsa hur många
+              bilder som kan skickas per timme. Uppgiften om en avvisad bild
+              raderas efter 30 dagar.
+            </li>
+          </ul>
+          <p>
+            Vill du att en bild tas bort, använd &rdquo;Föreslå en ändring&rdquo;
+            på gårdens sida eller mejla hej@gardsguiden.se.
+          </p>
           <p>
             Besökare som enbart söker eller tittar på gårdar lämnar i övrigt inga
             personuppgifter till oss. Däremot samlas anonymiserad användningsdata
@@ -132,8 +156,8 @@ export default function IntegritetPage() {
 
         <Section title="E-post — Resend">
           <p>
-            När du skickar in en gård, rapporterar en gård, föreslår en ändring
-            eller kontaktar oss skickas ett mejl till oss via{" "}
+            När du skickar in en gård, laddar upp en bild, rapporterar en gård,
+            föreslår en ändring eller kontaktar oss skickas ett mejl till oss via{" "}
             <a
               href="https://resend.com/legal/privacy-policy"
               target="_blank"

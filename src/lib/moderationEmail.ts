@@ -7,6 +7,15 @@
 
 import { btnRow } from "./email";
 import { actionUrl, actionTokensAvailable } from "./actionTokens";
+import { photoUrl } from "./photoNames.js";
+import { SITE_URL } from "./site";
+
+/** The photo itself in an admin e-mail — the card rendition, linked to the
+ *  full-size one when asked. */
+export function photoEmailImage(photoId: string, { link = false } = {}): string {
+  const img = `<img src="${SITE_URL}${photoUrl(photoId, "card")}" width="320" alt="" style="display:block;max-width:100%;border-radius:8px;border:1px solid #e7e5e4;">`;
+  return link ? `<a href="${SITE_URL}${photoUrl(photoId, "hero")}">${img}</a>` : img;
+}
 
 /** Shorter life than the default: a link that permanently deletes a farm
  *  should not stay live in a shared inbox for a month. */
@@ -48,5 +57,23 @@ export function submissionModerationButtons(submissionId: string): string {
   return btnRow([
     { label: "Godkänn", href: actionUrl("submission:approve", submissionId), tone: "approve" },
     { label: "Avvisa", href: actionUrl("submission:reject", submissionId), tone: "danger" },
+  ]);
+}
+
+/** Approve / reject pair for an uploaded photo. */
+export function photoModerationButtons(photoId: string): string {
+  if (!actionTokensAvailable()) return "";
+  return btnRow([
+    { label: "Godkänn", href: actionUrl("photo:approve", photoId), tone: "approve" },
+    { label: "Avvisa", href: actionUrl("photo:reject", photoId), tone: "danger" },
+  ]);
+}
+
+/** On the approval receipt: a short-lived way to take a published photo down
+ *  again without reaching for the command line. */
+export function photoDeleteButton(photoId: string): string {
+  if (!actionTokensAvailable()) return "";
+  return btnRow([
+    { label: "Ta bort bilden", href: actionUrl("photo:delete", photoId, DELETE_TTL_DAYS), tone: "danger" },
   ]);
 }

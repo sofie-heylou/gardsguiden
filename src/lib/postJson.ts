@@ -2,23 +2,35 @@
  *  what the caller does with it: show the server's message, or the network
  *  one.  Client-safe: no React, nothing server-only. */
 
-export type PostFailure = "rate_limited" | "server" | "network";
+/** invalid: the server refused what was sent (4xx); server: it failed (5xx). */
+export type PostFailure = "invalid" | "rate_limited" | "server" | "network";
 
 export type PostResult =
   | { ok: true }
   | { ok: false; error: string; kind: PostFailure };
 
-export async function postJson(url: string, body: unknown): Promise<PostResult> {
+function failureKind(status: number): PostFailure {
+  if (status === 429) return "rate_limited";
+  return status < 500 ? "invalid" : "server";
+}
+
+async function post(url: string, init: RequestInit): Promise<PostResult> {
   try {
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-    const data = (await res.json().catch(() => ({}))) as { error?: string };
+    const res = await fetch(url, { method: "POST", ...init });
     if (res.ok) return { ok: true };
-    return { ok: false, error: data.error ?? "Något gick fel", kind: res.status === 429 ? "rate_limited" : "server" };
+    const data = (await res.json().catch(() => ({}))) as { error?: unknown };
+    const error = typeof data.error === "string" ? data.error : "Något gick fel";
+    return { ok: false, error, kind: failureKind(res.status) };
   } catch {
     return { ok: false, error: "Nätverksfel – försök igen", kind: "network" };
   }
+}
+
+export function postJson(url: string, body: unknown): Promise<PostResult> {
+  return post(url, { headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+}
+
+/** multipart/form-data — the browser sets the boundary header itself. */
+export function postForm(url: string, form: FormData): Promise<PostResult> {
+  return post(url, { body: form });
 }

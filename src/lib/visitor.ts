@@ -53,12 +53,13 @@ function clientIp(headers: Headers): string {
   return headers.get("x-real-ip")?.trim() || "unknown";
 }
 
-/** Stable pseudonym for this visitor *on this farm*. */
-export function visitorHash(headers: Headers, farmId: string): string {
+/** Stable pseudonym for this visitor within one scope — a farm id for
+ *  flags and suggestions, "submit" and "photo" for the site-wide hourly caps. */
+export function visitorHash(headers: Headers, scope: string): string {
   return crypto
     .createHmac("sha256", key())
-    // NUL-separated so a farm id containing the separator cannot shift the
+    // NUL-separated so a scope containing the separator cannot shift the
     // boundary between the two fields.
-    .update(`${farmId}\0${clientIp(headers)}`)
+    .update(`${scope}\0${clientIp(headers)}`)
     .digest("base64url");
 }

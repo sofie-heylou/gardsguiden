@@ -20,6 +20,9 @@ export const ADMIN_ACTIONS = [
   "farm:delete",
   "suggestion:mark-handled",
   "tip:mark-handled",
+  "photo:approve",
+  "photo:reject",
+  "photo:delete",
 ] as const;
 
 export type AdminAction = (typeof ADMIN_ACTIONS)[number];

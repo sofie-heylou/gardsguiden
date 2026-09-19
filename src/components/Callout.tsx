@@ -1,21 +1,16 @@
 import type { LucideIcon } from "lucide-react";
-import CalloutContactLink from "./CalloutContactLink";
 
-// Shared shell for the amber "us talking" cards (advertising, profile upgrade).
-// Body content varies per callout; the card chrome and the tracked contact CTA
-// stay identical everywhere.
+// Shared chrome for the amber "us talking" cards (advertising, profile
+// upgrade). Body content varies per callout; a callout with something to sell
+// ends its children with <CalloutContactLink>, the tracked "Kontakta oss".
 export default function Callout({
   icon: Icon,
   title,
-  event,
-  eventParams,
   className,
   children,
 }: {
   icon: LucideIcon;
   title: string;
-  event: string;
-  eventParams?: Record<string, unknown>;
   className?: string;
   children: React.ReactNode;
 }) {
@@ -25,10 +20,9 @@ export default function Callout({
     >
       <div className="flex items-start gap-3">
         <Icon size={18} className="mt-0.5 shrink-0 text-amber-700" />
-        <div>
+        <div className="min-w-0 flex-1">
           <h2 className="font-display text-[15px] text-stone-900">{title}</h2>
           {children}
-          <CalloutContactLink event={event} eventParams={eventParams} />
         </div>
       </div>
     </div>

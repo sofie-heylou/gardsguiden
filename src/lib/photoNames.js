@@ -25,6 +25,10 @@ const VARIANTS = ["hero", "card", "og"];
  *  the paid "utökad profil", set by hand with `review-photos.js tier`. */
 const PHOTO_LIMITS = { free: 1, extended: 5 };
 
+/** Smallest long edge the pipeline accepts — below this a photo looks soft
+ *  as the hero. Quoted in the form's hint, enforced in photoPipeline.js. */
+const MIN_PHOTO_EDGE = 800;
+
 /** @param {string} id @param {PhotoVariant} variant */
 function photoFileName(id, variant) {
   return `${id}${SUFFIX[variant]}`;
@@ -67,6 +71,7 @@ function photoAlt(name) {
 module.exports = {
   PHOTO_ID_RE,
   PHOTO_LIMITS,
+  MIN_PHOTO_EDGE,
   photoFileName,
   photoUrl,
   renditionFiles,

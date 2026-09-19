@@ -20,10 +20,18 @@ All `dataLayer.push()` calls are implemented in the codebase. Follow the steps b
 | `add_farm_submitted` | `mode`, `seconds` (first touch → sent, rounded to 5) | **Yes** |
 | `add_farm_tip_submitted` | `mode` (tip), `seconds` | No |
 | `add_farm_draft_restored` | — | No |
+| `farm_photo_submitted` | `surface` (`farm_page` / `thank_you`) | No |
+| `farm_photo_error` | `surface`, `kind` (`invalid` / `rate_limited` / `server` / `network`) | No |
 
 The `add_farm_*` family is the add-a-farm funnel. Never any field contents —
 only which box, which kind of problem, how far. The names are a TypeScript
 union in `src/lib/analytics.ts` (`trackAddFarm`), so a typo fails to compile.
+
+The `farm_photo_*` pair is the photo upload (`trackPhoto`, 2026-09-19). **Not
+yet in GTM:** trigger 16's regex needs `|farm_photo_.*` added (workspace 9);
+until then the events are pushed but nothing fires on them. Note that from
+the same date `add_farm_error` reports a server-side 4xx as `kind=invalid`
+(it used to say `server`; `server` now means a 5xx).
 
 **GTM state (workspace 8, 2026-09-12):** trigger 16 matches
 `^(farm_contact|filter_applied|near_me_activated|add_farm_.*|advertise_contact_clicked|upgrade_profile_clicked)$`
