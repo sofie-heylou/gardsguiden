@@ -3,6 +3,7 @@ import { getAllFarms } from "../lib/farms";
 import { CATEGORIES, farmMatchesCategory } from "../lib/categories";
 import { groupFarmsByCounty } from "../lib/counties";
 import AddFarmCallout from "./AddFarmCallout";
+import NewFarms from "./NewFarms";
 import type { Farm } from "../types/farm";
 
 // Ranked by search demand, not farm count: per GSC (12-month export, Aug
@@ -108,6 +109,8 @@ export default function PopularAreas() {
         >
           Se alla {farms.length} gårdar
         </Link>
+
+        <NewFarms farms={farms} limit={4} className="pt-3 border-t border-stone-100" />
 
         <AddFarmCallout
           title="Driver du en gård?"

@@ -1,3 +1,5 @@
+import type { Farm } from "../types/farm";
+
 export interface Category {
   slug: string;
   label: string;
@@ -82,4 +84,10 @@ export function farmMatchesCategory(
 /** Returns all categories a farm belongs to based on its raw product strings. */
 export function getFarmCategories(products: string[]): Category[] {
   return CATEGORIES.filter((cat) => farmMatchesCategory(products, cat.slug));
+}
+
+// Beer-only places without gårdsförsäljning are city breweries and taprooms,
+// not farm shops — someone searching "gårdsbutik" shouldn't meet them first.
+export function isBrewery(farm: Pick<Farm, "products" | "onSiteSales">): boolean {
+  return farm.products.length === 1 && farm.products[0] === "öl" && !farm.onSiteSales;
 }

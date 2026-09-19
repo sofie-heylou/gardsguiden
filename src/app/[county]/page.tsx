@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { ChevronLeft } from "lucide-react";
 import { getFarmsByCounty, compareFarmNames } from "../../lib/farms";
+import { isBrewery } from "../../lib/categories";
 import { SLUG_TO_COUNTY, COUNTY_SLUGS, farmPath } from "../../lib/counties";
 import { COUNTY_DESCRIPTIONS } from "../../lib/county-descriptions";
 import { SITE_URL } from "../../lib/site";
@@ -10,6 +11,7 @@ import FarmList from "../../components/FarmList";
 import { FarmCardList } from "../../components/FarmCard";
 import ShowOnMapLink from "../../components/ShowOnMapLink";
 import AdvertiseCallout from "../../components/AdvertiseCallout";
+import NewFarms from "../../components/NewFarms";
 import type { Farm } from "../../types/farm";
 
 // Unknown slugs fall through to notFound() in the component below.
@@ -94,12 +96,6 @@ function CountyJsonLd({ lan, slug, farms }: { lan: string; slug: string; farms: 
   );
 }
 
-// Beer-only places without gårdsförsäljning are city breweries and taprooms,
-// not farm shops — someone searching "gårdsbutik" shouldn't meet them first.
-function isBrewery(farm: Farm): boolean {
-  return farm.products.length === 1 && farm.products[0] === "öl" && !farm.onSiteSales;
-}
-
 export default async function CountyPage({ params }: Props) {
   const { county } = await params;
   const lan = SLUG_TO_COUNTY[county];
@@ -138,6 +134,8 @@ export default async function CountyPage({ params }: Props) {
           </div>
 
           <AdvertiseCallout lan={lan} />
+
+          <NewFarms farms={gardar} limit={3} lan={lan} className="mb-8" />
 
           <FarmList initialFarms={gardar} lockedCounty={lan} embedded />
 
