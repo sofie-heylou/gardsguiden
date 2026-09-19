@@ -14,7 +14,12 @@ const TABS: { mode: AddFarmMode; label: string }[] = [
  *  tip.  A side is mounted the first time it is shown and stays mounted, so
  *  switching never loses what was typed — and a visitor who only came to tip
  *  never loads the owner form's address widget. */
-export default function SubmitFarmWizard({ initialMode }: { initialMode: AddFarmMode }) {
+export default function SubmitFarmWizard({ initialMode, photosOpen }: {
+  initialMode: AddFarmMode;
+  /** The FARM_PHOTOS switch, read by the page: shows the photo upload on the
+   *  thank-you screen. */
+  photosOpen: boolean;
+}) {
   const [mode, setMode] = useState<AddFarmMode>(initialMode);
   const [seen, setSeen] = useState<Set<AddFarmMode>>(() => new Set([initialMode]));
   const mounted = useRef(false);
@@ -58,7 +63,7 @@ export default function SubmitFarmWizard({ initialMode }: { initialMode: AddFarm
       </div>
 
       <div id="panel-owner" role="tabpanel" aria-labelledby="tab-owner" hidden={mode !== "owner"}>
-        {seen.has("owner") && <OwnerForm onTip={() => switchTo("tip")} />}
+        {seen.has("owner") && <OwnerForm onTip={() => switchTo("tip")} photosOpen={photosOpen} />}
       </div>
       <div id="panel-tip" role="tabpanel" aria-labelledby="tab-tip" hidden={mode !== "tip"}>
         {seen.has("tip") && <TipForm />}

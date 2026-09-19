@@ -6,7 +6,7 @@
 export type PostFailure = "invalid" | "rate_limited" | "server" | "network";
 
 export type PostResult =
-  | { ok: true }
+  | { ok: true; data: Record<string, unknown> }
   | { ok: false; error: string; kind: PostFailure };
 
 function failureKind(status: number): PostFailure {
@@ -17,8 +17,8 @@ function failureKind(status: number): PostFailure {
 async function post(url: string, init: RequestInit): Promise<PostResult> {
   try {
     const res = await fetch(url, { method: "POST", ...init });
-    if (res.ok) return { ok: true };
-    const data = (await res.json().catch(() => ({}))) as { error?: unknown };
+    const data = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+    if (res.ok) return { ok: true, data };
     const error = typeof data.error === "string" ? data.error : "Något gick fel";
     return { ok: false, error, kind: failureKind(res.status) };
   } catch {

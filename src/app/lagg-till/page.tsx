@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import nextDynamic from "next/dynamic";
+import { photosEnabled } from "../../lib/photos";
 
 /** Kill switch for the step-by-step form: set SUBMIT_FORM_V2=1 in the
  *  environment to serve it, unset to fall back to the single-page form.  The
@@ -11,9 +12,8 @@ export const dynamic = "force-dynamic";
 
 const WIZARD = process.env.SUBMIT_FORM_V2 === "1";
 
-const Form = WIZARD
-  ? nextDynamic(() => import("./wizard/SubmitFarmWizard"))
-  : nextDynamic(() => import("./SubmitFarmForm"));
+const SubmitFarmWizard = nextDynamic(() => import("./wizard/SubmitFarmWizard"));
+const SubmitFarmForm = nextDynamic(() => import("./SubmitFarmForm"));
 
 const copy = WIZARD
   ? {
@@ -44,7 +44,9 @@ export default async function LaggTillPage({ searchParams }: { searchParams: Pro
           <h1 className="font-display text-2xl text-stone-900">{copy.title}</h1>
           <p className="text-sm text-stone-500 mt-1 leading-relaxed">{copy.intro}</p>
         </div>
-        <Form initialMode={tips === "1" ? "tip" : "owner"} />
+        {WIZARD
+          ? <SubmitFarmWizard initialMode={tips === "1" ? "tip" : "owner"} photosOpen={photosEnabled()} />
+          : <SubmitFarmForm />}
       </div>
     </div>
   );

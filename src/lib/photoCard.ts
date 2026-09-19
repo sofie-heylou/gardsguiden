@@ -5,6 +5,15 @@ import { photoLimit } from "./photoNames.js";
 import type { PhotoTally } from "./photos";
 import type { Farm } from "../types/farm";
 
+/** Where an upload goes: a farm page, or a submission the thank-you screen
+ *  got the id of from the submit endpoint (a UUID — knowing it is the
+ *  capability). */
+export type UploadTarget = { kind: "farm" | "submission"; id: string };
+
+export function uploadPath(target: UploadTarget): string {
+  return `/api/${target.kind === "farm" ? "farms" : "submissions"}/${target.id}/photos`;
+}
+
 /** Why a farm cannot take another upload right now, or null when it can. */
 export type UploadBlock = "pending" | "full";
 

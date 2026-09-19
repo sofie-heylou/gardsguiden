@@ -24,10 +24,12 @@ function restoreValues(saved: FormValues): FormValues {
 
 /** The five-step owner form.  Step 1's "shown" event belongs to the page
  *  container, which knows which side is on screen. */
-export default function OwnerForm({ onTip }: { onTip: () => void }) {
+export default function OwnerForm({ onTip, photosOpen }: { onTip: () => void; photosOpen: boolean }) {
   const form = useAddFarmForm(MODE, initialValues);
   const { values, errors, update } = form;
   const [step, setStep] = useState(1);
+  /** The id the submit endpoint answered with — what a thank-you upload attaches to. */
+  const [submissionId, setSubmissionId] = useState<string | null>(null);
   const [returnToReview, setReturnToReview] = useState(false);
   // undefined: not looked yet · Draft: banner showing · null: decided.
   const [pendingDraft, setPendingDraft] = useState<Draft | null | undefined>(undefined);
@@ -79,6 +81,7 @@ export default function OwnerForm({ onTip }: { onTip: () => void }) {
     }, step);
     if (result.ok) {
       clearDraft();
+      setSubmissionId(typeof result.data.id === "string" ? result.data.id : null);
       trackAddFarm("add_farm_submitted", { mode: MODE, seconds: secondsSince(form.startedAt.current) });
     }
   }
@@ -97,7 +100,15 @@ export default function OwnerForm({ onTip }: { onTip: () => void }) {
   }
 
   if (form.phase === "sent") {
-    return <ThankYou name={values.name} email={values.submittedEmail} lan={values.lan} onTip={onTip} />;
+    return (
+      <ThankYou
+        name={values.name}
+        email={values.submittedEmail}
+        lan={values.lan}
+        onTip={onTip}
+        photoTarget={photosOpen && submissionId ? { kind: "submission", id: submissionId } : null}
+      />
+    );
   }
 
   const stepProps = { values, errors, update, headingRef };

@@ -41,7 +41,7 @@ export default function UpgradeProfileCallout({ farm, photos, uploadsOpen }: {
         </p>
       )}
       {plan.upload && (
-        <PhotoUploadForm farmId={farm.id} surface="farm_page" />
+        <PhotoUploadForm target={{ kind: "farm", id: farm.id }} surface="farm_page" />
       )}
 
       {plan.pitch && (

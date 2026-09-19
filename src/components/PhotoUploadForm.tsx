@@ -7,6 +7,7 @@ import { MAX_PHOTO_BYTES } from "../lib/limits";
 import { PHOTO_HINT, PHOTO_PICK, PHOTO_TOO_BIG } from "../lib/photoText";
 import { postForm } from "../lib/postJson";
 import { trackPhoto, type PhotoSurface } from "../lib/analytics";
+import { uploadPath, type UploadTarget } from "../lib/photoCard";
 
 /** One phase at a time, like SuggestChangeForm next to it on the page. */
 type Phase = "collapsed" | "editing" | "sending" | "sent";
@@ -17,14 +18,16 @@ function formatSize(bytes: number): string {
   return bytes >= 1024 * 1024 ? `${(bytes / 1024 / 1024).toFixed(1).replace(".", ",")} MB` : `${Math.round(bytes / 1024)} kB`;
 }
 
-export default function PhotoUploadForm({ farmId, surface }: {
-  farmId: string;
+export default function PhotoUploadForm({ target, surface, defaultEmail = "" }: {
+  target: UploadTarget;
   surface: PhotoSurface;
+  /** The thank-you screen already knows the sender's address. */
+  defaultEmail?: string;
 }) {
   const [phase, setPhase] = useState<Phase>("collapsed");
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(defaultEmail);
   const [rights, setRights] = useState(false);
   const [error, setError] = useState("");
 
@@ -58,7 +61,7 @@ export default function PhotoUploadForm({ farmId, surface }: {
     form.set("photo", file);
     form.set("email", email);
     form.set("rights", rights ? "1" : "");
-    const result = await postForm(`/api/farms/${farmId}/photos`, form);
+    const result = await postForm(uploadPath(target), form);
 
     if (result.ok) {
       trackPhoto("farm_photo_submitted", { surface });
@@ -118,11 +121,11 @@ export default function PhotoUploadForm({ farmId, surface }: {
       </div>
 
       <div className="space-y-1">
-        <label htmlFor={`photo-email-${farmId}`} className="block text-xs font-medium text-stone-600">
+        <label htmlFor={`photo-email-${target.id}`} className="block text-xs font-medium text-stone-600">
           Din e-postadress <span className="text-red-500">*</span>
         </label>
         <input
-          id={`photo-email-${farmId}`}
+          id={`photo-email-${target.id}`}
           type="email"
           required
           value={email}

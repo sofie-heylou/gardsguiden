@@ -16,6 +16,7 @@ import type { Farm } from "../types/farm";
 import { notFound, type ActionFailure } from "./actionResult";
 import { geocodeAddress } from "./geocode";
 import { SITE_URL } from "./site";
+import { attachSubmissionPhotos, rejectSubmissionPhotos } from "./photos";
 
 /** Who sent a row in farm_submissions: the farm's owner, whose submission
  *  can be approved into the catalogue, or a visitor tipping us off, whose row
@@ -77,6 +78,16 @@ export function getPendingSubmission(id: string): PendingSubmission | null {
     SELECT id, name, submitted_email
     FROM farm_submissions WHERE id = ? AND status = 'pending' AND role = 'owner'
   `).get(id) as PendingSubmission | undefined;
+  return row ?? null;
+}
+
+/** An owner's submission a photo may be attached to: still pending, or
+ *  already approved (then `farmId` says which farm the photo goes to). */
+export function getPhotoSubmission(id: string): { id: string; name: string; farmId: string | null } | null {
+  const row = getDb().prepare(`
+    SELECT id, name, farm_id AS farmId FROM farm_submissions
+    WHERE id = ? AND role = 'owner' AND status IN ('pending', 'approved')
+  `).get(id) as { id: string; name: string; farmId: string | null } | undefined;
   return row ?? null;
 }
 
@@ -145,9 +156,12 @@ function insertApprovedFarm(
 
     db.prepare(`
       UPDATE farm_submissions
-      SET status = 'approved', reviewed_at = datetime('now')
+      SET status = 'approved', reviewed_at = datetime('now'), farm_id = ?
       WHERE id = ?
-    `).run(submission.id);
+    `).run(farmId, submission.id);
+
+    // Photos uploaded from the thank-you screen were waiting for this farm.
+    attachSubmissionPhotos(submission.id, farmId);
   })();
 }
 
@@ -229,6 +243,7 @@ export function rejectSubmission(id: string, notes?: string | null): RejectResul
     SET status = 'rejected', reviewed_at = datetime('now'), notes = COALESCE(?, notes)
     WHERE id = ?
   `).run(notes?.trim() || null, id);
+  rejectSubmissionPhotos(id);
 
   sendEmail({
     to: submission.submitted_email,

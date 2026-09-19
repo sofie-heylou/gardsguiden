@@ -1,17 +1,22 @@
 "use client";
 
 import Link from "next/link";
+import PhotoUploadForm from "../../../components/PhotoUploadForm";
 import { GARDAR_COUNTY_TO_SLUG, countyDisplayName } from "../../../lib/counties";
+import type { UploadTarget } from "../../../lib/photoCard";
 import { CONTACT_EMAIL } from "../../../lib/site";
 import type { Farm } from "../../../types/farm";
 import { SentHeading, cardCls, hintCls, secondaryBtnCls } from "./fields";
 
-export default function ThankYou({ name, email, lan, onTip }: {
+export default function ThankYou({ name, email, lan, onTip, photoTarget }: {
   name: string;
   email: string;
   lan: string;
   /** Owners often know the neighbouring farms — opens the tip form. */
   onTip: () => void;
+  /** Where a photo can be uploaded to right now, or null while uploads are
+   *  closed — then the card falls back to asking for one by e-mail. */
+  photoTarget: UploadTarget | null;
 }) {
   const gardarSlug = GARDAR_COUNTY_TO_SLUG[lan as Farm["lan"]];
   const lanName = gardarSlug ? countyDisplayName(lan) : "";
@@ -38,11 +43,18 @@ export default function ThankYou({ name, email, lan, onTip }: {
 
       <section className={cardCls}>
         <h2 className="text-sm font-semibold text-stone-800">Har du en bild på gården?</h2>
-        <p className={hintCls}>
-          Mejla den till{" "}
-          <a href={`mailto:${CONTACT_EMAIL}?subject=${photoSubject}`} className="underline hover:text-stone-900">{CONTACT_EMAIL}</a>{" "}
-          så lägger vi in den på gårdens sida.
-        </p>
+        {photoTarget ? (
+          <>
+            <p className={hintCls}>Lägg till den nu, så visas den överst på gårdens sida när gården är publicerad.</p>
+            <PhotoUploadForm target={photoTarget} surface="thank_you" defaultEmail={email} />
+          </>
+        ) : (
+          <p className={hintCls}>
+            Mejla den till{" "}
+            <a href={`mailto:${CONTACT_EMAIL}?subject=${photoSubject}`} className="underline hover:text-stone-900">{CONTACT_EMAIL}</a>{" "}
+            så lägger vi in den på gårdens sida.
+          </p>
+        )}
       </section>
 
       <section className={cardCls}>

@@ -18,7 +18,9 @@ const FARM = "boo-musteri";
 type Intake = typeof import("./photoIntake");
 type Actions = typeof import("./photoActions");
 type Photos = typeof import("./photos");
-let intake: Intake, actions: Actions, photos: Photos;
+type Db = typeof import("./db");
+type Submissions = typeof import("./submissionActions");
+let intake: Intake, actions: Actions, photos: Photos, db: Db, submissions: Submissions;
 
 /** sendEmail logs instead of sending when the key is unset — capture the
  *  subjects so the tests can see what would have gone out. */
@@ -35,6 +37,8 @@ before(async () => {
   intake = await import("./photoIntake");
   actions = await import("./photoActions");
   photos = await import("./photos");
+  db = await import("./db");
+  submissions = await import("./submissionActions");
   (await import("./alertBudget")).__resetAlertBudget();
 });
 
@@ -47,7 +51,7 @@ async function image(format: "jpeg" | "png" | "gif", width = 2000, height = 1400
 
 const good = { email: "agare@example.se", rights: "1", visitor: "visitor-a" };
 const upload = (over: Partial<Parameters<Intake["intakePhoto"]>[0]> & { file: File | null }) =>
-  intake.intakePhoto({ farmId: FARM, ...good, ...over });
+  intake.intakePhoto({ target: { kind: "farm", id: FARM }, ...good, ...over });
 
 test("the guards, in order", async () => {
   const file = await image("jpeg");
@@ -56,7 +60,8 @@ test("the guards, in order", async () => {
   assert.deepEqual(await upload({ file }), { ok: false, status: 503, error: "Uppladdning av bilder är tillfälligt stängd." });
   process.env.FARM_PHOTOS = "1";
 
-  assert.equal((await upload({ file, farmId: "finns-inte" }) as { status: number }).status, 404);
+  assert.equal((await upload({ file, target: { kind: "farm", id: "finns-inte" } }) as { status: number }).status, 404);
+  assert.equal((await upload({ file, target: { kind: "submission", id: "finns-inte" } }) as { status: number }).status, 404);
   assert.equal((await upload({ file, email: "inte en adress" }) as { status: number }).status, 400);
   assert.equal((await upload({ file, rights: "" }) as { status: number }).status, 400);
 
@@ -105,7 +110,7 @@ test("a good upload becomes a pending row, three files and an e-mail to the inbo
 });
 
 test("a paid farm has room; rejecting deletes the files and keeps the row", async () => {
-  (await import("./db")).getDb().prepare("UPDATE farms SET tier = 'extended' WHERE id = ?").run(FARM);
+  db.getDb().prepare("UPDATE farms SET tier = 'extended' WHERE id = ?").run(FARM);
 
   const result = await upload({ file: await image("png") });
   assert.equal(result.ok, true);
@@ -134,4 +139,59 @@ test("three uploads an hour per visitor, then 429; delete takes a live photo dow
   assert.deepEqual(actions.deletePhoto(live.id), { ok: true, name: "Boo Musteri" });
   assert.equal(photos.getFarmPhotos(FARM).length, 0);
   assert.equal(await photos.readPhotoFile(live.id, "card"), null);
+});
+
+// ── The wizard's thank-you screen: photos for a farm that does not exist yet ──
+
+function insertSubmission(id: string, name: string): void {
+  // The columns approveSubmission reads; coordinates given so nothing geocodes.
+  db.getDb().prepare(`
+    INSERT INTO farm_submissions
+      (id, name, address, lan, website, products, submitted_email, role, lat, lng)
+    VALUES (?, ?, 'Testvägen 1, 123 45 Teststad', 'Stockholm', 'https://example.se', '[]', 'agare@example.se', 'owner', 59.3, 18.1)
+  `).run(id, name);
+}
+
+test("a photo for a pending submission waits, then follows the farm on approval", async () => {
+  insertSubmission("sub-1", "Nya gården");
+  const target = { kind: "submission", id: "sub-1" } as const;
+
+  sent.length = 0;
+  const first = await upload({ file: await image("jpeg"), target, visitor: "visitor-b" });
+  assert.equal(first.ok, true);
+  const id = (first as { photoId: string }).photoId;
+  assert.deepEqual(sent, ["Ny bild: Nya gården"]);
+  assert.deepEqual(photos.getSubmissionTally("sub-1"), { approved: 0, pending: true });
+
+  const again = await upload({ file: await image("jpeg"), target, visitor: "visitor-b" });
+  assert.equal((again as { status: number }).status, 409);
+
+  // Approving the photo before the farm exists: approved, but nothing to show it on yet.
+  sent.length = 0;
+  assert.deepEqual(actions.approvePhoto(id), { ok: true, name: "Nya gården" });
+  assert.deepEqual(sent, ["Din bild på Nya gården är nu publicerad", "Godkänd: bild för Nya gården"]);
+  assert.deepEqual(photos.getSubmissionTally("sub-1"), { approved: 1, pending: false });
+
+  // Approving the farm hands the photo over and makes it visible.
+  const approved = await submissions.approveSubmission("sub-1");
+  assert.equal(approved.ok, true);
+  const farmId = (approved as { farmId: string }).farmId;
+  assert.deepEqual(photos.getFarmPhotos(farmId).map((p) => p.id), [id]);
+  assert.deepEqual(photos.getSubmissionTally("sub-1"), { approved: 0, pending: false });
+
+  // A late upload to the approved submission goes to the farm — which is full (free tier).
+  const late = await upload({ file: await image("jpeg"), target, visitor: "visitor-b" });
+  assert.deepEqual(late, { ok: false, status: 409, error: "Gården har redan sitt antal bilder." });
+});
+
+test("rejecting a submission rejects its waiting photos too", async () => {
+  insertSubmission("sub-2", "Avslagna gården");
+  const result = await upload({ file: await image("png"), target: { kind: "submission", id: "sub-2" }, visitor: "visitor-c" });
+  assert.equal(result.ok, true);
+  const id = (result as { photoId: string }).photoId;
+
+  assert.equal(submissions.rejectSubmission("sub-2").ok, true);
+  assert.equal(actions.getPhotoTarget(id)?.status, "rejected");
+  assert.equal(await photos.readPhotoFile(id, "hero"), null);
+  assert.equal((await upload({ file: await image("png"), target: { kind: "submission", id: "sub-2" }, visitor: "visitor-c" }) as { status: number }).status, 404, "a rejected submission is not a target");
 });

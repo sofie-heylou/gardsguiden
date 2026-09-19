@@ -32,6 +32,9 @@ export interface FarmPhoto {
  *  column every farm read carries both come from here. */
 const VISIBLE = "status = 'approved' AND farm_id IS NOT NULL";
 const ORDER = "sort_order, created_at";
+/** A photo uploaded from the thank-you screen, still waiting for its farm to
+ *  be approved. Approval moves it over; until then it cannot show. */
+const WAITING = "submission_id = ? AND farm_id IS NULL";
 
 /** Correlated subquery for a farm's first visible photo; `f` is the farms
  *  alias in farms.ts (unqualified columns resolve to farm_photos). */
@@ -59,12 +62,37 @@ export interface PhotoTally {
   pending: boolean;
 }
 
-export function getPhotoTally(farmId: string): PhotoTally {
+function tally(where: string, id: string): PhotoTally {
   const row = getDb().prepare(`
-    SELECT COALESCE(SUM(${VISIBLE}), 0) AS approved, COALESCE(SUM(status = 'pending'), 0) AS pending
-    FROM farm_photos WHERE farm_id = ?
-  `).get(farmId) as { approved: number; pending: number };
+    SELECT COALESCE(SUM(status = 'approved'), 0) AS approved, COALESCE(SUM(status = 'pending'), 0) AS pending
+    FROM farm_photos WHERE ${where}
+  `).get(id) as { approved: number; pending: number };
   return { approved: row.approved, pending: row.pending > 0 };
+}
+
+export function getPhotoTally(farmId: string): PhotoTally {
+  return tally("farm_id = ?", farmId);
+}
+
+/** The same tally for photos still waiting for their farm — "approved" here
+ *  means approved and waiting. */
+export function getSubmissionTally(submissionId: string): PhotoTally {
+  return tally(WAITING, submissionId);
+}
+
+/** The submission became a farm: its photos now belong to that farm.
+ *  Approved ones become visible at once; pending ones wait for their turn. */
+export function attachSubmissionPhotos(submissionId: string, farmId: string): void {
+  getDb().prepare(`UPDATE farm_photos SET farm_id = ? WHERE ${WAITING}`).run(farmId, submissionId);
+}
+
+/** The submission was refused: nothing to attach its photos to, ever. */
+export function rejectSubmissionPhotos(submissionId: string): void {
+  const db = getDb();
+  const where = `${WAITING} AND status != 'rejected'`;
+  const rows = db.prepare(`SELECT id FROM farm_photos WHERE ${where}`).all(submissionId) as { id: string }[];
+  for (const { id } of rows) deletePhotoFiles(id);
+  db.prepare(`UPDATE farm_photos SET status = 'rejected', reviewed_at = datetime('now') WHERE ${where}`).run(submissionId);
 }
 
 /** Uploads by one visitor in the last hour, across all farms — the rate

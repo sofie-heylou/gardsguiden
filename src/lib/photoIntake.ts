@@ -2,16 +2,21 @@
  *  files on the volume, a pending row, and an e-mail to the inbox where it
  *  will be approved or refused.
  *
- *  Framework-free like submissionActions.ts: the route handler parses the
- *  multipart body and maps the result onto HTTP. */
+ *  Two places to upload from — a farm page, and the add-a-farm thank-you
+ *  screen, where the farm does not exist yet. Both resolve to the same
+ *  shape below, so the checks and the e-mail are written once.
+ *
+ *  Framework-free like submissionActions.ts: the route handlers parse the
+ *  multipart body and map the result onto HTTP. */
 
 import { getFarmById } from "./farms";
+import { getPhotoSubmission } from "./submissionActions";
 import { photoLimit } from "./photoNames.js";
 import { renderPhoto, PhotoRefusal } from "./photoPipeline.js";
-import { uploadBlock, type UploadBlock } from "./photoCard";
+import { uploadBlock, type UploadBlock, type UploadTarget } from "./photoCard";
 import {
-  countRecentUploads, generatePhotoId, getPhotoTally, insertPhoto, photosEnabled, writePhotoFiles,
-  type PhotoTally,
+  countRecentUploads, generatePhotoId, getPhotoTally, getSubmissionTally, insertPhoto, photosEnabled,
+  writePhotoFiles, type PhotoTally,
 } from "./photos";
 import { MAX_EMAIL, MAX_PHOTO_BYTES } from "./limits";
 import { PHOTO_PICK, PHOTO_TOO_BIG } from "./photoText";
@@ -27,7 +32,7 @@ import type { Farm } from "../types/farm";
 const MAX_UPLOADS_PER_HOUR = 3;
 
 export interface PhotoUpload {
-  farmId: string;
+  target: UploadTarget;
   /** null when the form field was missing or not a file. */
   file: File | null;
   email: string;
@@ -42,6 +47,37 @@ type IntakeStatus = 400 | 404 | 409 | 413 | 429 | 503;
 export type IntakeResult =
   | { ok: true; photoId: string }
   | { ok: false; status: IntakeStatus; error: string };
+
+/** What the checks and the e-mail need, whichever kind of target it was. */
+interface Resolved {
+  name: string;
+  tier: Farm["tier"];
+  farmId: string | null;
+  submissionId: string | null;
+  pageUrl: string | null;
+  tally: PhotoTally;
+}
+
+function resolveFarm(id: string): Resolved | null {
+  const farm = getFarmById(id);
+  if (!farm) return null;
+  return {
+    name: farm.name, tier: farm.tier, farmId: farm.id, submissionId: null,
+    pageUrl: `${SITE_URL}${farmPath(farm)}`, tally: getPhotoTally(farm.id),
+  };
+}
+
+/** An owner's submission that is still pending, or already a farm — in
+ *  which case the photo goes straight to that farm. */
+function resolveSubmission(id: string): Resolved | null {
+  const submission = getPhotoSubmission(id);
+  if (!submission) return null;
+  if (submission.farmId) return resolveFarm(submission.farmId);
+  return {
+    name: submission.name, tier: "free", farmId: null, submissionId: submission.id,
+    pageUrl: null, tally: getSubmissionTally(submission.id),
+  };
+}
 
 const REFUSAL_TEXT: Record<PhotoRefusal["kind"], string> = {
   format: "Bilden behöver vara JPEG, PNG eller WebP.",
@@ -61,8 +97,8 @@ const fail = (status: IntakeStatus, error: string): IntakeResult => ({ ok: false
 export async function intakePhoto(upload: PhotoUpload): Promise<IntakeResult> {
   if (!photosEnabled()) return fail(503, "Uppladdning av bilder är tillfälligt stängd.");
 
-  const farm = getFarmById(upload.farmId);
-  if (!farm) return fail(404, "Gården hittades inte.");
+  const target = upload.target.kind === "farm" ? resolveFarm(upload.target.id) : resolveSubmission(upload.target.id);
+  if (!target) return fail(404, "Gården hittades inte.");
 
   const email = upload.email.trim();
   if (!isValidEmail(email) || email.length > MAX_EMAIL) return fail(400, "Ange en giltig e-postadress.");
@@ -72,8 +108,7 @@ export async function intakePhoto(upload: PhotoUpload): Promise<IntakeResult> {
     return fail(429, "Du har redan skickat flera bilder. Försök igen om en stund.");
   }
 
-  const tally = getPhotoTally(farm.id);
-  const block = uploadBlock(tally, farm.tier);
+  const block = uploadBlock(target.tally, target.tier);
   if (block) return fail(409, BLOCK_TEXT[block]);
 
   if (!upload.file || upload.file.size === 0) return fail(400, PHOTO_PICK);
@@ -90,24 +125,24 @@ export async function intakePhoto(upload: PhotoUpload): Promise<IntakeResult> {
   const id = generatePhotoId();
   writePhotoFiles(id, rendered);
   insertPhoto({
-    id, farmId: farm.id, submissionId: null, uploaderEmail: email, visitorHash: upload.visitor,
-    width: rendered.width, height: rendered.height,
+    id, farmId: target.farmId, submissionId: target.submissionId, uploaderEmail: email,
+    visitorHash: upload.visitor, width: rendered.width, height: rendered.height,
   });
-  sendAdminAlert(`Ny bild: ${farm.name}`, () => newPhotoEmail(farm, id, email, tally));
+  sendAdminAlert(`Ny bild: ${target.name}`, () => newPhotoEmail(target, id, email));
 
   return { ok: true, photoId: id };
 }
 
-function newPhotoEmail(farm: Farm, photoId: string, email: string, tally: PhotoTally): string {
-  const tier = farm.tier === "extended" ? "utökad profil" : "gratis";
+function newPhotoEmail(target: Resolved, photoId: string, email: string): string {
+  const tier = target.tier === "extended" ? "utökad profil" : "gratis";
   return emailHtml(`
     ${emailHeading("Ny bild att granska")}
     ${table(
-      row("Gård", farm.name) +
-      row("Gård-ID", farm.id) +
+      row("Gård", target.name) +
+      (target.farmId ? row("Gård-ID", target.farmId) : row("Ansökan", `${target.submissionId} – gården är inte granskad än`)) +
       row("Från", email) +
-      row("Bilder nu", `${tally.approved} av ${photoLimit(farm.tier)} (${tier})`) +
-      linkRow("Sida", `${SITE_URL}${farmPath(farm)}`)
+      row("Bilder nu", `${target.tally.approved} av ${photoLimit(target.tier)} (${tier})`) +
+      (target.pageUrl ? linkRow("Sida", target.pageUrl) : "")
     )}
     ${photoEmailImage(photoId, { link: true })}
     <p style="margin:8px 0 0;font-size:12px;color:#a8a29e;">Klicka på bilden för full storlek. Avvisa raderar filerna direkt.</p>

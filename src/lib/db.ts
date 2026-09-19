@@ -179,6 +179,11 @@ function initSchema(db: Database.Database): void {
   if (!columnExists(db, "farm_submissions", "message")) {
     db.exec(`ALTER TABLE farm_submissions ADD COLUMN message TEXT`);
   }
+  // The farm an approved submission became, so a photo uploaded from the
+  // thank-you screen after approval still finds its way onto the page.
+  if (!columnExists(db, "farm_submissions", "farm_id")) {
+    db.exec(`ALTER TABLE farm_submissions ADD COLUMN farm_id TEXT`);
+  }
 
   // ── Anonymous flag dedup ───────────────────────────────────────────────────
   // One row per (farm, visitor). visitor_hash is a keyed hash of the caller's

@@ -221,9 +221,12 @@ export async function POST(req: NextRequest) {
   const id = insertSubmission(s, visitor);
 
   const decision = requestAlertSlot();
-  if (decision === "suppress") return NextResponse.json({ ok: true });
-  const { subject, body: mail } = s.role === "owner" ? ownerEmail(s, id) : tipEmail(s, id);
-  sendEmail({ to: ADMIN_EMAIL, subject, html: emailHtml(mail + (decision === "send-last" ? ALERT_CAP_NOTICE : "")) });
+  if (decision !== "suppress") {
+    const { subject, body: mail } = s.role === "owner" ? ownerEmail(s, id) : tipEmail(s, id);
+    sendEmail({ to: ADMIN_EMAIL, subject, html: emailHtml(mail + (decision === "send-last" ? ALERT_CAP_NOTICE : "")) });
+  }
 
-  return NextResponse.json({ ok: true });
+  // The id lets the thank-you screen attach a photo to this submission; it is
+  // a UUID, so knowing it is the same kind of capability as the e-mail link.
+  return NextResponse.json({ ok: true, id });
 }
