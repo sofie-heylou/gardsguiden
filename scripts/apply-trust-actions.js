@@ -26,7 +26,8 @@ db.pragma("busy_timeout = 10000"); // the app may hold the same WAL
 
 // Child tables reference farms(id); clear them first or the FK blocks the
 // delete. Probed per-DB — the set differs between prod and the local seed.
-const childDel = ["farm_categories", "farm_flags", "farm_removal_requests", "farm_suggestions"]
+// farm_photos rows go too; their files are left for `review-photos.js prune`.
+const childDel = ["farm_categories", "farm_flags", "farm_removal_requests", "farm_suggestions", "farm_photos"]
   .filter((t) => db.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?").get(t))
   .map((t) => db.prepare(`DELETE FROM ${t} WHERE farm_id = ?`));
 

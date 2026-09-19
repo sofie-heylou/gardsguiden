@@ -12,7 +12,7 @@ interface Props {
 
 export default function FarmDetailMap({ lat, lng, name }: Props) {
   return (
-    <div className="h-52 w-full overflow-hidden">
+    <div className="h-full w-full overflow-hidden">
       <Map
         initialViewState={{ latitude: lat, longitude: lng, zoom: 13 }}
         mapboxAccessToken={TOKEN}

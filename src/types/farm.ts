@@ -22,4 +22,8 @@ export interface Farm {
   source: string;
   facebook: string | null;
   instagram: string | null;
+  /** Free for everyone; `extended` is the paid "utökad profil" (more photos). */
+  tier: "free" | "extended";
+  /** The farm's first visible photo, or null — see photos.ts. */
+  photoId: string | null;
 }

@@ -10,6 +10,7 @@ scripts/*
 !scripts/backfill-kommun.js
 !scripts/kommun-lookup.js
 !scripts/apply-trust-actions.js
+!scripts/review-photos.js
 !scripts/data
 
 # Scraper intermediate files

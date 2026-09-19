@@ -1,7 +1,7 @@
 import Database from "better-sqlite3";
 import path from "path";
 
-const DB_PATH =
+export const DB_PATH =
   process.env.DB_PATH ?? path.join(process.cwd(), "data", "gardsguiden.db");
 
 const BUILD_DB_PATH = path.join(process.cwd(), "data", "gardsguiden.db");
@@ -19,7 +19,7 @@ export function getDb(): Database.Database {
   return db;
 }
 
-const KNOWN_TABLES = new Set(["farms", "farm_submissions"]);
+const KNOWN_TABLES = new Set(["farms", "farm_submissions", "farm_photos"]);
 
 function columnExists(db: Database.Database, table: string, column: string): boolean {
   if (!KNOWN_TABLES.has(table)) throw new Error(`Unknown table: ${table}`);
@@ -194,10 +194,39 @@ function initSchema(db: Database.Database): void {
     CREATE INDEX IF NOT EXISTS idx_farm_flags_farm ON farm_flags(farm_id);
   `);
 
+  // ── Farm photos ───────────────────────────────────────────────────────────
+  // User content, so it lives only here and on the volume — never in
+  // farms.json or the seed. farm_id is NULL while the photo belongs to a
+  // submission that has not been approved yet; a photo is visible once it is
+  // approved AND attached to a farm. No FK to farms, for the same reason as
+  // farm_flags: the files on disk have to go too, so deletion is explicit
+  // (see photos.ts deleteFarmPhotos).
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS farm_photos (
+      id             TEXT PRIMARY KEY,                 -- 32 hex chars, see photos.ts
+      farm_id        TEXT,
+      submission_id  TEXT,
+      status         TEXT NOT NULL DEFAULT 'pending',  -- pending | approved | rejected
+      sort_order     INTEGER NOT NULL DEFAULT 0,
+      uploader_email TEXT NOT NULL,
+      visitor_hash   TEXT NOT NULL,                    -- rate-limit key, see visitor.ts
+      width          INTEGER,                          -- of the 1600 px rendition
+      height         INTEGER,
+      created_at     TEXT NOT NULL DEFAULT (datetime('now')),
+      reviewed_at    TEXT
+    );
+    CREATE INDEX IF NOT EXISTS idx_farm_photos_farm       ON farm_photos(farm_id, status, sort_order);
+    CREATE INDEX IF NOT EXISTS idx_farm_photos_submission ON farm_photos(submission_id);
+  `);
+
   // A keyed hash of an IP is pseudonymous, not anonymous — we hold the key, so
   // storage limitation applies. These rows are a double-click guard, and there
   // is no reason to keep one for longer than a season.
   db.prepare(`DELETE FROM farm_flags WHERE created_at < datetime('now', '-90 days')`).run();
+
+  // A rejected photo's files are deleted on the spot; the row stays a month so
+  // the hourly upload cap still counts it, then goes.
+  db.prepare(`DELETE FROM farm_photos WHERE status = 'rejected' AND reviewed_at < datetime('now', '-30 days')`).run();
 
   // Suggestions carry a visitor's email and free text. Kept longer than the
   // flag hashes because they are the record of a correction request, but not

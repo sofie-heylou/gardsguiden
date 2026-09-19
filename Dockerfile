@@ -32,6 +32,13 @@ RUN npm run build
 RUN cp -r /app/node_modules/better-sqlite3 \
           /app/.next/standalone/node_modules/better-sqlite3
 
+# sharp (photo processing) is native too: the addon lives in sharp/, its
+# libvips binaries under @img/. The tracer usually catches both; copying is
+# the same insurance as above.
+RUN cp -r /app/node_modules/sharp /app/.next/standalone/node_modules/sharp \
+ && mkdir -p /app/.next/standalone/node_modules/@img \
+ && cp -r /app/node_modules/@img/. /app/.next/standalone/node_modules/@img/
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Stage 2: Production runner
 # Lean Alpine image — only the standalone server and runtime assets.
@@ -65,6 +72,11 @@ COPY --from=builder /app/scripts/kommun-lookup.js ./scripts/kommun-lookup.js
 COPY --from=builder /app/scripts/backfill-kommun.js ./scripts/backfill-kommun.js
 COPY --from=builder /app/scripts/apply-trust-actions.js ./scripts/apply-trust-actions.js
 COPY --from=builder /app/scripts/data/kommuner.geojson ./scripts/data/kommuner.geojson
+# Every plain-JS module in src/lib is shared between the server and these
+# scripts (review-photos.js needs the photo pipeline and naming), so the
+# runner carries src/lib/*.js as a rule rather than file by file.
+COPY --from=builder /app/scripts/review-photos.js ./scripts/review-photos.js
+COPY --from=builder /app/src/lib/*.js ./src/lib/
 
 # ── Seed database ──────────────────────────────────────────────────────────
 # Bake the current database into the image so the app works out-of-the-box

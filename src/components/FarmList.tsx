@@ -15,6 +15,7 @@ import { farmMatchesFilters, countByCounty, countByCategory, openNowCounts, pars
 import type { FilterState } from "../lib/farmFilters";
 import { getTodayHours } from "../lib/openingHours";
 import { track } from "../lib/analytics";
+import { FarmCardFrame } from "./FarmCardThumb";
 
 type SortKey = "name" | "lan" | "distance";
 
@@ -326,56 +327,58 @@ export default function FarmList({ initialFarms, initialCounty, lockedCounty, em
                 <li key={farm.id}>
                   <Link
                     href={farmPath(farm)}
-                    className="block bg-white rounded-xl border border-stone-100 shadow-sm hover:shadow-md active:shadow-none transition-shadow px-4 py-4"
+                    className="flex gap-3 bg-white rounded-xl border border-stone-100 shadow-sm hover:shadow-md active:shadow-none transition-shadow px-4 py-4"
                   >
-                    {/* Name + distance */}
-                    <div className="flex items-start justify-between gap-2 mb-0.5">
-                      <h2 className="font-display text-[15px] text-stone-900 leading-snug">{farm.name}</h2>
-                      <div className="flex items-center gap-1.5 shrink-0 mt-0.5">
-                        {dist !== null && (
-                          <span className={`flex items-center gap-0.5 text-[11px] ${nearMeActive ? "text-amber-600 font-medium" : "text-stone-400"}`}>
-                            <MapPin size={10} />
-                            {formatDistance(dist)}
+                    <FarmCardFrame photoId={farm.photoId} name={farm.name}>
+                      {/* Name + distance */}
+                      <div className="flex items-start justify-between gap-2 mb-0.5">
+                        <h2 className="font-display text-[15px] text-stone-900 leading-snug">{farm.name}</h2>
+                        <div className="flex items-center gap-1.5 shrink-0 mt-0.5">
+                          {dist !== null && (
+                            <span className={`flex items-center gap-0.5 text-[11px] ${nearMeActive ? "text-amber-600 font-medium" : "text-stone-400"}`}>
+                              <MapPin size={10} />
+                              {formatDistance(dist)}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Location */}
+                      <p className="text-[11px] text-stone-400 mb-2.5">{farm.kommun ? `${farm.kommun} · ` : ""}{farm.lan}</p>
+
+                      {/* Product tags */}
+                      {visibleProducts.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mb-2.5">
+                          {visibleProducts.map((p) => (
+                            <span key={p} className="px-1.5 py-0.5 rounded text-[10px] bg-stone-100 text-stone-500 capitalize">
+                              {p}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Badges + today's hours */}
+                      <div className="flex items-center gap-3 text-[11px] text-stone-400">
+                        {farm.onSiteSales && (
+                          <span className="flex items-center gap-1">
+                            <ShoppingBag size={11} />
+                            Gårdsförsäljning
+                          </span>
+                        )}
+                        {farm.tastingRoom && (
+                          <span className="flex items-center gap-1">
+                            <GlassWater size={11} />
+                            Provsmakning
+                          </span>
+                        )}
+                        {todayHours && (
+                          <span className={`flex items-center gap-1 ml-auto font-medium ${todayHours.open ? "text-stone-500" : "text-red-400"}`}>
+                            <Clock size={11} />
+                            {todayHours.label}
                           </span>
                         )}
                       </div>
-                    </div>
-
-                    {/* Location */}
-                    <p className="text-[11px] text-stone-400 mb-2.5">{farm.kommun ? `${farm.kommun} · ` : ""}{farm.lan}</p>
-
-                    {/* Product tags */}
-                    {visibleProducts.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mb-2.5">
-                        {visibleProducts.map((p) => (
-                          <span key={p} className="px-1.5 py-0.5 rounded text-[10px] bg-stone-100 text-stone-500 capitalize">
-                            {p}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Badges + today's hours */}
-                    <div className="flex items-center gap-3 text-[11px] text-stone-400">
-                      {farm.onSiteSales && (
-                        <span className="flex items-center gap-1">
-                          <ShoppingBag size={11} />
-                          Gårdsförsäljning
-                        </span>
-                      )}
-                      {farm.tastingRoom && (
-                        <span className="flex items-center gap-1">
-                          <GlassWater size={11} />
-                          Provsmakning
-                        </span>
-                      )}
-                      {todayHours && (
-                        <span className={`flex items-center gap-1 ml-auto font-medium ${todayHours.open ? "text-stone-500" : "text-red-400"}`}>
-                          <Clock size={11} />
-                          {todayHours.label}
-                        </span>
-                      )}
-                    </div>
+                    </FarmCardFrame>
                   </Link>
                 </li>
               );

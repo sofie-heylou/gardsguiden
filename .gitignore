@@ -38,3 +38,6 @@ tsconfig.tsbuildinfo
 
 # brainstorming visual-companion sessions
 .superpowers/
+
+# Uploaded farm photos live on the volume, never in git
+data/photos/

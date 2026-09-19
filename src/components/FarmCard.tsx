@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { farmPath } from "../lib/counties";
 import { farmBadges, type FarmBadge } from "../lib/farmBadges";
+import { FarmCardFrame } from "./FarmCardThumb";
 import type { Farm } from "../types/farm";
 
 /** The inside of a card: name, place, product chips, badge row.  FarmCard
@@ -53,14 +54,16 @@ export default function FarmCard({ farm }: { farm: Farm }) {
   return (
     <Link
       href={farmPath(farm)}
-      className="block bg-white rounded-xl border border-stone-100 shadow-sm hover:shadow-md active:shadow-none transition-shadow px-4 py-4"
+      className="flex gap-3 bg-white rounded-xl border border-stone-100 shadow-sm hover:shadow-md active:shadow-none transition-shadow px-4 py-4"
     >
-      <FarmCardBody
-        name={farm.name}
-        place={farm.kommun || `${farm.lan} län`}
-        products={farm.products}
-        badges={farmBadges(farm, { compact: true })}
-      />
+      <FarmCardFrame photoId={farm.photoId} name={farm.name}>
+        <FarmCardBody
+          name={farm.name}
+          place={farm.kommun || `${farm.lan} län`}
+          products={farm.products}
+          badges={farmBadges(farm, { compact: true })}
+        />
+      </FarmCardFrame>
     </Link>
   );
 }

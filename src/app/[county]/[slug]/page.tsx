@@ -7,6 +7,7 @@ import { SLUG_TO_COUNTY, COUNTY_TO_SLUG, farmPath } from "../../../lib/counties"
 import BackButton from "../../../components/BackButton";
 import FarmContactSection from "../../../components/FarmContactSection";
 import FarmDetailMapLoader from "../../../components/FarmDetailMapLoader";
+import FarmPhotoHero from "../../../components/FarmPhotoHero";
 import OpeningHoursTable from "../../../components/OpeningHoursTable";
 import OpenStatusBadge from "../../../components/OpenStatusBadge";
 import FarmStickyBar from "../../../components/FarmStickyBar";
@@ -14,6 +15,8 @@ import FlagFarmButton from "../../../components/FlagFarmButton";
 import SuggestChangeForm from "../../../components/SuggestChangeForm";
 import UpgradeProfileCallout from "../../../components/UpgradeProfileCallout";
 import { SITE_URL } from "../../../lib/site";
+import { getFarmPhotos } from "../../../lib/photos";
+import { photoAlt, photoUrl } from "../../../lib/photoNames.js";
 import type { Farm } from "../../../types/farm";
 
 // Known farms are pre-rendered at build time; farms added later render on demand.
@@ -65,6 +68,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const description = buildDescription(farm);
   const url = `${SITE_URL}${farmPath(farm)}`;
 
+  // With a photo, the link preview is its 1200×630 crop. Next only falls back
+  // to the generated text card (opengraph-image.tsx) when `images` is absent
+  // altogether, so the key is spread in rather than set to undefined.
+  const images = farm.photoId
+    ? { images: [{ url: photoUrl(farm.photoId, "og"), width: 1200, height: 630, type: "image/jpeg", alt: photoAlt(farm.name) }] }
+    : {};
+
   return {
     title: `${farm.name} – Gårdsbutik i ${farm.kommun || `${farm.lan} län`}`,
     description,
@@ -75,11 +85,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       url,
       locale: "sv_SE",
       type: "website",
+      ...images,
     },
     twitter: {
       card: "summary_large_image",
       title: `${farm.name} — Gårdsguiden`,
       description,
+      ...images,
     },
   };
 }
@@ -131,6 +143,7 @@ function FarmJsonLd({ farm }: { farm: Farm }) {
     jsonLd.hasMap = `https://www.google.com/maps/search/?api=1&query=${farm.lat},${farm.lng}`;
   }
 
+  if (farm.photoId) jsonLd.image = [`${SITE_URL}${photoUrl(farm.photoId, "og")}`];
   if (farm.phone) jsonLd.telephone = farm.phone;
   if (farm.email) jsonLd.email = farm.email;
   if (farm.website) jsonLd.sameAs = [farm.website];
@@ -175,6 +188,11 @@ export default async function FarmDetailPage({ params }: Props) {
 
   const visibleProducts = farm.products.filter((p) => p !== "annat");
 
+  // Photos take the map's place at the top; the map then moves down to
+  // "Hitta hit". Farms without a photo keep the map as their hero, as before.
+  const photos = getFarmPhotos(farm.id);
+  const hasPhotos = photos.length > 0;
+
   return (
     <>
       <FarmJsonLd farm={farm} />
@@ -182,9 +200,11 @@ export default async function FarmDetailPage({ params }: Props) {
       <div className="h-full overflow-y-auto" style={{ background: "#FAFAF8" }}>
         <div className="max-w-lg mx-auto pb-8">
 
-          {/* ── Map ─────────────────────────────────────────────────────────── */}
-          {hasCoords ? (
-            <div className="relative">
+          {/* ── Hero: photo, else map ───────────────────────────────────────── */}
+          {hasPhotos ? (
+            <FarmPhotoHero key={farm.id} photos={photos} name={farm.name} overlay={<BackButton />} />
+          ) : hasCoords ? (
+            <div className="relative h-52">
               <FarmDetailMapLoader lat={farm.lat} lng={farm.lng} name={farm.name} />
               <div className="absolute top-3 left-3">
                 <BackButton />
@@ -270,6 +290,18 @@ export default async function FarmDetailPage({ params }: Props) {
                       {p}
                     </span>
                   ))}
+                </div>
+              </section>
+            )}
+
+            {/* Hitta hit — only when a photo has taken the map's spot at the top */}
+            {hasPhotos && hasCoords && (
+              <section className="space-y-2">
+                <h2 className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">
+                  Hitta hit
+                </h2>
+                <div className="h-40 overflow-hidden rounded-2xl border border-stone-100 shadow-sm">
+                  <FarmDetailMapLoader lat={farm.lat} lng={farm.lng} name={farm.name} lazy />
                 </div>
               </section>
             )}

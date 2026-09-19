@@ -7,6 +7,7 @@
 
 import { getDb } from "./db";
 import { notFound, type ActionFailure } from "./actionResult";
+import { deleteFarmPhotos } from "./photos";
 import type { Farm } from "../types/farm";
 
 export interface FarmSummary {
@@ -52,10 +53,12 @@ export function deleteFarm(id: string): FarmActionResult {
   if (!farm) return notFound();
 
   // farm_flags has no FK to farms (the boot sync rewrites farm rows), so its
-  // rows are cleaned up explicitly rather than by ON DELETE CASCADE.
+  // rows are cleaned up explicitly rather than by ON DELETE CASCADE. Photos
+  // likewise, plus their files on the volume.
   db.transaction(() => {
     db.prepare("DELETE FROM farms WHERE id = ?").run(id);
     db.prepare("DELETE FROM farm_flags WHERE farm_id = ?").run(id);
+    deleteFarmPhotos(id);
   })();
 
   return { ok: true, name: farm.name };

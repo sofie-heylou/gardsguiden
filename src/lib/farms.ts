@@ -1,5 +1,6 @@
 import { getDb } from "./db";
 import { haversineKm } from "./geo";
+import { FIRST_PHOTO_ID_SUBQUERY } from "./photos";
 import type { Farm } from "../types/farm";
 
 interface FarmRow {
@@ -25,7 +26,13 @@ interface FarmRow {
   source: string;
   facebook: string | null;
   instagram: string | null;
+  tier: string | null;
+  photo_id: string | null;
 }
+
+/** Every farm read carries the id of its first visible photo, so cards and
+ *  the API get it without a second query. */
+const PHOTO_ID_SELECT = `${FIRST_PHOTO_ID_SUBQUERY} AS photo_id`;
 
 function parseProducts(raw: string | null): string[] {
   if (!raw) return [];
@@ -33,9 +40,12 @@ function parseProducts(raw: string | null): string[] {
 }
 
 function rowToFarm(row: FarmRow): Farm {
+  const { photo_id, ...rest } = row;
   return {
-    ...row,
+    ...rest,
     lan: row.lan as Farm["lan"],
+    tier: row.tier === "extended" ? "extended" : "free",
+    photoId: photo_id ?? null,
     products: parseProducts(row.products),
     onSiteSales: row.onSiteSales === 1,
     tastingRoom: row.tastingRoom === 1,
@@ -89,7 +99,7 @@ export function getFilteredFarms(filters: FarmFilters = {}): Farm[] {
   }
 
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
-  const sql = `SELECT f.* FROM farms f ${where} ORDER BY f.name`;
+  const sql = `SELECT f.*, ${PHOTO_ID_SELECT} FROM farms f ${where} ORDER BY f.name`;
   const rows = db.prepare(sql).all(...params) as FarmRow[];
   return rows.map(rowToFarm);
 }
@@ -129,8 +139,8 @@ export function getFarmsByCounty(county: string): Farm[] {
 export function getFarmById(id: string): Farm | null {
   const db = getDb();
   const row = db.prepare(
-    "SELECT * FROM farms WHERE id = ? AND address IS NOT NULL AND address != '' " +
-    "AND (COALESCE(website, '') != '' OR COALESCE(facebook, '') != '' OR COALESCE(instagram, '') != '')"
+    `SELECT f.*, ${PHOTO_ID_SELECT} FROM farms f WHERE f.id = ? AND f.address IS NOT NULL AND f.address != '' ` +
+    "AND (COALESCE(f.website, '') != '' OR COALESCE(f.facebook, '') != '' OR COALESCE(f.instagram, '') != '')"
   ).get(id) as FarmRow | undefined;
   return row ? rowToFarm(row) : null;
 }
