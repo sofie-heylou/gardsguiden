@@ -54,7 +54,7 @@ export default function FarmCard({ farm }: { farm: Farm }) {
   return (
     <Link
       href={farmPath(farm)}
-      className="flex h-full gap-3 bg-white rounded-xl border border-stone-100 shadow-sm hover:shadow-md active:shadow-none transition-shadow px-4 py-4"
+      className="flex gap-3 bg-white rounded-xl border border-stone-100 shadow-sm hover:shadow-md active:shadow-none transition-shadow px-4 py-4"
     >
       <FarmCardFrame photoId={farm.photoId} name={farm.name}>
         <FarmCardBody
@@ -83,12 +83,13 @@ export function FarmCardList({ farms }: { farms: Farm[] }) {
 /** The same cards as a row that scrolls sideways, for a highlight that must
  *  not push the page's main content down. Bleeds into the parent's 16px
  *  gutter so the next card peeks in at the edge, which is the cue to swipe;
- *  the scrollbar is hidden like the filter chips' (see no-scrollbar). */
+ *  the scrollbar is hidden like the filter chips' (see no-scrollbar). Each
+ *  cell is a grid so its card stretches to the row's height. */
 export function FarmCardStrip({ farms }: { farms: Farm[] }) {
   return (
     <ul className="flex gap-3 overflow-x-auto no-scrollbar snap-x -mx-4 px-4 scroll-px-4 pb-1">
       {farms.map((farm) => (
-        <li key={farm.id} className="w-72 shrink-0 snap-start">
+        <li key={farm.id} className="grid w-72 shrink-0 snap-start">
           <FarmCard farm={farm} />
         </li>
       ))}

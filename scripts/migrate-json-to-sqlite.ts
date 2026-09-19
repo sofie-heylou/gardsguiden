@@ -3,11 +3,12 @@ import { execFileSync } from "child_process";
 import fs from "fs";
 import path from "path";
 import { FARM_REDIRECTS } from "../src/lib/farmRedirects";
+import { sqliteStamp } from "../src/lib/sqliteTime";
 
 const ROOT = path.resolve(process.cwd());
-const JSON_PATH = path.join(ROOT, "data", "farms.json");
+const JSON_REL = "data/farms.json"; // as git names it
+const JSON_PATH = path.join(ROOT, JSON_REL);
 const DB_PATH = path.join(ROOT, "data", "gardsguiden.db");
-const JSON_REL = path.relative(ROOT, JSON_PATH);
 
 interface FarmJson {
   id: string;
@@ -34,11 +35,6 @@ interface FarmJson {
   source: string;
 }
 
-/** SQLite's own text format, in UTC — what datetime('now') writes. */
-function sqliteStamp(date: Date): string {
-  return date.toISOString().slice(0, 19).replace("T", " ");
-}
-
 function git(...args: string[]): string {
   return execFileSync("git", args, { cwd: ROOT, encoding: "utf-8", maxBuffer: 64 * 1024 * 1024 });
 }
@@ -46,9 +42,9 @@ function git(...args: string[]): string {
 /**
  * When each farm entered the guide: the earliest commit of farms.json that
  * contains its id. farms.json carries no date of its own and several scripts
- * rewrite it, so git is the one record that cannot be lost. A farm whose
- * duplicate was removed (FARM_REDIRECTS) inherits the older of the two dates —
- * the farm has been in the guide since the duplicate was, whatever id it kept.
+ * rewrite it, so git is the one record that cannot be lost. A deleted
+ * duplicate counts for the farm that stayed (FARM_REDIRECTS) — it has been in
+ * the guide since the duplicate was, whatever id it kept.
  */
 function addedDatesFromGit(): Map<string, string> {
   const log = git("log", "--format=%H %cI", "--", JSON_REL).trim();
@@ -71,15 +67,10 @@ function addedDatesFromGit(): Map<string, string> {
     if (!Array.isArray(ids)) continue;
     for (const entry of ids as { id?: unknown }[]) {
       if (typeof entry?.id !== "string") continue;
-      const seen = firstSeen.get(entry.id);
-      if (!seen || stamp < seen) firstSeen.set(entry.id, stamp);
+      const id = FARM_REDIRECTS[entry.id] ?? entry.id;
+      const seen = firstSeen.get(id);
+      if (!seen || stamp < seen) firstSeen.set(id, stamp);
     }
-  }
-
-  for (const [oldId, keptId] of Object.entries(FARM_REDIRECTS)) {
-    const older = firstSeen.get(oldId);
-    const kept = firstSeen.get(keptId);
-    if (older && (!kept || older < kept)) firstSeen.set(keptId, older);
   }
   return firstSeen;
 }

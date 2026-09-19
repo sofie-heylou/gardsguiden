@@ -1,6 +1,7 @@
 import { getDb } from "./db";
 import { haversineKm } from "./geo";
 import { FIRST_PHOTO_ID_SUBQUERY } from "./photos";
+import { sqliteToIso } from "./sqliteTime";
 import type { Farm } from "../types/farm";
 
 interface FarmRow {
@@ -47,7 +48,7 @@ function rowToFarm(row: FarmRow): Farm {
     lan: row.lan as Farm["lan"],
     tier: row.tier === "extended" ? "extended" : "free",
     photoId: photo_id ?? null,
-    addedAt: created_at ?? null,
+    addedAt: created_at ? sqliteToIso(created_at) : null,
     products: parseProducts(row.products),
     onSiteSales: row.onSiteSales === 1,
     tastingRoom: row.tastingRoom === 1,

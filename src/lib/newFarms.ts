@@ -6,13 +6,6 @@ import type { Farm } from "../types/farm";
  *  between imports, short enough that "ny" stays true. */
 export const NEW_FARM_WINDOW_DAYS = 90;
 
-/** SQLite's "2026-09-06 15:56:59" is UTC, but Date would read it as local
- *  time — so say so. Null for anything that is not that format. */
-export function parseSqliteUtc(text: string): Date | null {
-  const date = new Date(text.replace(" ", "T") + "Z");
-  return Number.isNaN(date.getTime()) ? null : date;
-}
-
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 /**
@@ -29,8 +22,8 @@ export function newestFarms(
   const fresh: { farm: Farm; added: number }[] = [];
   for (const farm of farms) {
     if (!farm.addedAt || isBrewery(farm)) continue;
-    const added = parseSqliteUtc(farm.addedAt)?.getTime();
-    if (added !== undefined && added >= cutoff) fresh.push({ farm, added });
+    const added = Date.parse(farm.addedAt);
+    if (added >= cutoff) fresh.push({ farm, added }); // NaN fails the comparison
   }
   fresh.sort((a, b) =>
     b.added - a.added ||
