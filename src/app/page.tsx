@@ -3,10 +3,13 @@ import PopularAreas from "../components/PopularAreas";
 import SeasonalBanner from "../components/SeasonalBanner";
 import { activeCampaign } from "../lib/seasons";
 
-// PopularAreas reads farm counts from the DB, which can change outside the
-// app; refresh the prerender hourly like the other listing pages. The same
-// refresh is what starts and ends a seasonal banner on its dates.
-export const revalidate = 3600;
+// The build prerenders this page from the seed database, which lacks every
+// farm approved through the form (those live only on the volume), so each
+// deploy hides them until the page is regenerated from the runtime DB — the
+// hourly window used to hide a new farm for an hour after every deploy. A
+// minute is cheap: the page re-renders on demand, from SQLite, in a few ms.
+// The same refresh is what starts and ends a seasonal banner on its dates.
+export const revalidate = 60;
 
 export default function MapPage() {
   const campaign = activeCampaign();

@@ -23,10 +23,10 @@ export function generateStaticParams() {
 
 type Props = { params: Promise<{ county: string }> };
 
-// Farm data can be changed outside the app (CLI moderation, direct SQL on the
-// runtime volume). Without a revalidate window those edits would never reach
-// these prerendered pages until a redeploy.
-export const revalidate = 3600;
+// Prerendered from the seed at build time, so farms approved through the
+// form are missing until the page is regenerated from the runtime DB; a
+// minute keeps that gap short after every deploy (see src/app/page.tsx).
+export const revalidate = 60;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { county } = await params;

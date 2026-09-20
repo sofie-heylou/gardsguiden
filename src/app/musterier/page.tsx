@@ -10,9 +10,10 @@ import AddFarmLink from "../../components/AddFarmLink";
 import AddFarmCallout from "../../components/AddFarmCallout";
 import type { Farm } from "../../types/farm";
 
-// Same hourly refresh as the county pages: the flag and the catalog change
-// outside the app (moderation scripts, owner corrections).
-export const revalidate = 3600;
+// Same refresh as the county pages: prerendered from the seed, so farms
+// approved through the form only appear once the page is regenerated from
+// the runtime DB (see src/app/page.tsx).
+export const revalidate = 60;
 
 const PAGE_URL = `${SITE_URL}/musterier`;
 const TITLE = "Musterier i Sverige – hitta ett musteri som mustar dina äpplen";

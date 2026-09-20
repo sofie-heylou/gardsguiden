@@ -52,9 +52,9 @@ function buildDescription(farm: Farm): string {
 // ── Metadata ─────────────────────────────────────────────────────────────────
 
 // Farm data can be changed outside the app (CLI moderation, direct SQL on the
-// runtime volume). Without a revalidate window those edits would never reach
-// these prerendered pages until a redeploy.
-export const revalidate = 3600;
+// runtime volume). A minute, like the listing pages, so such edits show up
+// promptly; each page re-renders on demand from SQLite in a few ms.
+export const revalidate = 60;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { county, slug } = await params;
