@@ -53,6 +53,8 @@ export default function PopularAreas() {
       <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-stone-300" aria-hidden="true" />
       <div className="max-w-3xl mx-auto flex flex-col gap-5">
 
+        <NewFarms farms={farms} limit={8} className="pb-3 border-b border-stone-100" />
+
         <div className="flex items-end justify-between gap-4">
           <div className="flex flex-col gap-1">
             <span className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest">Utforska Sverige</span>
@@ -109,8 +111,6 @@ export default function PopularAreas() {
         >
           Se alla {farms.length} gårdar
         </Link>
-
-        <NewFarms farms={farms} limit={8} className="pt-3 border-t border-stone-100" />
 
         <AddFarmCallout
           title="Driver du en gård?"
