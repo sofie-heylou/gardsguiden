@@ -1,0 +1,21 @@
+-- Structured "request a change" submissions from farm owners, replacing the
+-- free-text farm_suggestions form on the farm page.
+--
+-- INTENTIONALLY A NO-OP, like 004, 005, 007, 008 and 009. src/lib/db.ts
+-- initSchema() creates farm_change_requests with CREATE TABLE IF NOT EXISTS
+-- at boot, so it already exists on every database the app has started
+-- against. This file records when the table appeared:
+--
+--   farm_change_requests(id, farm_id, email, changes, note, visitor_hash,
+--                         status, notes, created_at, reviewed_at)
+--   idx_change_requests_farm    (farm_id)
+--   idx_change_requests_status  (status)
+--   idx_change_requests_visitor (farm_id, visitor_hash)
+--
+-- `changes` is a JSON object of only the fields that differed from the live
+-- farm row at submission time, e.g. {"phone":"08-123 45 67"} — computed
+-- server-side in the request-change API route, never trusted from the
+-- client. `note` is the optional free-text "Övrigt" box for anything the
+-- structured fields don't cover.
+
+SELECT 1;

@@ -123,6 +123,25 @@ function initSchema(db: Database.Database): void {
     CREATE INDEX IF NOT EXISTS idx_suggestions_farm    ON farm_suggestions(farm_id);
     CREATE INDEX IF NOT EXISTS idx_suggestions_visitor ON farm_suggestions(farm_id, visitor_hash);
 
+    -- ── Structured change requests from farm owners (replaces free-text
+    -- farm_suggestions on the farm page) ───────────────────────────────────────
+    CREATE TABLE IF NOT EXISTS farm_change_requests (
+      id           TEXT PRIMARY KEY,
+      farm_id      TEXT NOT NULL REFERENCES farms(id) ON DELETE CASCADE,
+      email        TEXT NOT NULL,
+      changes      TEXT NOT NULL,                    -- JSON: { field: newValue }, only what differs
+      note         TEXT,                              -- optional free-text "Övrigt"
+      visitor_hash TEXT,                              -- dedup key, see visitor.ts
+      status       TEXT NOT NULL DEFAULT 'pending',   -- pending | approved | rejected
+      notes        TEXT,                              -- admin notes on reject
+      created_at   TEXT NOT NULL DEFAULT (datetime('now')),
+      reviewed_at  TEXT
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_change_requests_farm    ON farm_change_requests(farm_id);
+    CREATE INDEX IF NOT EXISTS idx_change_requests_status  ON farm_change_requests(status);
+    CREATE INDEX IF NOT EXISTS idx_change_requests_visitor ON farm_change_requests(farm_id, visitor_hash);
+
   `);
 
   // ── Add new columns (ALTER TABLE does not support IF NOT EXISTS) ────────────

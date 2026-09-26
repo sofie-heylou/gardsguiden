@@ -23,6 +23,8 @@ export const ADMIN_ACTIONS = [
   "photo:approve",
   "photo:reject",
   "photo:delete",
+  "change-request:approve",
+  "change-request:reject",
 ] as const;
 
 export type AdminAction = (typeof ADMIN_ACTIONS)[number];

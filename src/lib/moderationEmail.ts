@@ -60,6 +60,16 @@ export function submissionModerationButtons(submissionId: string): string {
   ]);
 }
 
+/** Approve / reject pair, for a structured change request. Approving is
+ *  all-or-nothing — there is no per-field button. */
+export function changeRequestModerationButtons(changeRequestId: string): string {
+  if (!actionTokensAvailable()) return "";
+  return btnRow([
+    { label: "Godkänn", href: actionUrl("change-request:approve", changeRequestId), tone: "approve" },
+    { label: "Avvisa", href: actionUrl("change-request:reject", changeRequestId), tone: "danger" },
+  ]);
+}
+
 /** Approve / reject pair for an uploaded photo. */
 export function photoModerationButtons(photoId: string): string {
   if (!actionTokensAvailable()) return "";

@@ -24,6 +24,8 @@ import {
   getPendingPhoto, getLivePhoto, approvePhoto, rejectPhoto, deletePhoto, photoTargetName, type PhotoTarget,
 } from "../../lib/photoActions";
 import { photoUrl } from "../../lib/photoNames.js";
+import { getPendingChangeRequest, approveChangeRequest, rejectChangeRequest } from "../../lib/changeRequestActions";
+import { FIELD_LABELS } from "../../lib/changeRequestFields";
 
 export const dynamic = "force-dynamic";
 
@@ -97,6 +99,18 @@ function loadSuggestion(targetId: string): Target | null {
   // what you are marking done, not just which farm it concerns.
   const excerpt = s.message.length > 180 ? `${s.message.slice(0, 180)}…` : s.message;
   return { name: s.farm_name, subtitle: `”${excerpt}” — från ${s.email}` };
+}
+
+const CHANGE_REQUEST_GONE =
+  "Ändringsförslaget är redan hanterat, eller så finns gården inte längre — ingenting har ändrats.";
+
+function loadChangeRequest(targetId: string): Target | null {
+  const r = getPendingChangeRequest(targetId);
+  if (!r) return null;
+  const diffText = r.diff.map((d) => `${FIELD_LABELS[d.field]}: ${d.before} → ${d.after}`).join(" · ");
+  const noteText = r.note && r.note.length > 120 ? `${r.note.slice(0, 120)}…` : r.note;
+  const body = [diffText, noteText].filter(Boolean).join(" — ") || "Ingen fältändring, bara en kommentar";
+  return { name: r.farmName, subtitle: `${body} — från ${r.email}` };
 }
 
 const PHOTO_GONE = "Bilden är redan granskad eller borttagen — ingenting har ändrats.";
@@ -196,6 +210,24 @@ const ACTIONS: Record<AdminAction, ActionSpec> = {
     goneText: PHOTO_GONE,
     run: deletePhoto,
     revalidates: true,
+  },
+  "change-request:approve": {
+    load: loadChangeRequest,
+    question: (t) => `Godkänn ändringarna för ${t.name}?`,
+    confirmLabel: "Ja, godkänn",
+    tone: "approve",
+    goneText: CHANGE_REQUEST_GONE,
+    run: approveChangeRequest,
+    revalidates: true, // changes what the farm page shows
+  },
+  "change-request:reject": {
+    load: loadChangeRequest,
+    question: (t) => `Avvisa ändringsförslaget för ${t.name}?`,
+    confirmLabel: "Ja, avvisa",
+    tone: "danger",
+    goneText: CHANGE_REQUEST_GONE,
+    run: rejectChangeRequest,
+    revalidates: false,
   },
 };
 

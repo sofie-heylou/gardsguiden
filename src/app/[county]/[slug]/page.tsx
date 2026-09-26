@@ -12,8 +12,7 @@ import OpeningHoursTable from "../../../components/OpeningHoursTable";
 import OpenStatusBadge from "../../../components/OpenStatusBadge";
 import FarmStickyBar from "../../../components/FarmStickyBar";
 import FlagFarmButton from "../../../components/FlagFarmButton";
-import SuggestChangeForm from "../../../components/SuggestChangeForm";
-import UpgradeProfileCallout from "../../../components/UpgradeProfileCallout";
+import RequestChangeForm from "../../../components/RequestChangeForm";
 import { SITE_URL } from "../../../lib/site";
 import { getFarmPhotos, getPhotoTally } from "../../../lib/photos";
 import { photoAlt, photoUrl } from "../../../lib/photoNames.js";
@@ -318,12 +317,7 @@ export default async function FarmDetailPage({ params }: Props) {
               mapsUrl={mapsUrl}
             />
 
-            <UpgradeProfileCallout
-              farm={farm}
-              photos={getPhotoTally(farm.id)}
-            />
-
-            <SuggestChangeForm farmId={farm.id} farmName={farm.name} />
+            <RequestChangeForm farm={farm} photoTally={getPhotoTally(farm.id)} />
 
             <FlagFarmButton farmId={farm.id} />
 
