@@ -7,7 +7,7 @@ import { SUBMIT_PRODUCT_LIST, type SubmitProduct } from "../../../../lib/submitP
 const GROUPS: { label: string; values: string[] }[] = [
   { label: "Kött & fisk",                    values: ["kött", "fisk"] },
   { label: "Mejeri",                         values: ["mejeri", "ost", "mjölk"] },
-  { label: "Ägg, grönsaker, frukt & bär",    values: ["ägg", "grönsaker", "frukt", "bär", "honung", "självplock"] },
+  { label: "Ägg, grönsaker, frukt & bär",    values: ["ägg", "grönsaker", "pumpa", "frukt", "bär", "honung", "självplock", "blommor"] },
   { label: "Bröd & bakat",                   values: ["bröd", "bakat", "mjöl"] },
   { label: "Drycker",                        values: ["öl", "vin", "cider", "must", "mjöd", "sprit"] },
   { label: "Annat",                          values: ["annat"] },

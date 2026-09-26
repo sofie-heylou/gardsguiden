@@ -10,9 +10,9 @@
 const TAG_TO_SLUG = {
   "bär": "frukt-bar", frukt: "frukt-bar", must: "drycker", "ägg": "agg", honung: "honung",
   "självplock": "sjalvplock", vin: "drycker", "öl": "drycker", sprit: "drycker", cider: "drycker",
-  "grönsaker": "gronsaker", "kött": "kott-chark", fisk: "kott-chark",
+  "grönsaker": "gronsaker", pumpa: "gronsaker", "kött": "kott-chark", fisk: "kott-chark",
   mejeri: "mejeriprodukter", ost: "mejeriprodukter", "mjölk": "mejeriprodukter",
-  bakat: "brod-bageri", "bröd": "brod-bageri", "mjöl": "brod-bageri",
+  bakat: "brod-bageri", "bröd": "brod-bageri", "mjöl": "brod-bageri", blommor: "ovrigt",
 };
 
 function applyRetagActions(db, actions) {

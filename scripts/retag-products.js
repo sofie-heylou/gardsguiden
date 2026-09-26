@@ -15,6 +15,7 @@
 const fs = require("fs");
 const path = require("path");
 const Database = require("better-sqlite3");
+const { TAG_TO_SLUG } = require("./retag-lib.js");
 
 const APPLY = process.argv.includes("--apply");
 const SEED = process.argv.includes("--seed");
@@ -35,20 +36,14 @@ const RULES = [
   { tag: "sprit", re: /destilleri|bränneri/i },
   { tag: "cider", re: /cideri|cideri|cider/i },
   { tag: "grönsaker", re: /handelsträdgård|plantskola|plantshop|grönsak|potatis|tomat|sparris|svampodling|chili/i },
+  { tag: "pumpa", re: /pumpaodling|pumpafält|självplock.*pumpa|pumpa.*självplock/i },
+  { tag: "blommor", re: /blomsterodling|blomsteräng|blomsterfält|plocka blommor|självplock.*blomm|blomm.*självplock/i },
   { tag: "kött", re: /slakteri|chark|köttlåda|kött|lammgård|fårgård|hjorthägn|hjortgård|viltgård|strutsgård|angus|highland/i },
   { tag: "fisk", re: /fiskrökeri|ålrökeri|laxrökeri|fiskodling|\bfisk /i },
   { tag: "mejeri", re: /mejeri|ysteri|gårdsglass|getost|hantverksost/i },
   { tag: "bakat", re: /bageri|bagarstuga|stenugns|surdeg/i },
   { tag: "mjöl", re: /kvarn(?![a-zåäö])/i, not: /överstekvarn/i },
 ];
-
-// farm_categories slugs per raw tag, mirroring src/lib/categories.ts.
-const TAG_TO_SLUG = {
-  "bär": "frukt-bar", frukt: "frukt-bar", must: "drycker", "ägg": "agg", honung: "honung",
-  "självplock": "sjalvplock", vin: "drycker", "öl": "drycker", sprit: "drycker", cider: "drycker",
-  "grönsaker": "gronsaker", "kött": "kott-chark", fisk: "kott-chark",
-  mejeri: "mejeriprodukter", bakat: "brod-bageri", "mjöl": "brod-bageri",
-};
 
 const db = new Database(DB_PATH);
 db.pragma("busy_timeout = 10000"); // the app may hold the same WAL

@@ -31,7 +31,7 @@ export const CATEGORIES: Category[] = [
     slug: "gronsaker",
     label: "Grönsaker",
     emoji: "🥬",
-    products: ["grönsaker"],
+    products: ["grönsaker", "pumpa"],
   },
   {
     slug: "frukt-bar",
@@ -67,7 +67,7 @@ export const CATEGORIES: Category[] = [
     slug: "ovrigt",
     label: "Övrigt",
     emoji: "📦",
-    products: ["annat"],
+    products: ["annat", "blommor"],
   },
 ];
 
@@ -84,6 +84,25 @@ export function farmMatchesCategory(
 /** Returns all categories a farm belongs to based on its raw product strings. */
 export function getFarmCategories(products: string[]): Category[] {
   return CATEGORIES.filter((cat) => farmMatchesCategory(products, cat.slug));
+}
+
+// What a "självplock" farm actually offers, for display next to the bare tag
+// (e.g. "Självplock: bär & frukt"). Order matters: checked top to bottom, and
+// every matching label is joined — a farm can have several.
+const SELF_PICK_SUBTYPES: { products: string[]; label: string }[] = [
+  { products: ["frukt", "bär"], label: "bär & frukt" },
+  { products: ["pumpa"], label: "pumpor" },
+  { products: ["blommor"], label: "blommor" },
+  { products: ["grönsaker"], label: "grönsaker" },
+];
+
+/** For a farm with "självplock", what kind — or null if unknown. */
+export function getSelfPickLabel(products: string[]): string | null {
+  if (!products.includes("självplock")) return null;
+  const labels = SELF_PICK_SUBTYPES.filter((s) =>
+    s.products.some((p) => products.includes(p))
+  ).map((s) => s.label);
+  return labels.length > 0 ? labels.join(", ") : null;
 }
 
 // Beer-only places without gårdsförsäljning are city breweries and taprooms,

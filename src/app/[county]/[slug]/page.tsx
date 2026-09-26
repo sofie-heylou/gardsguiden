@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { getFarmById, getAllFarms } from "../../../lib/farms";
 import { FARM_REDIRECTS } from "../../../lib/farmRedirects";
 import { farmBadges } from "../../../lib/farmBadges";
+import { getSelfPickLabel } from "../../../lib/categories";
 import { SLUG_TO_COUNTY, COUNTY_TO_SLUG, farmPath } from "../../../lib/counties";
 import BackButton from "../../../components/BackButton";
 import FarmContactSection from "../../../components/FarmContactSection";
@@ -186,6 +187,7 @@ export default async function FarmDetailPage({ params }: Props) {
   const labels = farmBadges(farm);
 
   const visibleProducts = farm.products.filter((p) => p !== "annat");
+  const selfPickLabel = getSelfPickLabel(farm.products);
 
   // Photos take the map's place at the top; the map then moves down to
   // "Hitta hit". Farms without a photo keep the map as their hero, as before.
@@ -286,7 +288,9 @@ export default async function FarmDetailPage({ params }: Props) {
                       key={p}
                       className="px-2.5 py-1 rounded-full text-xs bg-amber-50 text-amber-800 capitalize font-medium"
                     >
-                      {p}
+                      {p === "självplock" && selfPickLabel
+                        ? `självplock: ${selfPickLabel}`
+                        : p}
                     </span>
                   ))}
                 </div>

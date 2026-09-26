@@ -51,9 +51,9 @@ function normalizeProducts(products) {
   // frukt/bär/ägg/must, so scraped farms never appeared under "Ägg" or
   // "Frukt & bär" (SCRAPER-PLAN stage 2).
   const valid = [
-    'kött', 'fisk', 'mejeri', 'ost', 'mjölk', 'ägg', 'grönsaker', 'frukt', 'bär',
+    'kött', 'fisk', 'mejeri', 'ost', 'mjölk', 'ägg', 'grönsaker', 'pumpa', 'frukt', 'bär',
     'honung', 'bakat', 'bröd', 'mjöl', 'öl', 'vin', 'sprit', 'cider', 'mjöd', 'must',
-    'annat',
+    'självplock', 'blommor', 'annat',
   ];
   const filtered = products.filter(p => valid.includes(p));
   return filtered.length > 0 ? filtered : ['annat'];
