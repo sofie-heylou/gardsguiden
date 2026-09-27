@@ -38,6 +38,7 @@ const path = require('path');
 const { categorizeProducts } = require('./scrape-places');
 const { fetchPage } = require('./verify-onsite');
 const { loadFeatures, locate } = require('./kommun-lookup');
+const { isArchipelago } = require('./archipelago');
 
 const ROOT = path.join(__dirname, '..');
 const IN_VERIFIED = path.join(ROOT, 'data/tmp', 'musterier-verified.json');
@@ -128,7 +129,7 @@ async function main() {
       onSiteSales: /gårdsbutik|gårdsförsäljning|gårdsbod|självplock|köp .{0,12}på gården/i.test(siteText),
       tastingRoom: false,
       gardsförsäljningLicense: false,
-      isArchipelago: false,
+      isArchipelago: isArchipelago(lead.lat, lead.lng),
       legomustning: true,
       openingHours: '',
       season: '',

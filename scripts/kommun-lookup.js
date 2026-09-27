@@ -112,4 +112,4 @@ function locate(features, lng, lat) {
   };
 }
 
-module.exports = { LAN_CODE_TO_NAME, loadFeatures, locate, kmBetween };
+module.exports = { LAN_CODE_TO_NAME, loadFeatures, locate, kmBetween, containsPoint };

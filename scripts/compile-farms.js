@@ -8,6 +8,7 @@ const fs = require('fs');
 const path = require('path');
 const { assess } = require('./farm-relevance');
 const { RAW_SCRAPE_FILES } = require('./scrape-config');
+const { isArchipelago } = require('./archipelago');
 
 const TMP_DIR = path.join(__dirname, '../data/tmp');
 const PRE_GEOCODE = path.join(TMP_DIR, 'compiled-pre-geocode.json');
@@ -246,6 +247,9 @@ async function main() {
   }
 
   const finalFarms = JSON.parse(fs.readFileSync(geocodedFile, 'utf8'));
+
+  // The badge follows the coordinates, not whatever the raw scrape said.
+  for (const f of finalFarms) f.isArchipelago = isArchipelago(f.lat, f.lng);
 
   // Sort by county then name
   finalFarms.sort((a, b) => {
