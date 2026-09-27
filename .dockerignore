@@ -11,6 +11,8 @@ scripts/*
 !scripts/kommun-lookup.js
 !scripts/apply-trust-actions.js
 !scripts/review-photos.js
+!scripts/archipelago.js
+!scripts/set-archipelago.js
 !scripts/data
 
 # Scraper intermediate files
