@@ -3,9 +3,10 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, ChevronRight } from "lucide-react";
-import { COUNTIES } from "../lib/counties";
-import AddFarmLink from "./AddFarmLink";
+import { Menu, X } from "lucide-react";
+import DesktopNav from "./header/DesktopNav";
+import MenuPanel from "./header/MenuPanel";
+import { useActiveCampaign } from "./header/useActiveCampaign";
 
 function GardsguidentIcon({ size = 24 }: { size?: number }) {
   const petal =
@@ -31,35 +32,29 @@ function GardsguidentIcon({ size = 24 }: { size?: number }) {
   );
 }
 
-const primaryLinks = [
-  { href: "/gardar",    label: "Alla gårdar" },
-  { href: "/musterier", label: "Musterier" },
-  { href: "/reportage", label: "Reportage" },
-  { href: "/om",        label: "Om Gårdsguiden" },
-] as const;
-
 export default function Header() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
-
-  function closeMenu() {
-    setOpen(false);
-  }
+  const campaign = useActiveCampaign();
 
   // Close menu on route change
   useEffect(() => {
-    closeMenu();
+    setOpen(false);
   }, [pathname]);
 
-  // Prevent body scroll when menu is open
+  // While open: close on Escape, and close if the window grows past the
+  // phone layout (the panel is hidden there). No scroll lock needed — the
+  // body never scrolls (layout.tsx) and the panel covers the page.
   useEffect(() => {
-    if (open) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    if (!open) return;
+    const close = () => setOpen(false);
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && close();
+    const wide = window.matchMedia("(min-width: 1024px)");
+    document.addEventListener("keydown", onKey);
+    wide.addEventListener("change", close);
     return () => {
-      document.body.style.overflow = "";
+      document.removeEventListener("keydown", onKey);
+      wide.removeEventListener("change", close);
     };
   }, [open]);
 
@@ -74,99 +69,20 @@ export default function Header() {
           Gårdsguiden
         </Link>
 
+        <DesktopNav pathname={pathname} campaign={campaign} />
+
         <button
           onClick={() => setOpen((o) => !o)}
-          className="p-2 -mr-2 text-stone-600 hover:text-stone-900 transition-colors"
+          className="lg:hidden p-2.5 -mr-2.5 text-stone-600 hover:text-stone-900 transition-colors"
           aria-label={open ? "Stäng meny" : "Öppna meny"}
           aria-expanded={open}
+          aria-controls="huvudmeny"
         >
           {open ? <X size={22} /> : <Menu size={22} />}
         </button>
       </header>
 
-      {/* Overlay */}
-      {open && (
-        <div
-          className="fixed inset-0 bg-black/20 z-40"
-          onClick={() => closeMenu()}
-          aria-hidden="true"
-        />
-      )}
-
-      {/* Slide-down menu */}
-      <div
-        className={`fixed left-0 right-0 bg-white border-b border-stone-200 shadow-lg z-40 transition-all duration-200 ease-out ${
-          open
-            ? "translate-y-0 opacity-100"
-            : "-translate-y-full opacity-0 pointer-events-none"
-        }`}
-        style={{ top: "3.5rem" }}
-      >
-        <nav className="flex flex-col py-4 px-5 gap-5">
-
-          {/* Primary links */}
-          <div className="flex flex-col gap-0.5">
-            {primaryLinks.map(({ href, label }) => (
-              <Link
-                key={href}
-                href={href}
-                onClick={closeMenu}
-                className={`py-2 text-[15px] transition-colors ${
-                  pathname === href
-                    ? "text-stone-900 font-semibold"
-                    : "text-stone-700 hover:text-stone-900"
-                }`}
-              >
-                {label}
-              </Link>
-            ))}
-          </div>
-
-          {/* County chips */}
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 mb-2.5">
-              Utforska per län
-            </p>
-            <div className="flex flex-wrap gap-1.5">
-              {COUNTIES.map(({ slug, name }) => (
-                <Link
-                  key={slug}
-                  href={`/${slug}`}
-                  onClick={closeMenu}
-                  className="px-2.5 py-1 rounded-full bg-stone-100 text-[12px] text-stone-600 hover:bg-amber-50 hover:text-amber-900 transition-colors"
-                >
-                  {name}
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          {/* Farmer CTA + auth */}
-          <div className="border-t border-stone-100 pt-4 flex items-center justify-between gap-4">
-            <div>
-              <p className="text-[11px] text-stone-400 mb-1">Är du gårdsägare?</p>
-              <AddFarmLink
-                surface="header_menu"
-                onClick={closeMenu}
-                className="text-[13px] font-semibold text-stone-800 hover:text-stone-600 transition-colors flex items-center gap-1"
-              >
-                Lägg till din gård
-                <ChevronRight size={13} />
-              </AddFarmLink>
-            </div>
-          </div>
-
-          {/* Legal — low visual weight */}
-          <Link
-            href="/integritet"
-            onClick={closeMenu}
-            className="text-[11px] text-stone-300 hover:text-stone-500 transition-colors -mt-3"
-          >
-            Integritetspolicy
-          </Link>
-
-        </nav>
-      </div>
+      <MenuPanel open={open} pathname={pathname} campaign={campaign} onNavigate={() => setOpen(false)} />
     </>
   );
 }
