@@ -10,6 +10,7 @@ const IN = {
   Gålö: [59.106, 18.265],
   Tjörn: [58.004, 11.617],
   Donsö: [57.602, 11.803],
+  "Orust north (Töllås)": [58.296, 11.737],
   Loftahammar: [57.904, 16.693],
   Sturkö: [56.102, 15.691],
 };
@@ -25,6 +26,7 @@ const OUT = {
   Visby: [57.635, 18.292],
   "Västra Frölunda": [57.676, 11.881],
   "Karlskrona Gullberna": [56.194, 15.627],
+  "Uddevalla (Bjällansås)": [58.266, 11.601],
 };
 
 test("sea archipelago points get the badge", () => {

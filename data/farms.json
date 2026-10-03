@@ -14903,7 +14903,7 @@
     "onSiteSales": true,
     "tastingRoom": false,
     "gardsförsäljningLicense": false,
-    "isArchipelago": false,
+    "isArchipelago": true,
     "legomustning": false,
     "openingHours": "måndag: Stängt, tisdag: Stängt, onsdag: Stängt, torsdag: Stängt, fredag: 12:00–18:00, lördag: 12:00–18:00, söndag: 12:00–18:00",
     "season": "",
