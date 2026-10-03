@@ -7,6 +7,7 @@
 
 const fs = require("fs");
 const path = require("path");
+const { containsPoint } = require("../src/lib/pointInPolygon.js");
 
 // SCB län codes → the site's county names (the 13 counties we cover).
 const LAN_CODE_TO_NAME = {
@@ -24,35 +25,6 @@ const LAN_CODE_TO_NAME = {
   "14": "Västra Götaland",
   "19": "Västmanland",
 };
-
-function inRing(lng, lat, ring) {
-  let inside = false;
-  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
-    const [xi, yi] = ring[i];
-    const [xj, yj] = ring[j];
-    if (yi > lat !== yj > lat && lng < ((xj - xi) * (lat - yi)) / (yj - yi) + xi) {
-      inside = !inside;
-    }
-  }
-  return inside;
-}
-
-function inPolygon(lng, lat, coords) {
-  // First ring is the outer boundary, the rest are holes.
-  if (!inRing(lng, lat, coords[0])) return false;
-  for (let i = 1; i < coords.length; i++) {
-    if (inRing(lng, lat, coords[i])) return false;
-  }
-  return true;
-}
-
-function containsPoint(geometry, lng, lat) {
-  if (geometry.type === "Polygon") return inPolygon(lng, lat, geometry.coordinates);
-  if (geometry.type === "MultiPolygon") {
-    return geometry.coordinates.some((poly) => inPolygon(lng, lat, poly));
-  }
-  return false;
-}
 
 // The boundaries are simplified, so coastal and skärgård farms can fall just
 // outside every polygon. For those, take the kommun with the nearest boundary
@@ -112,4 +84,4 @@ function locate(features, lng, lat) {
   };
 }
 
-module.exports = { LAN_CODE_TO_NAME, loadFeatures, locate, kmBetween, containsPoint };
+module.exports = { LAN_CODE_TO_NAME, loadFeatures, locate, kmBetween };

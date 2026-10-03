@@ -8,7 +8,7 @@ const fs = require('fs');
 const path = require('path');
 const { assess } = require('./farm-relevance');
 const { RAW_SCRAPE_FILES } = require('./scrape-config');
-const { isArchipelago } = require('./archipelago');
+const { isArchipelago } = require('../src/lib/archipelago.js');
 
 const TMP_DIR = path.join(__dirname, '../data/tmp');
 const PRE_GEOCODE = path.join(TMP_DIR, 'compiled-pre-geocode.json');

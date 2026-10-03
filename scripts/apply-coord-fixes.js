@@ -11,6 +11,7 @@
 const fs = require("fs");
 const path = require("path");
 const Database = require("better-sqlite3");
+const { isArchipelago } = require("../src/lib/archipelago.js");
 
 const file = process.argv[2];
 if (!file) {
@@ -37,9 +38,9 @@ if (!APPLY) {
   process.exit(0);
 }
 
-const upd = db.prepare("UPDATE farms SET lat = ?, lng = ?, kommun = ? WHERE id = ?");
+const upd = db.prepare("UPDATE farms SET lat = ?, lng = ?, kommun = ?, isArchipelago = ? WHERE id = ?");
 let n = 0;
-db.transaction(() => { for (const f of fixes) n += upd.run(f.lat, f.lng, f.kommun, f.id).changes; })();
+db.transaction(() => { for (const f of fixes) n += upd.run(f.lat, f.lng, f.kommun, isArchipelago(f.lat, f.lng) ? 1 : 0, f.id).changes; })();
 console.log(`DB updated (${DB_PATH}): ${n} rows.`);
 db.close();
 
@@ -49,7 +50,7 @@ if (SEED) {
   let m = 0;
   for (const farm of farms) {
     const f = byId.get(farm.id);
-    if (f) { farm.lat = f.lat; farm.lng = f.lng; farm.kommun = f.kommun; m++; }
+    if (f) { farm.lat = f.lat; farm.lng = f.lng; farm.kommun = f.kommun; farm.isArchipelago = isArchipelago(f.lat, f.lng); m++; }
   }
   fs.writeFileSync(SEED_PATH, JSON.stringify(farms, null, 2) + "\n");
   console.log(`farms.json updated (${m} farms).`);

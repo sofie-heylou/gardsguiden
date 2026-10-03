@@ -38,7 +38,7 @@ const path = require('path');
 const { categorizeProducts } = require('./scrape-places');
 const { fetchPage } = require('./verify-onsite');
 const { loadFeatures, locate } = require('./kommun-lookup');
-const { isArchipelago } = require('./archipelago');
+const { isArchipelago } = require('../src/lib/archipelago.js');
 
 const ROOT = path.join(__dirname, '..');
 const IN_VERIFIED = path.join(ROOT, 'data/tmp', 'musterier-verified.json');

@@ -72,9 +72,7 @@ COPY --from=builder /app/scripts/kommun-lookup.js ./scripts/kommun-lookup.js
 COPY --from=builder /app/scripts/backfill-kommun.js ./scripts/backfill-kommun.js
 COPY --from=builder /app/scripts/apply-trust-actions.js ./scripts/apply-trust-actions.js
 COPY --from=builder /app/scripts/data/kommuner.geojson ./scripts/data/kommuner.geojson
-COPY --from=builder /app/scripts/archipelago.js ./scripts/archipelago.js
 COPY --from=builder /app/scripts/set-archipelago.js ./scripts/set-archipelago.js
-COPY --from=builder /app/scripts/data/archipelago-zones.geojson ./scripts/data/archipelago-zones.geojson
 # Every plain-JS module in src/lib is shared between the server and these
 # scripts (review-photos.js needs the photo pipeline and naming), so the
 # runner carries src/lib/*.js as a rule rather than file by file.

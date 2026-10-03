@@ -138,13 +138,13 @@ test("three uploads an hour per visitor, then 429; delete takes a live photo dow
 
 // ── The wizard's thank-you screen: photos for a farm that does not exist yet ──
 
-function insertSubmission(id: string, name: string): void {
+function insertSubmission(id: string, name: string, lat = 59.3, lng = 18.1): void {
   // The columns approveSubmission reads; coordinates given so nothing geocodes.
   db.getDb().prepare(`
     INSERT INTO farm_submissions
       (id, name, address, lan, website, products, submitted_email, role, lat, lng)
-    VALUES (?, ?, 'Testvägen 1, 123 45 Teststad', 'Stockholm', 'https://example.se', '[]', 'agare@example.se', 'owner', 59.3, 18.1)
-  `).run(id, name);
+    VALUES (?, ?, 'Testvägen 1, 123 45 Teststad', 'Stockholm', 'https://example.se', '[]', 'agare@example.se', 'owner', ?, ?)
+  `).run(id, name, lat, lng);
 }
 
 test("a photo for a pending submission waits, then follows the farm on approval", async () => {
@@ -189,4 +189,16 @@ test("rejecting a submission rejects its waiting photos too", async () => {
   assert.equal(actions.getPhotoTarget(id)?.status, "rejected");
   assert.equal(await photos.readPhotoFile(id, "hero"), null);
   assert.equal((await upload({ file: await image("png"), target: { kind: "submission", id: "sub-2" }, visitor: "visitor-c" }) as { status: number }).status, 404, "a rejected submission is not a target");
+});
+
+test("approval sets the Skärgård badge from the farm's coordinates", async () => {
+  const badgeAfterApproval = async (id: string, lat: number, lng: number) => {
+    insertSubmission(id, `Gård ${id}`, lat, lng);
+    const approved = await submissions.approveSubmission(id);
+    assert.equal(approved.ok, true);
+    const farmId = (approved as { farmId: string }).farmId;
+    return (db.getDb().prepare("SELECT isArchipelago FROM farms WHERE id = ?").get(farmId) as { isArchipelago: number }).isArchipelago;
+  };
+  assert.equal(await badgeAfterApproval("sub-ingaro", 59.264, 18.505), 1);
+  assert.equal(await badgeAfterApproval("sub-koping", 59.51, 16.0), 0);
 });

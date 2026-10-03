@@ -30,6 +30,7 @@
 import Database from "better-sqlite3";
 import path from "path";
 import { geocodeAddress } from "../src/lib/geocode";
+import { isArchipelago } from "../src/lib/archipelago.js";
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
@@ -128,7 +129,7 @@ async function main(): Promise<void> {
     return;
   }
 
-  const update = db.prepare("UPDATE farms SET lat = ?, lng = ? WHERE id = ? AND lat IS NULL AND lng IS NULL");
+  const update = db.prepare("UPDATE farms SET lat = ?, lng = ?, isArchipelago = ? WHERE id = ? AND lat IS NULL AND lng IS NULL");
 
   let resolved = 0;
   let unresolved = 0;
@@ -161,7 +162,7 @@ async function main(): Promise<void> {
       if (APPLY) {
         // The WHERE clause re-checks for null so a concurrent write is not
         // clobbered, and so a re-run cannot overwrite good coordinates.
-        const res = update.run(coords.lat, coords.lng, farm.id);
+        const res = update.run(coords.lat, coords.lng, isArchipelago(coords.lat, coords.lng) ? 1 : 0, farm.id);
         console.log(`${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)}${usedFallback ? " [broader match]" : ""} ${res.changes ? "✓ written" : "(already set, skipped)"}`);
       } else {
         console.log(`${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)}${usedFallback ? " [broader match]" : ""} (dry run)`);

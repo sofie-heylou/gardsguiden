@@ -1,9 +1,8 @@
-// node --test scripts/archipelago.test.js
-const test = require("node:test");
-const assert = require("node:assert");
-const { isArchipelago } = require("./archipelago");
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { isArchipelago } from "./archipelago.js";
 
-const IN = {
+const IN: Record<string, [number, number]> = {
   Utö: [58.96, 18.31],
   Väddö: [59.979, 18.83],
   Ingarö: [59.264, 18.505],
@@ -15,7 +14,7 @@ const IN = {
   Sturkö: [56.102, 15.691],
 };
 
-const OUT = {
+const OUT: Record<string, [number, number]> = {
   Köping: [59.51, 16.0],
   Björklinge: [60.03, 17.55],
   Lovön: [59.322, 17.831],
@@ -42,5 +41,5 @@ test("inland, Mälaren, suburbs and Gotland do not", () => {
 });
 
 test("missing coordinates never get the badge", () => {
-  assert.strictEqual(isArchipelago(null, null), false);
+  assert.equal(isArchipelago(null, null), false);
 });

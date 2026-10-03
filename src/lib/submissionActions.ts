@@ -15,6 +15,7 @@ import { COUNTY_TO_SLUG, farmPath } from "./counties";
 import type { Farm } from "../types/farm";
 import { notFound, type ActionFailure } from "./actionResult";
 import { geocodeAddress } from "./geocode";
+import { isArchipelago } from "./archipelago.js";
 import { SITE_URL } from "./site";
 import { attachSubmissionPhotos, rejectSubmissionPhotos } from "./photos";
 
@@ -131,7 +132,7 @@ function insertApprovedFarm(
       VALUES
         (?, ?, ?, ?, ?, ?,
          ?, ?, ?, ?, ?, ?,
-         ?, ?, 0, 0,
+         ?, ?, 0, ?,
          'submission', 0, 'free', ?, ?, ?, ?, datetime('now'))
     `).run(
       farmId,
@@ -148,6 +149,7 @@ function insertApprovedFarm(
       submission.season,
       submission.on_site_sales,
       submission.tasting_room,
+      isArchipelago(coords?.lat, coords?.lng) ? 1 : 0,
       coords?.lat ?? null,
       coords?.lng ?? null,
       submission.facebook,

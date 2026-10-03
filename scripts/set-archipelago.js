@@ -1,8 +1,8 @@
 /**
  * Sets the Skärgård badge (isArchipelago) on every farm from its coordinates,
- * using the zones in scripts/archipelago.js. It is the single source of truth
- * for the badge, so it can be re-run any time — e.g. after new approvals,
- * which insert isArchipelago = 0.
+ * using the zones in src/lib/archipelago.js. Approvals, the compile scripts
+ * and the coordinate fix-up scripts apply the same rule as rows change; this
+ * re-syncs every row, e.g. after a zone edge moves.
  *
  * Replaces the old address rule, which tagged 19 inland farms (Köping,
  * Björklinge, …) and missed real ones (Väddö, Ingarö, Tjörn).
@@ -15,7 +15,7 @@
 const fs = require("fs");
 const path = require("path");
 const Database = require("better-sqlite3");
-const { archipelagoZone } = require("./archipelago");
+const { archipelagoZone } = require("../src/lib/archipelago.js");
 
 const APPLY = process.argv.includes("--apply");
 const SEED = process.argv.includes("--seed");
