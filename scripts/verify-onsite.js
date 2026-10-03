@@ -29,6 +29,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const { classifyText } = require('./onsite-evidence');
+const { checkIdentity } = require('./site-identity');
 
 const ROOT = path.join(__dirname, '..');
 const DEFAULT_IN = path.join(ROOT, 'data/farms.json');
@@ -168,15 +169,18 @@ async function auditFarm(farm, useCache) {
   const base = { id: farm.id, name: farm.name, lan: farm.lan, website: farm.website };
 
   if (SOCIAL_ONLY.test(farm.website)) {
-    return { ...base, verdict: 'unclear', reason: 'social-only', strong: [], supporting: [], reseller: [], localSupport: [], text: '' };
+    return { ...base, verdict: 'unclear', reason: 'social-only', identity: null, strong: [], supporting: [], reseller: [], localSupport: [], text: '' };
   }
 
   const url = /^https?:\/\//i.test(farm.website) ? farm.website : `http://${farm.website}`;
   const page = await fetchPage(url, useCache);
+  // Whether the site is this farm's at all — judged on the homepage, before
+  // anything the page says is allowed to count for or against the farm.
+  const identity = checkIdentity(page, farm.name, farm.kommun || '');
 
   if (page.status === 0 || page.status >= 400) {
     const reason = page.status === 0 ? `dead-link:${page.error}` : `http-${page.status}`;
-    return { ...base, verdict: 'unclear', reason, strong: [], supporting: [], reseller: [], localSupport: [], text: '' };
+    return { ...base, verdict: 'unclear', reason, identity, strong: [], supporting: [], reseller: [], localSupport: [], text: '' };
   }
 
   // The homepage is often a teaser; pull up to two same-site about-pages in.
@@ -197,6 +201,7 @@ async function auditFarm(farm, useCache) {
     ...base,
     ...result,
     reason,
+    identity,
     finalUrl: page.finalUrl,
     textChars: text.length,
     // The combined page text rides along so callers (the intake gate) can

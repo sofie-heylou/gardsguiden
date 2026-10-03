@@ -41,6 +41,10 @@ interface PlaceResult {
   reviewCount: number | null;
   googleTypes: string[];
   source: string;
+  // Every search term that returned the place (scrape-places.js, autumn 2026
+  // onward); older scrape files carry only `source`.
+  foundBy?: string[];
+  businessStatus?: string;
   // Read by assess() for the urban-centre check. Declared rather than left to
   // the index signature so the field names are at least documented here; the
   // actual enforcement is the runtime assertion below, since parsed JSON
@@ -94,13 +98,18 @@ function classify(r: PlaceResult): { verdict: Verdict; reason: string } {
   if (relevance.verdict === "review" && signals.verdict === "keep") {
     return { verdict: "maybe", reason: `needs a look — ${relevance.reasons.join(", ")}` };
   }
+  // Farm shops close for the winter, so this is not a reject — but whether it
+  // is seasonal or winding down is a human call.
+  if (r.businessStatus === "CLOSED_TEMPORARILY" && signals.verdict === "keep") {
+    return { verdict: "maybe", reason: `${signals.reason} — Google says temporarily closed` };
+  }
   return signals;
 }
 
 function classifyGoogleSignals(r: PlaceResult): { verdict: Verdict; reason: string } {
   const name  = r.name  || "";
   const types = r.googleTypes || [];
-  const src   = r.source || "";
+  const src   = (r.foundBy ?? [r.source || ""]).join(" ");
 
   // ── Hard removes ────────────────────────────────────────────────────────────
 
@@ -206,7 +215,7 @@ for (const r of all) {
 //   contradicted → removed        verified → through (maybe promotes to keep)
 //   unclear      → maybe          human-kept names → untouched
 // Rows without a website (social-only farms) pass unchanged — Sofie's policy.
-const gateStats = { verified: 0, contradicted: 0, unclear: 0, promoted: 0, demoted: 0, keptList: 0, skipped: 0 };
+const gateStats = { verified: 0, contradicted: 0, unclear: 0, promoted: 0, demoted: 0, keptList: 0, skipped: 0, notTheirs: 0 };
 
 async function websiteGate() {
   type Tagged = PlaceResult & { _reason: string };
@@ -230,9 +239,21 @@ async function websiteGate() {
       }
 
       const audit = await auditFarm(
-        { id: row.place_id, name: row.name, lan: row.lan, website: row.website as string },
+        { id: row.place_id, name: row.name, lan: row.lan, kommun: row.kommun, website: row.website as string },
         true,
       );
+
+      // A page that is not theirs can neither vouch for them nor remove them.
+      // The bar is lower than the musteri lead tool's: there the URL came from
+      // web search, here it is what the owner gave Google.
+      const id = audit.identity;
+      if (id && id.verdict !== "confirmed" && !id.namesIt) {
+        gateStats.notTheirs++;
+        const why = id.verdict === "unconfirmed" ? "website never names the business" : `website: ${id.why}`;
+        row._reason += ` — ${why} — find the real site`;
+        maybe.push(row);
+        continue;
+      }
 
       if (audit.verdict === "contradicted") {
         gateStats.contradicted++;
@@ -271,7 +292,8 @@ if (NO_VERIFY) {
   console.log(
     `Website gate: ${gateStats.verified} verified (${gateStats.promoted} promoted), ` +
     `${gateStats.unclear} unclear (${gateStats.demoted} demoted), ` +
-    `${gateStats.contradicted} contradicted, ${gateStats.keptList} human-kept, ${gateStats.skipped} no-website\n`,
+    `${gateStats.contradicted} contradicted, ${gateStats.notTheirs} site not theirs (to maybe), ` +
+    `${gateStats.keptList} human-kept, ${gateStats.skipped} no-website\n`,
   );
 }
 

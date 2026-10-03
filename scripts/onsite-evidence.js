@@ -102,7 +102,10 @@ const RESELLER = [
 // Content that belongs to no farm at all — expired domains resurrected as
 // casino/spam pages (seen in the wild: attanasgard.se). A trust finding in its
 // own right, reported separately.
-const OFF_TOPIC = /casino|kasino|betting|spelautomater|gratissnurr|välkomstbonus|online slots|krypto ?valuta|viagra/;
+// Also the spam test in site-identity.js — one list, so a phrase learned from
+// one hijacked domain guards both checks. Bare "slots" stays out: Thorslunda
+// självplock offers pre-booked time slots.
+const OFF_TOPIC = /casino|kasino|betting|poker|spelautomater|slot machines?|gratissnurr|free spins|välkomstbonus|online slots|krypto ?valuta|viagra/;
 
 // ±40 chars of context around a match, so reports show the sentence, not just
 // which regex fired.

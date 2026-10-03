@@ -37,6 +37,8 @@ const fs = require('fs');
 const path = require('path');
 const { assess, SKIP_TYPES } = require('./farm-relevance');
 const { nameMatch } = require('./name-match');
+const { loadFeatures, locate } = require('./kommun-lookup');
+const { isArchipelago } = require('../src/lib/archipelago.js');
 const {
   SEARCH_TERMS, COUNTY_POINTS, COUNTY_KEYWORDS, KOMMUN_LIST, DEFAULT_SCRAPE_OUT,
 } = require('./scrape-config');
@@ -142,7 +144,17 @@ function categorizeProducts(text) {
   return products;
 }
 
-// ── County / kommun from address ──────────────────────────────────────────────
+// ── County / kommun ───────────────────────────────────────────────────────────
+// Coordinates first: the municipality polygons know where a farm is, while an
+// address string only knows what it happens to mention. The address guessers
+// stay as the fallback for a row without coordinates.
+
+let kommunFeatures = null;
+function locateRow(lat, lng) {
+  if (lat == null || lng == null) return null;
+  kommunFeatures = kommunFeatures || loadFeatures();
+  return locate(kommunFeatures, lng, lat);
+}
 
 function guessCounty(address, fallbackCounty) {
   if (!address) return fallbackCounty;
@@ -175,6 +187,10 @@ function guessKommun(address) {
  * filter-google-results.ts, which caps it at "maybe" so a human still sees it.
  */
 function preFilter(r) {
+  // A permanently closed place is never a lead, and it is the one thing
+  // Google knows for certain about it. Temporarily closed passes: farm shops
+  // close for the winter, and filter-google-results caps those at maybe.
+  if (r.business_status === 'CLOSED_PERMANENTLY') return { keep: false, reason: 'closed-permanently' };
   const types = r.types || [];
   const skip = types.find(t => SKIP_TYPES.has(t));
   if (skip) return { keep: false, reason: `skip-type:${skip}` };
@@ -207,7 +223,7 @@ function textSearch(query, lat, lng, pageToken) {
 function placeDetails(placeId) {
   return apiGet(DETAILS_URL, {
     place_id: placeId,
-    fields: 'name,formatted_address,geometry,website,formatted_phone_number,rating,user_ratings_total,types,opening_hours',
+    fields: 'name,formatted_address,geometry,website,formatted_phone_number,rating,user_ratings_total,types,opening_hours,business_status',
     language: 'sv',
     key: API_KEY,
   });
@@ -234,6 +250,9 @@ function buildRow(r, detail, term, fallbackCounty) {
   const name    = detail.name || r.name;
   const types   = r.types || [];
   const text    = [name, types.join(' ')].join(' ').toLowerCase();
+  const lat     = detail.geometry?.location?.lat ?? r.geometry?.location?.lat;
+  const lng     = detail.geometry?.location?.lng ?? r.geometry?.location?.lng;
+  const loc     = locateRow(lat, lng);
 
   return {
     // identification
@@ -241,10 +260,10 @@ function buildRow(r, detail, term, fallbackCounty) {
     name,
     description: '',
     address,
-    kommun: guessKommun(address),
-    lan: guessCounty(address, fallbackCounty),
-    lat: detail.geometry?.location?.lat ?? r.geometry?.location?.lat,
-    lng: detail.geometry?.location?.lng ?? r.geometry?.location?.lng,
+    kommun: loc?.kommun || guessKommun(address),
+    lan: loc?.countyName || guessCounty(address, fallbackCounty),
+    lat,
+    lng,
     // contact
     ...splitSocial(detail.website),
     phone:   detail.formatted_phone_number || '',
@@ -255,14 +274,19 @@ function buildRow(r, detail, term, fallbackCounty) {
     tastingRoom: /café|kafé|restaurang|musteri|vingård|bryggeri|destilleri/.test(text)
                  || types.includes('cafe') || types.includes('restaurant'),
     gardsförsäljningLicense: false,
-    isArchipelago: /skärgård|vaxholm|ljusterö|möja|sandhamn|\butö\b|ornö|dalarö|grinda|finnhamn|svartsö|runmarö|nämdö|ingmarsö/.test(address.toLowerCase()),
+    isArchipelago: isArchipelago(lat, lng),
     openingHours: (detail.opening_hours?.weekday_text || []).join(', '),
     season: '',
     // meta
     rating:      r.rating             ?? null,
     reviewCount: r.user_ratings_total ?? null,
     googleTypes: r.types              ?? [],
+    businessStatus: detail.business_status || r.business_status || '',
     source:      `google-places:${term}`,
+    // Every term that returned this place, not just the first. What lets a
+    // run be judged term by term: a term whose finds keep getting rejected in
+    // review is costing money and reviewer time for nothing.
+    foundBy:     [term],
   };
 }
 
@@ -421,18 +445,27 @@ async function main() {
   const doneCounties = new Set(
     fs.existsSync(doneFile) ? JSON.parse(fs.readFileSync(doneFile, 'utf8')) : []
   );
+  // Output written before foundBy existed carries only `source`; lift it once
+  // here so the search loop can rely on the list.
+  const withFoundBy = f => ({ ...f, foundBy: f.foundBy || [f.source.replace(/^google-places:/, '')] });
   if (fs.existsSync(args.out)) {
-    for (const f of JSON.parse(fs.readFileSync(args.out, 'utf8'))) seen.set(f.place_id, f);
+    for (const f of JSON.parse(fs.readFileSync(args.out, 'utf8'))) seen.set(f.place_id, withFoundBy(f));
     console.log(`[Resume] ${seen.size} existing results, ${doneCounties.size} county centres already done`);
   }
   if (fs.existsSync(noWebsiteFile)) {
     for (const f of JSON.parse(fs.readFileSync(noWebsiteFile, 'utf8'))) {
-      noWebsite.set(f.place_id, f);
+      noWebsite.set(f.place_id, withFoundBy(f));
       dropped.add(f.place_id);
     }
   }
 
   let prefilterDrops = 0;
+
+  // Per-term yield, so a run can show which terms find farms and which mostly
+  // find junk. Counts first sightings only; a place's later sightings are in
+  // its foundBy list.
+  const termStatsFile = args.out.replace(/\.json$/, '-term-stats.json');
+  const termStats = fs.existsSync(termStatsFile) ? JSON.parse(fs.readFileSync(termStatsFile, 'utf8')) : {};
 
   for (const point of points) {
     const pointKey = `${point.name}:${point.lat}:${point.lng}`;
@@ -447,6 +480,7 @@ async function main() {
       let pageNum = 1;
       let token = null;
       let termHits = 0;
+      const stat = termStats[term] ??= { new: 0, prefilterDropped: 0, noWebsite: 0, withWebsite: 0, repeats: 0 };
 
       do {
         if (token) await sleep(2000); // Google requires ~2s before next_page_token works
@@ -462,10 +496,17 @@ async function main() {
         if (data.status !== 'OK') { console.log(`  [${term}] status=${data.status}`); break; }
 
         for (const r of data.results || []) {
-          if (seen.has(r.place_id) || dropped.has(r.place_id)) continue;
+          const known = seen.get(r.place_id) || noWebsite.get(r.place_id);
+          if (known) {
+            if (!known.foundBy.includes(term)) known.foundBy.push(term);
+            stat.repeats++;
+            continue;
+          }
+          if (dropped.has(r.place_id)) { stat.repeats++; continue; }
+          stat.new++;
 
           const pre = preFilter(r);
-          if (!pre.keep) { dropped.add(r.place_id); prefilterDrops++; continue; }
+          if (!pre.keep) { dropped.add(r.place_id); prefilterDrops++; stat.prefilterDropped++; continue; }
 
           await sleep(SLEEP_MS);
           const det = await placeDetails(r.place_id);
@@ -478,10 +519,12 @@ async function main() {
           if (!detail.website) {
             noWebsite.set(r.place_id, buildRow(r, detail, term, point.name));
             dropped.add(r.place_id);
+            stat.noWebsite++;
             continue;
           }
 
           seen.set(r.place_id, buildRow(r, detail, term, point.name));
+          stat.withWebsite++;
           termHits++;
         }
 
@@ -497,6 +540,7 @@ async function main() {
     fs.writeFileSync(doneFile, JSON.stringify([...doneCounties], null, 2));
     saveProgress(args.out, seen);
     saveProgress(noWebsiteFile, noWebsite);
+    fs.writeFileSync(termStatsFile, JSON.stringify(termStats, null, 2));
     console.log(`  ✓ Saved ${seen.size} total so far (+${noWebsite.size} without website)`);
   }
 
@@ -516,6 +560,7 @@ async function main() {
     console.log(`  ${county.padEnd(20)} ${n}`);
   }
   console.log(`\nSaved to ${args.out}`);
+  console.log(`Per-term yield in ${path.basename(termStatsFile)}`);
 }
 
 if (require.main === module) {

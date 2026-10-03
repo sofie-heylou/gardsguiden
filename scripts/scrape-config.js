@@ -87,11 +87,23 @@ const COUNTY_POINTS = [
   { name: 'Kronoberg',       lat: 56.88, lng: 14.81 },
   { name: 'Jönköping',       lat: 57.78, lng: 14.16 },
   { name: 'Östergötland',    lat: 58.41, lng: 15.62 },
+  // Expansion counties, not yet on the site (autumn 2026). Scraped into
+  // review files only; rows are filed by coordinates (kommun-lookup), so
+  // these names only steer the search. Jämtland is large and thin: Östersund
+  // covers Storsjöbygden, the second point the Åre valley, the third
+  // Härjedalen.
+  { name: 'Örebro',          lat: 59.35, lng: 15.10 },
+  { name: 'Värmland',        lat: 59.40, lng: 13.40 }, // Karlstad / Vänern shore
+  { name: 'Värmland',        lat: 60.05, lng: 12.90 }, // Arvika / Fryksdalen / Torsby
+  { name: 'Jämtland',        lat: 63.18, lng: 14.64 }, // Östersund / Storsjön
+  { name: 'Jämtland',        lat: 63.35, lng: 13.30 }, // Åre / Järpen
+  { name: 'Jämtland',        lat: 62.10, lng: 14.20 }, // Härjedalen / Sveg
 ];
 
-// Address → county guessing. Lowercase substrings; first county with a hit
-// wins, the search centre's county is the fallback. Known-imperfect (see
-// SCRAPER-PLAN backlog: retire in favour of coordinate-based kommun-lookup).
+// Address → county guessing, now only the fallback for a row without
+// coordinates: scrape-places.js files rows by kommun-lookup first. Lowercase
+// substrings; first county with a hit wins, the search centre's county is the
+// last resort.
 const COUNTY_KEYWORDS = {
   Stockholm: [
     'stockholms', 'norrtälje', 'värmdö', 'nacka', 'haninge', 'tyresö',

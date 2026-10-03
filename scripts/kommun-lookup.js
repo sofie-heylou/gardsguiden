@@ -9,8 +9,8 @@ const fs = require("fs");
 const path = require("path");
 const { containsPoint } = require("../src/lib/pointInPolygon.js");
 
-// SCB län codes → the site's county names (the 13 counties we cover).
-const LAN_CODE_TO_NAME = {
+// SCB län code → short county name, for all 21 counties.
+const LAN_NAMES = {
   "01": "Stockholm",
   "03": "Uppsala",
   "04": "Södermanland",
@@ -23,8 +23,26 @@ const LAN_CODE_TO_NAME = {
   "12": "Skåne",
   "13": "Halland",
   "14": "Västra Götaland",
+  "17": "Värmland",
+  "18": "Örebro",
   "19": "Västmanland",
+  "20": "Dalarna",
+  "21": "Gävleborg",
+  "22": "Västernorrland",
+  "23": "Jämtland",
+  "24": "Västerbotten",
+  "25": "Norrbotten",
 };
+
+// The counties the site shows. `locate` reports `lan` only for these, because
+// the cleanup tools read `lan` as "a county the site can show" and would
+// otherwise propose moves into counties with no pages yet. The scraper files
+// rows by `countyName`, so a farm in a county still being built (Örebro,
+// Värmland, Jämtland) lands under its real county. Opening a county on the
+// site means adding its code here.
+const COVERED_LAN_CODES = new Set([
+  "01", "03", "04", "05", "06", "07", "08", "09", "10", "12", "13", "14", "19",
+]);
 
 // The boundaries are simplified, so coastal and skärgård farms can fall just
 // outside every polygon. For those, take the kommun with the nearest boundary
@@ -67,8 +85,9 @@ function kmBetween(lat1, lng1, lat2, lng2) {
 }
 
 /**
- * Returns { kommun, lan, lanCode, km } for a coordinate, where `lan` is one of
- * the site's 13 county names or undefined when the point lies outside them.
+ * Returns { kommun, lan, lanCode, countyName, km } for a coordinate, where
+ * `lan` is one of the site's 13 county names or undefined when the point lies
+ * outside them, and `countyName` names the county whether covered or not.
  * `km` is 0 for a direct polygon hit, otherwise the distance to the nearest
  * boundary vertex.
  */
@@ -76,12 +95,14 @@ function locate(features, lng, lat) {
   const hit = features.find((f) => containsPoint(f.geometry, lng, lat));
   const { feature, km } = hit ? { feature: hit, km: 0 } : nearestFeature(features, lng, lat);
   if (!feature) return null;
+  const code = feature.properties.lan_code;
   return {
     kommun: feature.properties.kom_namn,
-    lan: LAN_CODE_TO_NAME[feature.properties.lan_code],
-    lanCode: feature.properties.lan_code,
+    lan: COVERED_LAN_CODES.has(code) ? LAN_NAMES[code] : undefined,
+    lanCode: code,
+    countyName: LAN_NAMES[code],
     km: Math.round(km * 10) / 10,
   };
 }
 
-module.exports = { LAN_CODE_TO_NAME, loadFeatures, locate, kmBetween };
+module.exports = { loadFeatures, locate, kmBetween };

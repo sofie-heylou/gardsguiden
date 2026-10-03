@@ -28,7 +28,7 @@
 const fs = require('fs');
 const path = require('path');
 const { fetchPage } = require('./verify-onsite');
-const { normalize, distinctiveTokens, nameMatch } = require('./name-match');
+const { DIRECTORIES, hostMatchesName, titleNames, checkIdentity } = require('./site-identity');
 
 const ROOT = path.join(__dirname, '..');
 const DEFAULT_IN = path.join(ROOT, 'data/tmp', 'musterier-enriched.json');
@@ -36,12 +36,6 @@ const DEFAULT_OUT = path.join(ROOT, 'data/tmp', 'musterier-verified.json');
 
 const DELAY_MS = 700;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
-
-const JUNK = /casino|betting|poker|\bslots?\b|domain (is )?for sale|köp denna domän|buy this domain|parkerad|under construction|loopia parking|this domain is/i;
-
-// Directory and registry sites: real pages about the business, but not the
-// business's own presence, and never what we want to link to.
-const DIRECTORIES = /musterier\.se|hitta\.se|merinfo\.se|ratsit\.se|allabolag\.se|eniro\.se|bolagsfakta|118100|yumpu|visitdalarna|matkluster|proff\.se|linkedin\.com|booking\.com|tripadvisor/i;
 
 function parseArgs(argv) {
   const args = { in: DEFAULT_IN, out: DEFAULT_OUT, results: null };
@@ -64,60 +58,23 @@ function parseArgs(argv) {
  *   rejected   — dead, junk, a directory, or somebody else
  */
 function checkWebsite(page, name, ort) {
-  if (!page || page.status === 0) return { verdict: 'rejected', why: `unreachable (${page?.error || 'no response'})` };
-  if (page.status >= 400) return { verdict: 'rejected', why: `HTTP ${page.status}` };
+  const id = checkIdentity(page, name, ort);
+  if (id.verdict === 'confirmed') return { verdict: 'confirmed', why: id.why };
+  if (id.verdict !== 'unconfirmed') return { verdict: 'rejected', why: id.why };
 
-  const raw = page.text || '';
-  if (!raw.trim()) return { verdict: 'rejected', why: 'empty page' };
-  if (JUNK.test(raw)) return { verdict: 'rejected', why: 'parked or spam content' };
-
-  const title = raw.split(/[|–—·]|\s{2,}/)[0].slice(0, 120).trim();
-
-  // A title that spells out the whole business name settles it, and has to be
-  // checked before nameMatch: nameMatch removes the town first, so a business
-  // named after its town ("Uppsala Musteri", "Lidingö Musteri") has no words
-  // left and can never match its own site. Removing the town is right when
-  // telling two businesses apart; it is wrong when confirming a page is the
-  // one it says it is.
-  if (normalize(title).includes(normalize(name))) {
-    return { verdict: 'confirmed', why: `title names it: ${title}` };
-  }
-  if (nameMatch(name, title, ort)) return { verdict: 'confirmed', why: `title: ${title}` };
-
-  const text = raw.toLowerCase();
-  const ortWords = new Set(normalize(ort).split(' ').filter(Boolean));
-  const tokens = [...distinctiveTokens(normalize(name))].filter(t => !ortWords.has(t));
-  const hit = tokens.filter(t => text.includes(t));
-  const saysMusteri = /musteri|äppelmust|äpplemust|mustning|cider|pressa äpplen/i.test(raw);
-
-  if (hit.length && saysMusteri) return { verdict: 'confirmed', why: `names "${hit.join(', ')}" and describes musteri work` };
+  // The name alone is not enough here: the page also has to be about musteri
+  // work, because these URLs came from web search, not from the business.
+  const saysMusteri = /musteri|äppelmust|äpplemust|mustning|cider|pressa äpplen/i.test(page.text);
+  if (id.tokensHit.length && saysMusteri) return { verdict: 'confirmed', why: `names "${id.tokensHit.join(', ')}" and describes musteri work` };
 
   // The domain itself is evidence when it spells the business name and the page
   // is genuinely about musteri work — bällstaträdgård.se (punycode) for Bällsta
   // Trädgård, lilla-musteriet.se for Lilla Musteriet i Borgholm.
-  const host = decodeHost(page.finalUrl || page.url);
-  if (saysMusteri && host && hostMatchesName(host, name)) {
-    return { verdict: 'confirmed', why: `domain ${host} spells the name; page describes musteri work` };
+  if (saysMusteri && id.hostMatches) {
+    return { verdict: 'confirmed', why: 'domain spells the name; page describes musteri work' };
   }
   if (saysMusteri) return { verdict: 'musteri', why: `musteri page, but does not name ${name}` };
   return { verdict: 'rejected', why: `no mention of ${name} or of musteri work` };
-}
-
-/** Internationalised domains arrive as punycode; bällstaträdgård.se reads as xn--… */
-function decodeHost(url) {
-  try {
-    const host = new URL(url).hostname.replace(/^www\./, '');
-    // Node's URL keeps punycode; domainToUnicode restores the Swedish letters.
-    return require('url').domainToUnicode(host) || host;
-  } catch { return ''; }
-}
-
-function hostMatchesName(host, name) {
-  const stem = normalize(host.replace(/\.[a-z.]+$/, ''));
-  const joined = stem.split(' ').join('');
-  const target = normalize(name).split(' ').join('');
-  if (!joined || !target) return false;
-  return joined === target || target.includes(joined) || joined.includes(target);
 }
 
 /**
@@ -137,8 +94,7 @@ function checkSocial(page, name, ort, url) {
   if (page.status >= 400) return { verdict: 'rejected', why: `HTTP ${page.status}` };
 
   const title = (page.text || '').split(/[|·•]/)[0].replace(/\(@[^)]*\)/, '').trim().slice(0, 120);
-  if (title && normalize(title).includes(normalize(name))) return { verdict: 'confirmed', why: `title: ${title}` };
-  if (title && nameMatch(name, title, ort)) return { verdict: 'confirmed', why: `title: ${title}` };
+  if (titleNames(title, name, ort)) return { verdict: 'confirmed', why: `title: ${title}` };
   if (handleOk) return { verdict: 'confirmed', why: `handle @${handle} matches the name` };
   if (!title) return { verdict: 'unconfirmed', why: 'no title and handle does not match' };
   return { verdict: 'unconfirmed', why: `title "${title}" does not match` };
